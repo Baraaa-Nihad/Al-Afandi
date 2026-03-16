@@ -34,9 +34,7 @@ class _RiderRideDetailsScreenState extends State<RiderRideDetailsScreen> {
     if (!Get.isRegistered<RideMapController>(tag: 'rider')) Get.put(RideMapController(), tag: 'rider');
     if (!Get.isRegistered<MessageRepo>(tag: 'rider')) Get.put(MessageRepo(apiClient: Get.find()), tag: 'rider');
     if (!Get.isRegistered<RideMessageController>(tag: 'rider')) Get.put(RideMessageController(repo: Get.find(tag: 'rider')), tag: 'rider');
-    final controller = Get.isRegistered<RideDetailsController>(tag: 'rider')
-        ? Get.find<RideDetailsController>(tag: 'rider')
-        : Get.put(RideDetailsController(repo: Get.find(tag: 'rider'), mapController: Get.find(tag: 'rider')), tag: 'rider');
+    final controller = Get.isRegistered<RideDetailsController>(tag: 'rider') ? Get.find<RideDetailsController>(tag: 'rider') : Get.put(RideDetailsController(repo: Get.find(tag: 'rider'), mapController: Get.find(tag: 'rider')), tag: 'rider');
     if (!Get.isRegistered<PusherRideController>(tag: 'rider')) Get.put(PusherRideController(apiClient: Get.find(), rideMessageController: Get.find(tag: 'rider'), rideDetailsController: Get.find(tag: 'rider'), rideID: widget.rideId), tag: 'rider');
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {

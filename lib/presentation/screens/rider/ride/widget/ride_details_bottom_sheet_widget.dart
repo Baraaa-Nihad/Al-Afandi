@@ -13,13 +13,10 @@ import 'package:ovoride/core/utils/util.dart';
 import 'package:ovoride/data/controller/rider/ride/ride_details/ride_details_controller.dart';
 import 'package:ovoride/data/controller/rider/ride/ride_meassage/ride_meassage_controller.dart';
 import 'package:ovoride/data/model/global/app/ride_model.dart';
-import 'package:ovoride/data/services/api_client.dart';
 import 'package:ovoride/data/services/download_service.dart';
-import 'package:ovoride/environment.dart';
 import 'package:ovoride/presentation/components/bottom-sheet/bottom_sheet_bar.dart';
 import 'package:ovoride/presentation/components/bottom-sheet/custom_bottom_sheet.dart';
 import 'package:ovoride/presentation/components/buttons/rounded_button.dart';
-import 'package:ovoride/presentation/components/card/inner_shadow_container.dart';
 import 'package:ovoride/presentation/components/column_widget/card_column.dart';
 import 'package:ovoride/presentation/components/divider/custom_divider.dart';
 import 'package:ovoride/presentation/components/divider/custom_spacer.dart';
@@ -77,7 +74,6 @@ class RiderRideDetailsBottomSheetWidget extends StatelessWidget {
                 clipBehavior: Clip.none,
                 controller: scrollController,
                 children: [
-                  // Drag Handle
                   const Center(child: BottomSheetBar()),
                   const CustomSpacer(height: Dimensions.space15),
 
@@ -97,6 +93,8 @@ class RiderRideDetailsBottomSheetWidget extends StatelessWidget {
                     _buildArrivingHeader(),
                     const CustomSpacer(height: Dimensions.space20),
                     _buildSecurityCodeSection(ride),
+                    const CustomSpacer(height: Dimensions.space15),
+                    _buildInfoCard(buildRideCounterWidget(ride, currency)),
                     if (ride.driver != null) ...[
                       const CustomSpacer(height: Dimensions.space20),
                       _buildInfoCard(DriverProfileWidget(
@@ -139,6 +137,8 @@ class RiderRideDetailsBottomSheetWidget extends StatelessWidget {
                   // ---------------- STATUS: PAYMENT REQUESTED ----------------
                   if (ride.status == AppStatus.RIDE_PAYMENT_REQUESTED) ...[
                     const CustomSpacer(height: Dimensions.space40),
+                    _buildInfoCard(buildRideCounterWidget(ride, currency)),
+                    const CustomSpacer(height: Dimensions.space15),
                     _buildPaymentSummaryCard(controller, ride, context),
                     const CustomSpacer(height: Dimensions.space20),
                     if (ride.driver != null)
@@ -155,7 +155,13 @@ class RiderRideDetailsBottomSheetWidget extends StatelessWidget {
                   // ---------------- STATUS: COMPLETED ----------------
                   if (ride.status == AppStatus.RIDE_COMPLETED) ...[
                     const CustomSpacer(height: Dimensions.space40),
-                    _buildInfoCard(buildRideLocationAndDestinationWidget(ride)),
+                    _buildInfoCard(Column(
+                      children: [
+                        buildRideCounterWidget(ride, currency),
+                        const CustomDivider(space: Dimensions.space15),
+                        buildRideLocationAndDestinationWidget(ride),
+                      ],
+                    )),
                     if (ride.driver != null) ...[
                       const CustomSpacer(height: Dimensions.space15),
                       _buildInfoCard(DriverProfileWidget(
@@ -169,20 +175,31 @@ class RiderRideDetailsBottomSheetWidget extends StatelessWidget {
                     _buildCompletedActions(controller, ride, context),
                   ],
 
-                  // ---------------- STATUS: CANCELED ----------------
                   if (ride.status == AppStatus.RIDE_CANCELED) ...[
                     const CustomSpacer(height: Dimensions.space40),
-                    _buildInfoCard(buildRideLocationAndDestinationWidget(ride)),
-                    const CustomSpacer(height: Dimensions.space15),
-                    _buildInfoCard(buildRideCounterWidget(ride, currency)),
+                    _buildInfoCard(Column(
+                      children: [
+                        buildRideLocationAndDestinationWidget(ride),
+                        const CustomDivider(space: Dimensions.space50),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: Dimensions.space5),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text("اتفركشت وما فيش نصيب", style: boldDefault.copyWith(color: MyColor.redCancelTextColor)),
+                              const SizedBox(width: 8),
+                              const Icon(Icons.cancel_outlined, color: MyColor.redCancelTextColor, size: 18),
+                            ],
+                          ),
+                        ),
+                      ],
+                    )),
                   ],
 
                   const CustomSpacer(height: Dimensions.space30),
                 ],
               ),
             ),
-
-            // Top Status Overlay (Floating effect)
             if (_shouldShowTopOverlay(ride.status ?? "")) _buildTopStatusOverlay(ride),
           ],
         );
@@ -225,7 +242,7 @@ class RiderRideDetailsBottomSheetWidget extends StatelessWidget {
   Widget _buildSearchingView() {
     return Column(
       children: [
-        SearchingForRideAnimation(),
+        const SearchingForRideAnimation(),
         const CustomSpacer(height: Dimensions.space10),
         HeaderText(
           text: MyStrings.searchingForDriver.tr,
@@ -300,9 +317,9 @@ class RiderRideDetailsBottomSheetWidget extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              HeaderText(text: MyStrings.securityCode, style: regularDefault.copyWith(color: MyColor.getBodyTextColor())),
+              HeaderText(text: MyStrings.securityCode.tr, style: regularDefault.copyWith(color: MyColor.getBodyTextColor())),
               const CustomSpacer(height: 5),
-              Text("شارك مع الكابتن", style: regularSmall.copyWith(color: MyColor.getPrimaryColor())),
+              Text("شارك الكود مع الكابتن", style: regularSmall.copyWith(color: MyColor.getPrimaryColor())),
             ],
           ),
           Row(
@@ -437,7 +454,7 @@ class RiderRideDetailsBottomSheetWidget extends StatelessWidget {
     return Center(
       child: Column(
         children: [
-          SearchingForRideAnimation(),
+          const SearchingForRideAnimation(),
           const CustomSpacer(height: 10),
           SmallText(text: MyStrings.driverArriveMsg.tr, textStyle: regularDefault.copyWith(color: MyColor.getBodyTextColor())),
         ],
@@ -473,9 +490,6 @@ class RiderRideDetailsBottomSheetWidget extends StatelessWidget {
     );
   }
 
-  // --- Re-using existing builds from your code ---
-  // (Assuming these are defined within the class or available globally as in your snippet)
-
   CustomTimeLine buildRideLocationAndDestinationWidget(RideModel ride) {
     return CustomTimeLine(
       firstIndicatorColor: MyColor.getPrimaryColor(),
@@ -501,7 +515,6 @@ class RiderRideDetailsBottomSheetWidget extends StatelessWidget {
   }
 
   Row buildMessageOrCallWidget(RideModel ride) {
-    // Keep your existing Row logic here, but wrapped in Container/Decoration for consistent UI
     return Row(
       children: [
         Expanded(
@@ -542,23 +555,17 @@ class RiderRideDetailsBottomSheetWidget extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        CardColumn(header: MyStrings.distance.tr, body: "${ride.distance} KM"),
-        CardColumn(header: MyStrings.duration.tr, body: "${ride.duration}"),
-        CardColumn(header: "الأجرة", body: "$currency${ride.amount}"),
+        CardColumn(header: MyStrings.distance.tr, body: "${ride.distance ?? '0'} KM"),
+        CardColumn(header: MyStrings.duration.tr, body: ride.duration ?? '0'),
+        CardColumn(header: "الأجرة", body: "$currency${ride.amount ?? '0'}"),
       ],
     );
   }
 }
 
-// Helper methods for spacing
-Widget spaceDown(double height) => SizedBox(height: height);
-Widget spaceSide(double width) => SizedBox(width: width);
-
 class CustomSpacer extends StatelessWidget {
   final double? height;
   final double? width;
-
-  // يمكنك إضافة قيم افتراضية أو تركها اختيارية
   const CustomSpacer({super.key, this.height, this.width});
 
   @override
