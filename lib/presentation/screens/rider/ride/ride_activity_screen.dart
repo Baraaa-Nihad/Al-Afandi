@@ -54,7 +54,7 @@ class _RiderRideActivityScreenState extends State<RiderRideActivityScreen> with 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: MyColor.secondaryScreenBgColor,
+      backgroundColor: const Color.fromARGB(45, 164, 172, 179),
       appBar: CustomAppBar(
         title: (Get.arguments ?? "") == "" ? MyStrings.activity.tr : (Get.arguments == 1 ? MyStrings.city.tr : MyStrings.interCity.tr),
         backBtnPress: () {

@@ -200,7 +200,8 @@ class _RideMessageScreenState extends State<RideMessageScreen> {
           ),
         );
 
-    return GetBuilder<RideMessageController>(tag: 'driver', 
+    return GetBuilder<RideMessageController>(
+      tag: 'driver',
       builder: (controller) {
         return AnnotatedRegionWidget(
           child: Scaffold(
