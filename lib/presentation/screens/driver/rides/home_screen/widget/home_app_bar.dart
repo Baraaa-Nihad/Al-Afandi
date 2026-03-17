@@ -9,11 +9,9 @@ import 'package:ovoride/core/utils/my_strings.dart';
 import 'package:ovoride/core/utils/style.dart';
 import 'package:ovoride/core/utils/url_container.dart';
 import 'package:ovoride/data/controller/driver/dashboard/dashboard_controller.dart';
-import 'package:ovoride/presentation/components/divider/custom_spacer.dart';
 import 'package:ovoride/presentation/components/image/custom_svg_picture.dart';
 import 'package:ovoride/presentation/components/image/my_network_image_widget.dart';
 import 'package:ovoride/presentation/components/switch/lite_rolling_switch.dart';
-import 'package:ovoride/presentation/components/text/header_text.dart';
 
 class HomeScreenAppBar extends StatelessWidget {
   final DashBoardController controller; // أضفت final للممارسة البرمجية الصحيحة

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'dart:ui';
 
 class LiteRollingSwitch extends StatefulWidget {
   final bool tValue;

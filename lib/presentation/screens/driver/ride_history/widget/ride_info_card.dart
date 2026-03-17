@@ -1,4 +1,3 @@
-import 'package:ovoride/core/helper/date_converter.dart';
 import 'package:ovoride/core/helper/string_format_helper.dart';
 import 'package:ovoride/core/route/route.dart';
 import 'package:ovoride/core/utils/app_status.dart';
@@ -6,15 +5,11 @@ import 'package:ovoride/core/utils/my_color.dart';
 import 'package:ovoride/core/utils/my_icons.dart';
 import 'package:ovoride/core/utils/my_strings.dart';
 import 'package:ovoride/core/utils/style.dart';
-import 'package:ovoride/core/utils/url_container.dart';
 import 'package:ovoride/core/utils/util.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ovoride/data/controller/driver/ride/all_ride/all_ride_controller.dart';
 import 'package:ovoride/data/model/global/ride/ride_model.dart';
-import 'package:ovoride/data/services/api_client.dart';
-import 'package:ovoride/data/services/download_service.dart';
-import 'package:ovoride/environment.dart';
 import 'package:ovoride/presentation/components/bottom-sheet/custom_bottom_sheet.dart';
 import 'package:ovoride/presentation/components/buttons/rounded_button.dart';
 import 'package:ovoride/presentation/components/card/custom_app_card.dart';
@@ -59,7 +54,7 @@ class _RideInfoCardState extends State<RideInfoCard> {
       String period = dt.hour >= 12 ? "مساءاً" : "صباحاً";
       int hour = dt.hour > 12 ? dt.hour - 12 : (dt.hour == 0 ? 12 : dt.hour);
       String minute = dt.minute.toString().padLeft(2, '0');
-      String timeStr = _toArabicNumbers("$hour:$minute") + " $period";
+      String timeStr = "${_toArabicNumbers("$hour:$minute")} $period";
       String dateStr = _toArabicNumbers("${dt.day.toString().padLeft(2, '0')}-${dt.month.toString().padLeft(2, '0')}-${dt.year}");
 
       return Column(

@@ -37,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Get.find<LoginController>().remember = true; // تم تفعيلها افتراضياً كما فعلنا للركاب
+      Get.find<LoginController>().remember = true;
     });
   }
 
@@ -50,246 +50,287 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Scaffold(
           backgroundColor: MyColor.colorWhite,
           body: GetBuilder<LoginController>(
-            builder: (controller) => SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  AuthBackgroundWidget(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: Dimensions.space20, vertical: Dimensions.space10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start, // تعديل المحاذاة لليسار
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          spaceDown(Dimensions.space15),
-                          Center(
-                            // اللوجو فقط يبقى في المنتصف
-                            child: Image.asset(
-                              MyImages.appLogoWhite,
-                              color: MyColor.colorWhite,
-                              width: MediaQuery.of(context).size.width / 2.5,
-                            ),
-                          ),
-                          spaceDown(Dimensions.space15),
-                          Text(
-                            MyStrings.loginScreenTitle, // تخصيص للسائق
-                            style: boldExtraLarge.copyWith(
-                              fontSize: 32,
-                              color: MyColor.colorWhite,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          spaceDown(Dimensions.space5),
-                          Text(
-                            MyStrings.loginScreenSubTitle,
-                            style: regularDefault.copyWith(
-                              color: MyColor.colorWhite,
-                              fontSize: Dimensions.fontLarge,
-                            ),
-                          ),
-                          spaceDown(Dimensions.space40),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Transform.translate(
-                    offset: Offset(0, -Dimensions.space20),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: MyColor.colorWhite,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(Dimensions.radius25),
-                          topRight: Radius.circular(Dimensions.radius25),
+            builder: (controller) {
+              return SafeArea(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      physics: const ClampingScrollPhysics(),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight,
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: MyColor.colorBlack.withValues(alpha: 0.05),
-                            offset: const Offset(0, -30),
-                            blurRadius: 15,
-                            spreadRadius: -3,
-                          ),
-                        ],
-                      ),
-                      padding: EdgeInsets.symmetric(horizontal: Dimensions.space15, vertical: Dimensions.space15),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          spaceDown(Dimensions.space15),
-                          SocialAuthSection(),
-                          Form(
-                            key: formKey,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                spaceDown(Dimensions.space20),
-                                CustomTextField(
-                                  controller: controller.emailController,
-                                  hintText: MyStrings.usernameOrEmail.tr,
-                                  onChanged: (value) {},
-                                  focusNode: controller.emailFocusNode,
-                                  nextFocus: controller.passwordFocusNode,
-                                  textInputType: TextInputType.emailAddress,
-                                  inputAction: TextInputAction.next,
-                                  prefixIcon: Padding(
-                                    padding: EdgeInsetsDirectional.only(start: Dimensions.space12, end: Dimensions.space8),
-                                    child: CustomSvgPicture(
-                                      image: MyIcons.user,
-                                      color: MyColor.primaryColor,
-                                      height: Dimensions.space30,
-                                    ),
-                                  ),
-                                  validator: (value) {
-                                    if (value!.isEmpty) {
-                                      return MyStrings.fieldErrorMsg.tr;
-                                    } else {
-                                      return null;
-                                    }
-                                  },
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            AuthBackgroundWidget(
+                              child: Container(
+                                width: double.infinity,
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: Dimensions.space20,
+                                  vertical: Dimensions.space10,
                                 ),
-                                spaceDown(Dimensions.space20),
-                                CustomTextField(
-                                  hintText: MyStrings.password.tr,
-                                  controller: controller.passwordController,
-                                  focusNode: controller.passwordFocusNode,
-                                  onChanged: (value) {},
-                                  isShowSuffixIcon: true,
-                                  isPassword: true,
-                                  textInputType: TextInputType.text,
-                                  inputAction: TextInputAction.done,
-                                  prefixIcon: Padding(
-                                    padding: EdgeInsetsDirectional.only(start: Dimensions.space12, end: Dimensions.space8),
-                                    child: CustomSvgPicture(
-                                      image: MyIcons.password,
-                                      color: MyColor.primaryColor,
-                                      height: Dimensions.space30,
-                                    ),
-                                  ),
-                                  validator: (value) {
-                                    if (value!.isEmpty) {
-                                      return MyStrings.fieldErrorMsg.tr;
-                                    } else {
-                                      return null;
-                                    }
-                                  },
-                                ),
-                                spaceDown(Dimensions.space15),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
-                                    Row(
-                                      children: [
-                                        SizedBox(
-                                          width: 28,
-                                          height: 28,
-                                          child: Checkbox(
-                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Dimensions.space5)),
-                                            activeColor: MyColor.primaryColor,
-                                            checkColor: MyColor.colorWhite,
-                                            value: controller.remember,
-                                            side: WidgetStateBorderSide.resolveWith(
-                                              (states) => BorderSide(
-                                                width: 2.0,
-                                                color: controller.remember ? MyColor.primaryColor : MyColor.getTextFieldDisableBorder(),
+                                    spaceDown(Dimensions.space15),
+                                    Center(
+                                      child: Image.asset(
+                                        MyImages.appLogoWhite,
+                                        color: MyColor.colorWhite,
+                                        width: MediaQuery.of(context).size.width / 2.5,
+                                      ),
+                                    ),
+                                    spaceDown(Dimensions.space15),
+                                    Text(
+                                      MyStrings.loginScreenTitle,
+                                      style: boldExtraLarge.copyWith(
+                                        fontSize: 32,
+                                        color: MyColor.colorWhite,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    spaceDown(Dimensions.space5),
+                                    Text(
+                                      MyStrings.loginScreenSubTitle,
+                                      style: regularDefault.copyWith(
+                                        color: MyColor.colorWhite,
+                                        fontSize: Dimensions.fontLarge,
+                                      ),
+                                    ),
+                                    spaceDown(Dimensions.space40),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Transform.translate(
+                              offset: Offset(0, -Dimensions.space20),
+                              child: Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: MyColor.colorWhite,
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(Dimensions.radius25),
+                                    topRight: Radius.circular(Dimensions.radius25),
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: MyColor.colorBlack.withValues(alpha: 0.05),
+                                      offset: const Offset(0, -30),
+                                      blurRadius: 15,
+                                      spreadRadius: -3,
+                                    ),
+                                  ],
+                                ),
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: Dimensions.space15,
+                                  vertical: Dimensions.space15,
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    spaceDown(Dimensions.space15),
+                                    const SocialAuthSection(),
+                                    Form(
+                                      key: formKey,
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          spaceDown(Dimensions.space20),
+                                          CustomTextField(
+                                            controller: controller.emailController,
+                                            hintText: MyStrings.usernameOrEmail.tr,
+                                            onChanged: (value) {},
+                                            focusNode: controller.emailFocusNode,
+                                            nextFocus: controller.passwordFocusNode,
+                                            textInputType: TextInputType.emailAddress,
+                                            inputAction: TextInputAction.next,
+                                            prefixIcon: Padding(
+                                              padding: EdgeInsetsDirectional.only(
+                                                start: Dimensions.space12,
+                                                end: Dimensions.space8,
+                                              ),
+                                              child: CustomSvgPicture(
+                                                image: MyIcons.user,
+                                                color: MyColor.primaryColor,
+                                                height: Dimensions.space30,
                                               ),
                                             ),
-                                            onChanged: (value) => controller.changeRememberMe(),
+                                            validator: (value) {
+                                              if (value == null || value.isEmpty) {
+                                                return MyStrings.fieldErrorMsg.tr;
+                                              } else {
+                                                return null;
+                                              }
+                                            },
                                           ),
-                                        ),
-                                        spaceSide(Dimensions.space8),
-                                        InkWell(
-                                          onTap: () => controller.changeRememberMe(),
-                                          child: DefaultText(
-                                            text: MyStrings.rememberMe.tr,
-                                            textColor: MyColor.getBodyTextColor(),
-                                            fontSize: 14,
+                                          spaceDown(Dimensions.space20),
+                                          CustomTextField(
+                                            hintText: MyStrings.password.tr,
+                                            controller: controller.passwordController,
+                                            focusNode: controller.passwordFocusNode,
+                                            onChanged: (value) {},
+                                            isShowSuffixIcon: true,
+                                            isPassword: true,
+                                            textInputType: TextInputType.text,
+                                            inputAction: TextInputAction.done,
+                                            prefixIcon: Padding(
+                                              padding: EdgeInsetsDirectional.only(
+                                                start: Dimensions.space12,
+                                                end: Dimensions.space8,
+                                              ),
+                                              child: CustomSvgPicture(
+                                                image: MyIcons.password,
+                                                color: MyColor.primaryColor,
+                                                height: Dimensions.space30,
+                                              ),
+                                            ),
+                                            validator: (value) {
+                                              if (value == null || value.isEmpty) {
+                                                return MyStrings.fieldErrorMsg.tr;
+                                              } else {
+                                                return null;
+                                              }
+                                            },
                                           ),
-                                        ),
-                                      ],
+                                          spaceDown(Dimensions.space15),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  SizedBox(
+                                                    width: 28,
+                                                    height: 28,
+                                                    child: Checkbox(
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.circular(
+                                                          Dimensions.space5,
+                                                        ),
+                                                      ),
+                                                      activeColor: MyColor.primaryColor,
+                                                      checkColor: MyColor.colorWhite,
+                                                      value: controller.remember,
+                                                      side: WidgetStateBorderSide.resolveWith(
+                                                        (states) => BorderSide(
+                                                          width: 2.0,
+                                                          color: controller.remember ? MyColor.primaryColor : MyColor.getTextFieldDisableBorder(),
+                                                        ),
+                                                      ),
+                                                      onChanged: (value) => controller.changeRememberMe(),
+                                                    ),
+                                                  ),
+                                                  spaceSide(Dimensions.space8),
+                                                  InkWell(
+                                                    onTap: () => controller.changeRememberMe(),
+                                                    child: DefaultText(
+                                                      text: MyStrings.rememberMe.tr,
+                                                      textColor: MyColor.getBodyTextColor(),
+                                                      fontSize: 14,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              InkWell(
+                                                onTap: () {
+                                                  controller.clearTextField();
+                                                  Get.toNamed(RouteHelper.forgotPasswordScreen);
+                                                },
+                                                child: DefaultText(
+                                                  text: MyStrings.forgotPassword.tr,
+                                                  textColor: MyColor.redCancelTextColor,
+                                                  textStyle: boldDefault.copyWith(
+                                                    fontSize: Dimensions.fontLarge,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          spaceDown(Dimensions.space25),
+                                          RoundedButton(
+                                            isLoading: controller.isSubmitLoading,
+                                            text: MyStrings.logIn.tr,
+                                            press: () {
+                                              if (formKey.currentState!.validate()) {
+                                                controller.loginUser();
+                                              }
+                                            },
+                                          ),
+                                          spaceDown(Dimensions.space30),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                MyStrings.doNotHaveAccount.tr,
+                                                style: boldLarge.copyWith(
+                                                  color: MyColor.getBodyTextColor(),
+                                                  fontWeight: FontWeight.normal,
+                                                ),
+                                              ),
+                                              const SizedBox(width: Dimensions.space5),
+                                              TextButton(
+                                                onPressed: () {
+                                                  Get.offAndToNamed(RouteHelper.registrationScreen);
+                                                },
+                                                child: Text(
+                                                  MyStrings.register.tr,
+                                                  style: boldLarge.copyWith(
+                                                    color: MyColor.getPrimaryColor(),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                    InkWell(
-                                      onTap: () {
-                                        controller.clearTextField();
-                                        Get.toNamed(RouteHelper.forgotPasswordScreen);
-                                      },
-                                      child: DefaultText(
-                                        text: MyStrings.forgotPassword.tr,
-                                        textColor: MyColor.redCancelTextColor,
-                                        textStyle: boldDefault.copyWith(fontSize: Dimensions.fontLarge),
+                                    spaceDown(Dimensions.space15),
+                                    Container(
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 10,
+                                        horizontal: 15,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: MyColor.primaryColor.withValues(alpha: 0.05),
+                                        borderRadius: BorderRadius.circular(
+                                          Dimensions.radius25,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            "ترجع تسجل كراكب ؟",
+                                            style: boldDefault.copyWith(
+                                              color: MyColor.primaryColor,
+                                            ),
+                                          ),
+                                          InkWell(
+                                            onTap: () => Get.offAllNamed(RouteHelper.userRoleScreen),
+                                            child: Text(
+                                              "تغيير الدور؟",
+                                              style: regularDefault.copyWith(
+                                                color: MyColor.redCancelTextColor,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ],
                                 ),
-                                spaceDown(Dimensions.space25),
-                                RoundedButton(
-                                  isLoading: controller.isSubmitLoading,
-                                  text: MyStrings.logIn.tr,
-                                  press: () {
-                                    if (formKey.currentState!.validate()) {
-                                      controller.loginUser();
-                                    }
-                                  },
-                                ),
-                                spaceDown(Dimensions.space30),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      MyStrings.doNotHaveAccount.tr,
-                                      style: boldLarge.copyWith(
-                                        color: MyColor.getBodyTextColor(),
-                                        fontWeight: FontWeight.normal,
-                                      ),
-                                    ),
-                                    const SizedBox(width: Dimensions.space5),
-                                    TextButton(
-                                      onPressed: () {
-                                        Get.offAndToNamed(RouteHelper.registrationScreen);
-                                      },
-                                      child: Text(
-                                        MyStrings.register.tr,
-                                        style: boldLarge.copyWith(color: MyColor.getPrimaryColor()),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                              ),
                             ),
-                          ),
-                          spaceDown(Dimensions.space15),
-
-                          // --- النقطة 2: Role Reminder & Switcher ---
-                          Container(
-                            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                            decoration: BoxDecoration(
-                              color: MyColor.primaryColor.withValues(alpha: 0.05),
-                              borderRadius: BorderRadius.circular(Dimensions.radius25),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  "ترجع تسجل كراكب ؟",
-                                  style: boldDefault.copyWith(color: MyColor.primaryColor),
-                                ),
-                                InkWell(
-                                  onTap: () => Get.offAllNamed(RouteHelper.userRoleScreen),
-                                  child: Text(
-                                    "تغيير الدور؟",
-                                    style: regularDefault.copyWith(
-                                      color: MyColor.redCancelTextColor,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+                    );
+                  },
+                ),
+              );
+            },
           ),
         ),
       ),
