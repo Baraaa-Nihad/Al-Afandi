@@ -1,120 +1,119 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 
-/// A customizable container widget that applies beautiful inner shadows
-/// from any side (top-left, top-right, bottom-right, bottom-left).
-///
-/// Perfect for neumorphic, soft UI, and modern elevated surfaces.
-///
-///
-/// ⚡ **Key Features:**
-/// ✅ Inner shadow on any side: top-left, top-right, bottom-right, bottom-left
-/// ✅ Fully customizable blur, offset, radius, and shadow color
-/// ✅ Lightweight, dependency-free and pure Flutter implementation
-/// ✅ Supports circular, rounded, or rectangular containers
-/// ✅ Perfect for neumorphic and soft UI designs
 class InnerShadowContainer extends StatelessWidget {
-  /// The height of the container.
   final double? height;
-
-  /// The width of the container.
   final double? width;
-
-  /// The border radius of the container.
   final double borderRadius;
-
-  /// The background color of the container.
   final Color backgroundColor;
 
-  /// Whether to apply inner shadow from the top-left direction.
   final bool isShadowTopLeft;
-
-  /// Whether to apply inner shadow from the top-right direction.
   final bool isShadowTopRight;
-
-  /// Whether to apply inner shadow from the bottom-right direction.
   final bool isShadowBottomRight;
-
-  /// Whether to apply inner shadow from the bottom-left direction.
   final bool isShadowBottomLeft;
 
-  /// The blur radius for the shadow.
   final double blur;
-
-  /// The offset of the shadow.
   final Offset offset;
-
-  /// The shadow color.
   final Color shadowColor;
 
-  /// The child widget inside the container.
   final Widget? child;
-
-  /// Alignment of the child widget.
   final AlignmentGeometry alignment;
+  final EdgeInsetsGeometry padding; // تم تقليل القيمة الافتراضية لضبط المساحة
+  final EdgeInsetsGeometry margin;
 
-  final EdgeInsetsGeometry padding;
+  final List<BoxShadow>? outerShadows;
+  final Border? border;
+  final Gradient? gradient;
 
-  /// Creates an [InnerShadowContainer].
   const InnerShadowContainer({
     super.key,
     this.height,
     this.width,
-    this.borderRadius = 12.0,
+    this.borderRadius = 24,
     this.backgroundColor = Colors.white,
     this.isShadowTopLeft = false,
     this.isShadowTopRight = false,
     this.isShadowBottomRight = false,
     this.isShadowBottomLeft = false,
-    this.blur = 4.0,
-    this.offset = const Offset(4, -3),
-    this.shadowColor = Colors.black26,
+    this.blur = 4, // تقليل التغبيش لمنع مظهر "الضباب" حول النص
+    this.offset = const Offset(1.5, 1.5), // إزاحة دقيقة جداً
+    this.shadowColor = const Color(0x12000000),
     this.child,
     this.alignment = Alignment.center,
-    this.padding = EdgeInsets.zero,
+    this.padding = EdgeInsets.zero, // تغيير القيمة الافتراضية إلى صفر لمنع الـ Overflow
+    this.margin = EdgeInsets.zero,
+    this.outerShadows,
+    this.border,
+    this.gradient,
   });
 
   @override
   Widget build(BuildContext context) {
     final hasShadow = isShadowTopLeft || isShadowTopRight || isShadowBottomRight || isShadowBottomLeft;
 
-    return Stack(
-      children: [
-        Container(
-          height: height,
-          width: width,
-          alignment: alignment,
-          decoration: BoxDecoration(
-            color: backgroundColor,
-            borderRadius: BorderRadius.circular(borderRadius),
-          ),
-          child: Padding(padding: padding, child: child),
-        ),
-        if (hasShadow)
-          Positioned.fill(
-            child: IgnorePointer(
-              child: ClipRRect(
+    return Container(
+      height: height,
+      width: width,
+      margin: margin,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(borderRadius),
+        boxShadow: outerShadows ??
+            [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 2),
+              ),
+            ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(borderRadius),
+        child: Stack(
+          fit: StackFit.expand, // يضمن أن المحتوى يملأ الحاوية بالكامل
+          children: [
+            // الطبقة الأساسية (الخلفية والحدود)
+            Container(
+              alignment: alignment,
+              decoration: BoxDecoration(
+                color: gradient == null ? backgroundColor : null,
+                gradient: gradient,
                 borderRadius: BorderRadius.circular(borderRadius),
-                child: CustomPaint(
-                  painter: InnerShadowPainter(
-                    shadowColor: shadowColor,
-                    blur: blur,
-                    offset: offset,
-                    borderRadius: borderRadius,
-                    isShadowTopLeft: isShadowTopLeft,
-                    isShadowTopRight: isShadowTopRight,
-                    isShadowBottomRight: isShadowBottomRight,
-                    isShadowBottomLeft: isShadowBottomLeft,
+                border: border ??
+                    Border.all(
+                      color: Colors.white.withOpacity(0.2),
+                      width: 1,
+                    ),
+              ),
+              child: Padding(
+                padding: padding,
+                child: child,
+              ),
+            ),
+
+            if (hasShadow)
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: CustomPaint(
+                    painter: InnerShadowPainter(
+                      shadowColor: shadowColor,
+                      blur: blur,
+                      offset: offset,
+                      borderRadius: borderRadius,
+                      isShadowTopLeft: isShadowTopLeft,
+                      isShadowTopRight: isShadowTopRight,
+                      isShadowBottomRight: isShadowBottomRight,
+                      isShadowBottomLeft: isShadowBottomLeft,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
-      ],
+          ],
+        ),
+      ),
     );
   }
 }
 
-/// A custom painter to draw the inner shadow effect from selected directions.
 class InnerShadowPainter extends CustomPainter {
   final Color shadowColor;
   final double blur;
@@ -138,47 +137,35 @@ class InnerShadowPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = shadowColor
-      ..maskFilter = MaskFilter.blur(BlurStyle.normal, blur);
-
     final rect = Offset.zero & size;
     final rrect = RRect.fromRectAndRadius(rect, Radius.circular(borderRadius));
 
-    final outer = Path()
-      ..addRect(
-        Rect.fromLTRB(
-          -size.width,
-          -size.height,
-          size.width * 2,
-          size.height * 2,
-        ),
-      );
+    final shadowPaint = Paint()
+      ..color = shadowColor
+      ..maskFilter = MaskFilter.blur(BlurStyle.normal, blur);
 
-    final inner = Path()
-      ..addRRect(rrect)
-      ..fillType = PathFillType.evenOdd;
+    final path = Path()..addRRect(rrect);
 
-    canvas.saveLayer(rect, Paint());
+    canvas.save();
+    canvas.clipRRect(rrect);
 
     void drawShadow(double dx, double dy) {
-      canvas.save();
-      canvas.translate(dx, dy);
-      canvas.drawPath(
-        Path.combine(PathOperation.difference, outer, inner),
-        paint,
+      final shadowPath = Path.combine(
+        PathOperation.difference,
+        Path()..addRect(rect.inflate(blur * 3)), // زيادة مساحة التمدد للنعومة
+        path.shift(Offset(dx, dy)),
       );
-      canvas.restore();
+      canvas.drawPath(shadowPath, shadowPaint);
     }
 
-    if (isShadowBottomRight) drawShadow(-offset.dx.abs(), -offset.dy.abs());
-    if (isShadowBottomLeft) drawShadow(offset.dx.abs(), -offset.dy.abs());
-    if (isShadowTopLeft) drawShadow(offset.dx.abs(), offset.dy.abs());
-    if (isShadowTopRight) drawShadow(-offset.dx.abs(), offset.dy.abs());
+    if (isShadowTopLeft) drawShadow(offset.dx, offset.dy);
+    if (isShadowBottomRight) drawShadow(-offset.dx, -offset.dy);
+    if (isShadowTopRight) drawShadow(-offset.dx, offset.dy);
+    if (isShadowBottomLeft) drawShadow(offset.dx, -offset.dy);
 
     canvas.restore();
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+  bool shouldRepaint(covariant InnerShadowPainter oldDelegate) => false;
 }

@@ -146,9 +146,9 @@ class MyStrings {
 
   static const String or = "أو";
 
-  static const String onLine = " (أونلاين)";
+  static const String onLine = "(أونلاين)";
 
-  static const String offLine = " (أوفلاين";
+  static const String offLine = "(أوفلاين)";
 
   static const String onlineRegistration = "تسجيل أونلاين";
 
@@ -241,7 +241,7 @@ class MyStrings {
 
   static const String acceptBids = "قبول المشوار";
 
-  static const String review = "تقييم";
+  static const String review = "التقييم";
 
   static const String sendOTP = "إرسال كود التحقق";
 

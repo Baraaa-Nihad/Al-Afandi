@@ -14,7 +14,8 @@ class AllRideListSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<AllRideController>(tag: 'driver', 
+    return GetBuilder<AllRideController>(
+      tag: 'driver',
       builder: (controller) {
         return RefreshIndicator(
           onRefresh: () async {

@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ovoride/core/route/route.dart';
 import 'package:ovoride/core/utils/dimensions.dart';
 import 'package:ovoride/core/utils/my_color.dart';
 import 'package:ovoride/core/utils/my_strings.dart';
+import 'package:ovoride/core/utils/style.dart';
 import 'package:ovoride/data/controller/driver/ride/ride_action/ride_action_controller.dart';
 import 'package:ovoride/data/controller/driver/ride/all_ride/all_ride_controller.dart';
 import 'package:ovoride/data/repo/driver/ride/ride_repo.dart';
-import 'package:ovoride/presentation/components/app-bar/custom_appbar.dart';
 import 'package:ovoride/presentation/screens/driver/ride_history/all_ride/all_ride_list_section.dart';
 
 class RideActivityScreen extends StatefulWidget {
@@ -21,6 +20,7 @@ class RideActivityScreen extends StatefulWidget {
 class _RideActivityScreenState extends State<RideActivityScreen> with SingleTickerProviderStateMixin {
   ScrollController scrollController = ScrollController();
   static const int totalTabls = 6;
+
   void scrollListener() {
     if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
       if (Get.find<AllRideController>(tag: 'driver').hasNext()) {
@@ -32,10 +32,11 @@ class _RideActivityScreenState extends State<RideActivityScreen> with SingleTick
   @override
   void initState() {
     super.initState();
-
+    // تهيئة الكونترولرز
     Get.put(RideRepo(apiClient: Get.find()), tag: 'driver');
     Get.put(RideActionController(repo: Get.find(tag: 'driver')));
     var controller = Get.put(AllRideController(repo: Get.find(tag: 'driver')), tag: 'driver');
+
     controller.tabController = TabController(
       length: totalTabls,
       vsync: this,
@@ -62,72 +63,58 @@ class _RideActivityScreenState extends State<RideActivityScreen> with SingleTick
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: MyColor.secondaryScreenBgColor,
-      appBar: CustomAppBar(
-        title: (Get.arguments ?? "") == "" ? MyStrings.activity.tr : (Get.arguments == 1 ? MyStrings.city.tr : MyStrings.interCity.tr),
-        backBtnPress: () {
-          if (Get.currentRoute == RouteHelper.dashboard) {
-            if (widget.onBackPress != null) {
-              widget.onBackPress?.call();
-            }
-          } else {
-            Get.back();
-          }
-        },
-      ),
-      body: GetBuilder<AllRideController>(tag: 'driver', 
+      // خلفية فاتحة جداً تعطي شعوراً بالنظافة (تجنب الرمادي الغامق)
+      backgroundColor: const Color.fromARGB(197, 158, 152, 157),
+      body: GetBuilder<AllRideController>(
+        tag: 'driver',
         builder: (controller) {
           return Column(
             children: [
+              SizedBox(
+                height: 40,
+              ),
               Container(
-                color: MyColor.colorWhite,
-                child: DefaultTabController(
-                  length: totalTabls,
-                  initialIndex: controller.selectedTab,
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(color: MyColor.colorWhite),
-                      ),
-                    ),
-                    child: TabBar(
-                      controller: controller.tabController,
-                      physics: const BouncingScrollPhysics(),
-                      dividerColor: MyColor.borderColor,
-                      indicator: const BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                            color: MyColor.primaryColor,
-                            width: 2,
-                          ),
-                        ),
-                      ),
-                      tabAlignment: TabAlignment.start,
-                      isScrollable: true,
-                      indicatorSize: TabBarIndicatorSize.tab,
-                      labelColor: MyColor.primaryColor,
-                      unselectedLabelColor: MyColor.colorBlack,
-                      onTap: (i) {
-                        controller.changeTab(i);
-                      },
-                      tabs: [
-                        Tab(text: MyStrings.allRide.tr),
-                        Tab(text: MyStrings.acceptedRide.tr),
-                        Tab(text: MyStrings.activeRide.tr),
-                        Tab(text: MyStrings.runningRide.tr),
-                        Tab(text: MyStrings.completedRides.tr),
-                        Tab(text: MyStrings.canceledRides.tr),
-                      ],
-                    ),
+                padding: const EdgeInsets.only(top: 10),
+                decoration: BoxDecoration(
+                  color: MyColor.colorWhite,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.03),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    )
+                  ],
+                ),
+                child: TabBar(
+                  controller: controller.tabController,
+                  physics: const BouncingScrollPhysics(),
+                  isScrollable: true,
+                  tabAlignment: TabAlignment.start,
+                  labelColor: MyColor.primaryColor,
+                  unselectedLabelColor: MyColor.colorGrey,
+                  labelStyle: boldDefault.copyWith(fontSize: 14),
+                  unselectedLabelStyle: regularDefault.copyWith(fontSize: 14),
+                  indicatorSize: TabBarIndicatorSize.label, // المؤشر تحت النص فقط
+                  indicator: const UnderlineTabIndicator(
+                    borderSide: BorderSide(width: 3, color: MyColor.primaryColor),
+                    insets: EdgeInsets.symmetric(horizontal: 10),
                   ),
+                  onTap: (i) => controller.changeTab(i),
+                  tabs: [
+                    Tab(text: MyStrings.allRide.tr),
+                    Tab(text: MyStrings.acceptedRide.tr),
+                    Tab(text: MyStrings.activeRide.tr),
+                    Tab(text: MyStrings.runningRide.tr),
+                    Tab(text: MyStrings.completedRides.tr),
+                    Tab(text: MyStrings.canceledRides.tr),
+                  ],
                 ),
               ),
-              const SizedBox(height: Dimensions.space10),
+
+              // --- قائمة الرحلات ---
               Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: Dimensions.space10,
-                  ),
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 10),
                   child: AllRideListSection(scrollController: scrollController),
                 ),
               ),

@@ -16,111 +16,112 @@ import 'package:ovoride/presentation/components/switch/lite_rolling_switch.dart'
 import 'package:ovoride/presentation/components/text/header_text.dart';
 
 class HomeScreenAppBar extends StatelessWidget {
-  DashBoardController controller;
-  HomeScreenAppBar({super.key, required this.controller});
+  final DashBoardController controller; // أضفت final للممارسة البرمجية الصحيحة
+  const HomeScreenAppBar({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Container(
+        width: double.infinity,
         padding: EdgeInsets.symmetric(
           horizontal: Dimensions.space16,
-          vertical: Dimensions.space16,
+          vertical: Dimensions.space12, // تقليل الـ vertical قليلاً لرشاقة التصميم
         ),
-        child: Column(
+        decoration: BoxDecoration(
+          color: MyColor.getCardBgColor(), // اختيار لون خلفية متناسق
+        ),
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          Get.toNamed(RouteHelper.profileScreen);
-                        },
-                        child: MyImageWidget(
-                          imageUrl: '${UrlContainer.domainUrl}/${controller.userImagePath}/${controller.driver.image}',
-                          height: 50,
-                          width: 50,
-                          radius: 50,
-                          isProfile: true,
+            // 1. قسم بيانات السائق (صورة + اسم + موقع)
+            Expanded(
+              child: Row(
+                children: [
+                  // صورة البروفايل
+                  GestureDetector(
+                    onTap: () => Get.toNamed(RouteHelper.profileScreen),
+                    child: MyImageWidget(
+                      imageUrl: '${UrlContainer.domainUrl}/${controller.userImagePath}/${controller.driver.image}',
+                      height: 45,
+                      width: 45,
+                      radius: 45,
+                      isProfile: true,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  // النصوص (الاسم والموقع)
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          controller.driver.id == '-1' ? controller.repo.apiClient.getUserName().toTitleCase() : controller.driver.getFullName(),
+                          style: boldLarge.copyWith(
+                            color: MyColor.getTextColor(),
+                            fontSize: Dimensions.fontLarge,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                      spaceSide(Dimensions.space10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        const SizedBox(height: 4),
+                        Row(
                           children: [
-                            FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: HeaderText(
-                                text: controller.driver.id == '-1' ? controller.repo.apiClient.getUserName().toTitleCase() : controller.driver.getFullName(),
-                                style: boldLarge.copyWith(
-                                  color: MyColor.getTextColor(),
-                                  fontSize: Dimensions.fontLarge,
+                            CustomSvgPicture(
+                              image: MyIcons.currentLocation,
+                              color: MyColor.primaryColor,
+                              height: 14,
+                            ),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                controller.currentAddress,
+                                style: regularDefault.copyWith(
+                                  color: MyColor.getBodyTextColor(),
+                                  fontSize: Dimensions.fontSmall,
                                 ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                            spaceDown(Dimensions.space3),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                CustomSvgPicture(
-                                  image: MyIcons.currentLocation,
-                                  color: MyColor.primaryColor,
-                                ),
-                                spaceSide(Dimensions.space5),
-                                Expanded(
-                                  child: Text(
-                                    controller.currentAddress,
-                                    style: regularDefault.copyWith(
-                                      color: MyColor.getBodyTextColor(),
-                                      fontSize: Dimensions.fontDefault,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            spaceDown(Dimensions.space2),
                           ],
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                SizedBox(width: Dimensions.space30),
-                SizedBox(
-                  height: Dimensions.space45,
-                  child: LiteRollingSwitch(
-                    tValue: controller.userOnline,
-                    width: Dimensions.space50 + 60,
-                    textOn: MyStrings.onLine.tr,
-                    textOnColor: MyColor.colorWhite,
-                    textOff: MyStrings.offLine.tr,
-                    colorOn: MyColor.colorGreen,
-                    colorOff: MyColor.colorGrey,
-                    iconOn: Icons.network_check,
-                    iconOff: Icons.signal_wifi_off,
-                    animationDuration: const Duration(milliseconds: 300),
-                    onToggle: (newValue) async {
-                      try {
-                        // Your API call or auth check
-                        await controller.changeOnlineStatus(newValue);
-                        return true; // Success - allow UI to change
-                      } catch (e) {
-                        // Auth shutdown or error occurred
-                        return false; // Failure - revert UI
-                      }
-                    },
-                  ),
-                ),
-              ],
+                ],
+              ),
+            ),
+
+            // 2. فاصل مرن لضمان عدم التلامس
+            const SizedBox(width: 12),
+
+            // 3. قسم السويتش (أونلاين / أوفلاين)
+            // تحديد SizedBox ثابت هنا هو السر في منع الـ Overflow
+            SizedBox(
+              width: 115,
+              height: 42,
+              child: LiteRollingSwitch(
+                tValue: controller.userOnline,
+                width: 115,
+                textOn: MyStrings.onLine.tr,
+                textOff: MyStrings.offLine.tr,
+                textOnColor: MyColor.colorWhite,
+                colorOn: MyColor.colorGreen,
+                colorOff: MyColor.colorGrey,
+                iconOn: Icons.network_check,
+                iconOff: Icons.signal_wifi_off,
+                animationDuration: const Duration(milliseconds: 300),
+                onToggle: (newValue) async {
+                  try {
+                    await controller.changeOnlineStatus(newValue);
+                    return true;
+                  } catch (e) {
+                    return false;
+                  }
+                },
+              ),
             ),
           ],
         ),

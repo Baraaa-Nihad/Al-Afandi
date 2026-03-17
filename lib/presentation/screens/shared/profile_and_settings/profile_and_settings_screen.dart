@@ -50,7 +50,9 @@ class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
     }
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      setState(() { _role = role; });
+      setState(() {
+        _role = role;
+      });
     });
   }
 
@@ -64,9 +66,7 @@ class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
     if (_role == 'rider') {
       // Lazily register rider profile controller only when rider menu is actually shown
       if (!Get.isRegistered<riderProfileCtrl.ProfileController>(tag: 'rider')) {
-        Get.put(riderProfileCtrl.ProfileController(
-          profileRepo: Get.find<riderProfile.ProfileRepo>(tag: 'rider')
-        ), tag: 'rider');
+        Get.put(riderProfileCtrl.ProfileController(profileRepo: Get.find<riderProfile.ProfileRepo>(tag: 'rider')), tag: 'rider');
       }
       return GetBuilder<riderProfileCtrl.ProfileController>(
         tag: 'rider',
@@ -470,7 +470,6 @@ class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
                         ),
                       ),
                       const CustomDivider(space: Dimensions.space15),
-
                       MenuRowWidget(
                         image: MyIcons.passwordChange,
                         label: MyStrings.changePassword,
@@ -533,7 +532,6 @@ class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
                         onPressed: () => Get.toNamed(RouteHelper.riderPaymentHistoryScreen),
                       ),
                       const CustomDivider(space: Dimensions.space15),
-
                     ],
                   ),
                 ),
@@ -652,7 +650,7 @@ class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
                     image: MyIcons.logout,
                     imgColor: MyColor.redCancelTextColor,
                     textColor: MyColor.redCancelTextColor,
-                    label: controller.logoutLoading ? '\${MyStrings.loggingOut}...' : MyStrings.logout,
+                    label: controller.logoutLoading ? '${MyStrings.loggingOut}...' : MyStrings.logout,
                     textStyle: regularLarge.copyWith(color: MyColor.redCancelTextColor, fontSize: Dimensions.space20),
                     onPressed: () {
                       if (controller.logoutLoading == false) {
@@ -677,5 +675,4 @@ class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
       ),
     );
   }
-
 }

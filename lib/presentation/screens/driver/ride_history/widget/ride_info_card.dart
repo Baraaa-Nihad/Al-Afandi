@@ -2,7 +2,6 @@ import 'package:ovoride/core/helper/date_converter.dart';
 import 'package:ovoride/core/helper/string_format_helper.dart';
 import 'package:ovoride/core/route/route.dart';
 import 'package:ovoride/core/utils/app_status.dart';
-import 'package:ovoride/core/utils/dimensions.dart';
 import 'package:ovoride/core/utils/my_color.dart';
 import 'package:ovoride/core/utils/my_icons.dart';
 import 'package:ovoride/core/utils/my_strings.dart';
@@ -21,16 +20,15 @@ import 'package:ovoride/presentation/components/buttons/rounded_button.dart';
 import 'package:ovoride/presentation/components/card/custom_app_card.dart';
 import 'package:ovoride/presentation/components/image/my_local_image_widget.dart';
 import 'package:ovoride/presentation/components/image/my_network_image_widget.dart';
-import 'package:ovoride/presentation/components/text/default_text.dart';
 import 'package:ovoride/presentation/components/text/header_text.dart';
 import 'package:ovoride/presentation/screens/driver/ride_history/widget/pick_up_from_activity_bottom_sheet.dart';
-import 'package:ovoride/presentation/components/divider/custom_spacer.dart';
 import 'package:ovoride/presentation/components/timeline/custom_time_line.dart';
 
 class RideInfoCard extends StatefulWidget {
   final String currency;
   final RideModel ride;
   final AllRideController controller;
+
   const RideInfoCard({
     super.key,
     required this.currency,
@@ -45,334 +43,189 @@ class RideInfoCard extends StatefulWidget {
 class _RideInfoCardState extends State<RideInfoCard> {
   bool isDownLoadLoading = false;
 
+  String _toArabicNumbers(String input) {
+    const english = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    const arabic = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+    for (int i = 0; i < english.length; i++) {
+      input = input.replaceAll(english[i], arabic[i]);
+    }
+    return input;
+  }
+
+  Widget _buildDateTimeSection(String isoDate) {
+    if (isoDate.isEmpty) return const SizedBox.shrink();
+    try {
+      DateTime dt = DateTime.parse(isoDate).toLocal();
+      String period = dt.hour >= 12 ? "مساءاً" : "صباحاً";
+      int hour = dt.hour > 12 ? dt.hour - 12 : (dt.hour == 0 ? 12 : dt.hour);
+      String minute = dt.minute.toString().padLeft(2, '0');
+      String timeStr = _toArabicNumbers("$hour:$minute") + " $period";
+      String dateStr = _toArabicNumbers("${dt.day.toString().padLeft(2, '0')}-${dt.month.toString().padLeft(2, '0')}-${dt.year}");
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Text(timeStr, style: boldDefault.copyWith(color: const Color(0xFF6C5CE7), fontSize: 13)),
+          Text("بتاريخ: $dateStr", style: regularSmall.copyWith(color: MyColor.colorGrey, fontSize: 10)),
+        ],
+      );
+    } catch (e) {
+      return Text(isoDate);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return CustomAppCard(
+      padding: const EdgeInsets.all(16),
       onPressed: () {
-        Get.toNamed(
-          RouteHelper.driverRideDetailsScreen,
-          arguments: widget.ride.id.toString(),
-        )?.then((value) {
-          widget.controller.initialData(
-            shouldLoading: false,
-            tabID: widget.controller.selectedTab,
-          );
+        Get.toNamed(RouteHelper.driverRideDetailsScreen, arguments: widget.ride.id.toString())?.then((value) {
+          widget.controller.initialData(shouldLoading: false, tabID: widget.controller.selectedTab);
         });
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              MyImageWidget(imageUrl: widget.controller.userImagePath, height: 50, width: 50, radius: 25, isProfile: true),
+              const SizedBox(width: 12),
               Expanded(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    MyImageWidget(
-                      imageUrl: widget.controller.userImagePath,
-                      height: Dimensions.space45,
-                      width: Dimensions.space45,
-                      radius: Dimensions.radiusHuge,
-                      boxFit: BoxFit.contain,
-                      isProfile: true,
-                    ),
-                    spaceSide(Dimensions.space10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          HeaderText(
-                            text: widget.ride.user?.getFullName() ?? "",
-                            style: boldDefault.copyWith(
-                              color: MyColor.getHeadingTextColor(),
-                              fontSize: Dimensions.fontTitleLarge,
-                            ),
-                          ),
-                          DefaultText(
-                            text: "${widget.ride.duration ?? ""} • ${widget.ride.getDistance()} ${MyUtils.getDistanceLabel(distance: widget.ride.distance, unit: Get.find<ApiClient>().getDistanceUnit())}",
-                            textStyle: boldDefault.copyWith(
-                              color: MyColor.informationColor,
-                            ),
-                          ),
-                          if (widget.ride.service != null && widget.ride.service!.name != null) ...[
-                            Text(
-                              widget.ride.service?.name ?? '',
-                              textAlign: TextAlign.start,
-                              style: regularLarge.copyWith(
-                                color: MyColor.getBodyTextColor(),
-                              ),
-                            ),
-                          ]
-                        ],
-                      ),
+                    // اسم الراكب بخط عريض
+                    HeaderText(text: widget.ride.user?.getFullName() ?? "", style: boldDefault.copyWith(fontSize: 16)),
+                    const SizedBox(height: 4),
+                    // توضيح المسافة ونوع الخدمة بشكل مقروء
+                    Text(
+                      _toArabicNumbers("${widget.ride.service?.name ?? ''} • المسافة: ${widget.ride.getDistance()} كيلومتر"),
+                      style: regularDefault.copyWith(color: MyColor.colorGrey, fontSize: 13),
                     ),
                   ],
                 ),
               ),
-              spaceSide(Dimensions.space20),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: Dimensions.space5,
-                      vertical: Dimensions.space2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: MyUtils.getRideStatusColor(
-                        widget.ride.status ?? '9',
-                      ).withValues(alpha: 0.01),
-                      borderRadius: BorderRadius.circular(
-                        Dimensions.mediumRadius,
-                      ),
-                      border: Border.all(
-                        color: MyUtils.getRideStatusColor(
-                          widget.ride.status ?? '9',
-                        ),
-                      ),
-                    ),
-                    child: Text(
-                      MyUtils.getRideStatus(widget.ride.status ?? '9').tr,
-                      style: regularDefault.copyWith(
-                        fontSize: Dimensions.fontDefault,
-                        color: MyUtils.getRideStatusColor(
-                          widget.ride.status ?? '9',
-                        ),
-                      ),
-                    ),
-                  ),
-                  spaceDown(Dimensions.space3),
-                  Text(
-                    "${widget.currency}${StringConverter.formatNumber(widget.ride.amount.toString())}",
-                    style: boldLarge.copyWith(
-                      fontSize: Dimensions.fontLarge,
-                      fontWeight: FontWeight.w700,
-                      color: MyColor.rideTitle,
-                    ),
-                  ),
-                ],
-              ),
             ],
           ),
-          const SizedBox(height: Dimensions.space20),
+          const SizedBox(height: 15),
+
+          // القسم الجديد: السعر وحالة الدفع تحت الاسم
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: MyColor.getPrimaryColor().withOpacity(0.05),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("إجمالي التكلفة", style: regularSmall.copyWith(color: MyColor.colorGrey)),
+                    Text(
+                      _toArabicNumbers("${widget.currency}${StringConverter.formatNumber(widget.ride.amount.toString())}"),
+                      style: boldLarge.copyWith(fontSize: 18, color: MyColor.getPrimaryColor()),
+                    ),
+                  ],
+                ),
+                _buildStatusBadge(),
+              ],
+            ),
+          ),
+
+          const Divider(height: 30, thickness: 0.5),
+
           CustomTimeLine(
             indicatorPosition: 0.1,
             dashColor: MyColor.neutral300,
-            firstWidget: Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Align(
-                    alignment: Alignment.topLeft,
-                    child: Text(
-                      MyStrings.pickUpLocation.tr,
-                      style: boldLarge.copyWith(
-                        color: MyColor.getHeadingTextColor(),
-                        fontSize: Dimensions.fontTitleLarge,
-                        fontWeight: FontWeight.w700,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  spaceDown(Dimensions.space5),
-                  Text(
-                    widget.ride.pickupLocation ?? '',
-                    style: regularDefault.copyWith(
-                      color: MyColor.getBodyTextColor(),
-                      fontSize: Dimensions.fontDefault,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  if (widget.ride.startTime != null) ...[
-                    spaceDown(Dimensions.space8),
-                    Text(
-                      DateConverter.estimatedDate(
-                        DateTime.tryParse('${widget.ride.startTime}') ?? DateTime.now(),
-                      ),
-                      style: regularDefault.copyWith(
-                        color: MyColor.bodyMutedTextColor,
-                        fontSize: Dimensions.fontSmall,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                  spaceDown(Dimensions.space15),
-                ],
-              ),
+            firstWidget: _buildLocationStep(
+              title: MyStrings.pickUpLocation.tr,
+              address: widget.ride.pickupLocation ?? '',
+              time: widget.ride.startTime,
+              isPickup: true,
             ),
-            secondWidget: Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Align(
-                    alignment: Alignment.topLeft,
-                    child: Text(
-                      MyStrings.destination.tr,
-                      style: boldLarge.copyWith(
-                        color: MyColor.getHeadingTextColor(),
-                        fontSize: Dimensions.fontTitleLarge,
-                        fontWeight: FontWeight.w700,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  const SizedBox(height: Dimensions.space5 - 1),
-                  Text(
-                    widget.ride.destination ?? '',
-                    style: regularDefault.copyWith(
-                      color: MyColor.getBodyTextColor(),
-                      fontSize: Dimensions.fontDefault,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  if (widget.ride.endTime != null) ...[
-                    spaceDown(Dimensions.space8),
-                    Text(
-                      DateConverter.estimatedDate(
-                        DateTime.tryParse('${widget.ride.endTime}') ?? DateTime.now(),
-                      ),
-                      style: regularDefault.copyWith(
-                        color: MyColor.bodyMutedTextColor,
-                        fontSize: Dimensions.fontSmall,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ],
-              ),
+            secondWidget: _buildLocationStep(
+              title: MyStrings.destination.tr,
+              address: widget.ride.destination ?? '',
+              time: widget.ride.endTime,
+              isPickup: false,
             ),
           ),
-          spaceDown(Dimensions.space15),
-          Column(
-            children: [
-              if (![
-                AppStatus.RIDE_CANCELED,
-                AppStatus.RIDE_COMPLETED,
-                AppStatus.RIDE_ACTIVE,
-              ].contains(widget.ride.status))
-                CustomAppCard(
-                  radius: Dimensions.largeRadius,
-                  width: double.infinity,
-                  backgroundColor: MyColor.neutral100,
-                  padding: const EdgeInsets.all(12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          const SizedBox(height: 16),
+          _buildActionSection(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLocationStep({required String title, required String address, String? time, required bool isPickup}) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 12.0, bottom: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: boldDefault.copyWith(color: isPickup ? MyColor.colorGreen : MyColor.colorRed, fontSize: 12)),
+          const SizedBox(height: 4),
+          Text(address, style: regularDefault.copyWith(fontSize: 14), maxLines: 2, overflow: TextOverflow.ellipsis),
+          if (time != null) ...[
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              decoration: BoxDecoration(color: const Color(0xFFF1F4F9), borderRadius: BorderRadius.circular(8)),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
                     children: [
-                      Text(
-                        MyStrings.createdTime.tr,
-                        style: boldDefault.copyWith(color: MyColor.colorGrey),
-                      ),
-                      Text(
-                        DateConverter.estimatedDate(
-                          DateTime.tryParse('${widget.ride.createdAt}') ?? DateTime.now(),
-                        ),
-                        style: boldDefault.copyWith(color: MyColor.colorGrey),
-                      ),
+                      Icon(Icons.access_time_filled, size: 16, color: isPickup ? MyColor.colorGreen : MyColor.colorRed),
+                      const SizedBox(width: 8),
+                      Text(isPickup ? "وقت الركوب" : "وقت الوصول", style: regularDefault.copyWith(color: isPickup ? MyColor.colorGreen : MyColor.colorRed, fontSize: 12)),
                     ],
                   ),
-                ),
-              if (widget.ride.status == AppStatus.RIDE_ACTIVE) ...[
-                spaceDown(Dimensions.space15),
-                buildMessageAndCallWidget(),
-                spaceDown(Dimensions.space15),
-                RoundedButton(
-                  text: MyStrings.pickupPassenger.tr,
-                  press: () {
-                    CustomBottomSheet(
-                      child: PickUpRiderFromActivityBottomSheet(
-                        ride: widget.ride,
-                      ),
-                    ).customBottomSheet(context);
-                  },
-                  textColor: MyColor.getRideTitleColor(),
-                  textStyle: regularDefault.copyWith(
-                    color: MyColor.colorWhite,
-                    fontSize: Dimensions.fontLarge,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-              if (widget.ride.status == AppStatus.RIDE_COMPLETED) ...[
-                spaceDown(Dimensions.space15),
-                RoundedButton(
-                  isOutlined: true,
-                  text: MyStrings.receipt,
-                  isLoading: isDownLoadLoading,
-                  press: () async {
-                    setState(() {
-                      isDownLoadLoading = true;
-                    });
-                    await DownloadService.downloadPDF(
-                      url: "${UrlContainer.rideReceipt}/${widget.ride.id}",
-                      fileName: "${Environment.appName}_receipt_${widget.ride.id}.pdf",
-                    );
-                    setState(() {
-                      isDownLoadLoading = false;
-                    });
-                  },
-                  bgColor: MyColor.getPrimaryColor().withValues(alpha: 0.1),
-                  textColor: MyColor.getPrimaryColor(),
-                  textStyle: regularDefault.copyWith(
-                    color: MyColor.getPrimaryColor(),
-                    fontSize: Dimensions.fontLarge,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-              if (widget.ride.status == AppStatus.RIDE_CANCELED) ...[
-                spaceDown(Dimensions.space15),
-                if (widget.ride.cancelReason != null) ...[
-                  CustomAppCard(
-                    radius: Dimensions.largeRadius,
-                    width: double.infinity,
-                    backgroundColor: MyColor.redCancelTextColor.withValues(alpha: 0.1),
-                    child: Text.rich(
-                      TextSpan(
-                        children: [
-                          TextSpan(
-                            text: widget.ride.canceledUserType == "1" ? (widget.ride.user?.getFullName() ?? '') : MyStrings.byMe.tr,
-                            style: boldLarge.copyWith(
-                              color: MyColor.redCancelTextColor,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          if (widget.ride.user != null) ...[
-                            TextSpan(
-                              text: ' : ',
-                              style: regularDefault.copyWith(
-                                color: MyColor.redCancelTextColor,
-                              ),
-                            ),
-                          ],
-                          TextSpan(
-                            text: widget.ride.cancelReason ?? '',
-                            style: regularDefault.copyWith(
-                              color: MyColor.redCancelTextColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ]
-              ],
-            ],
+                  _buildDateTimeSection(time),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusBadge() {
+    Color statusColor = MyUtils.getRideStatusColor(widget.ride.status ?? '9');
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(color: statusColor.withOpacity(0.1), borderRadius: BorderRadius.circular(20), border: Border.all(color: statusColor.withOpacity(0.5))),
+      child: Text(MyUtils.getRideStatus(widget.ride.status ?? '9').tr, style: boldDefault.copyWith(color: statusColor, fontSize: 12)),
+    );
+  }
+
+  Widget _buildActionSection() {
+    if (widget.ride.status == AppStatus.RIDE_ACTIVE) {
+      return Column(
+        children: [
+          buildMessageAndCallWidget(),
+          const SizedBox(height: 12),
+          RoundedButton(
+            text: MyStrings.pickupPassenger.tr,
+            press: () {
+              CustomBottomSheet(child: PickUpRiderFromActivityBottomSheet(ride: widget.ride)).customBottomSheet(context);
+            },
           ),
+        ],
+      );
+    }
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(color: const Color(0xFFF1F4F9), borderRadius: BorderRadius.circular(12)),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text("وقت الطلب", style: regularDefault.copyWith(color: MyColor.colorGrey)),
+          _buildDateTimeSection(widget.ride.createdAt ?? ""),
         ],
       ),
     );
@@ -382,74 +235,33 @@ class _RideInfoCardState extends State<RideInfoCard> {
     return Row(
       children: [
         Expanded(
-          child: CustomAppCard(
-            radius: Dimensions.largeRadius,
-            backgroundColor: MyColor.getPrimaryColor().withValues(alpha: 0.1),
-            onPressed: () {
-              Get.toNamed(
-                RouteHelper.rideMessageScreen,
-                arguments: [
-                  widget.ride.id.toString(),
-                  widget.ride.user?.getFullName(),
-                  widget.ride.status.toString(),
-                ],
-              );
-            },
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                MyLocalImageWidget(
-                  imagePath: MyIcons.message,
-                  width: Dimensions.space25,
-                  height: Dimensions.space25,
-                  boxFit: BoxFit.contain,
-                  imageOverlayColor: MyColor.getPrimaryColor(),
-                ),
-                spaceSide(Dimensions.space10),
-                HeaderText(
-                  text: MyStrings.message,
-                  style: boldDefault.copyWith(
-                    fontSize: Dimensions.fontTitleLarge,
-                    color: MyColor.getPrimaryColor(),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        spaceSide(Dimensions.space10),
+            child: _buildCircleAction(MyIcons.message, MyStrings.message, () {
+          Get.toNamed(RouteHelper.rideMessageScreen, arguments: [widget.ride.id.toString(), widget.ride.user?.getFullName(), widget.ride.status.toString()]);
+        })),
+        const SizedBox(width: 12),
         Expanded(
-          child: CustomAppCard(
-            radius: Dimensions.largeRadius,
-            backgroundColor: MyColor.getPrimaryColor().withValues(alpha: 0.1),
-            onPressed: () {
-              MyUtils.launchPhone('${widget.ride.user?.mobile}');
-            },
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                MyLocalImageWidget(
-                  imagePath: MyIcons.callIcon,
-                  width: Dimensions.space25,
-                  height: Dimensions.space25,
-                  boxFit: BoxFit.contain,
-                  imageOverlayColor: MyColor.getPrimaryColor(),
-                ),
-                spaceSide(Dimensions.space10),
-                HeaderText(
-                  text: MyStrings.call,
-                  style: boldDefault.copyWith(
-                    fontSize: Dimensions.fontTitleLarge,
-                    color: MyColor.getPrimaryColor(),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+            child: _buildCircleAction(MyIcons.callIcon, MyStrings.call, () {
+          MyUtils.launchPhone('${widget.ride.user?.mobile}');
+        })),
       ],
+    );
+  }
+
+  Widget _buildCircleAction(String icon, String label, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), border: Border.all(color: MyColor.getPrimaryColor().withOpacity(0.3))),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            MyLocalImageWidget(imagePath: icon, width: 20, height: 20, imageOverlayColor: MyColor.getPrimaryColor()),
+            const SizedBox(width: 8),
+            Text(label.tr, style: boldDefault.copyWith(color: MyColor.getPrimaryColor())),
+          ],
+        ),
+      ),
     );
   }
 }
