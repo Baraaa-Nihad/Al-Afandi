@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ovoride/core/helper/shared_preference_helper.dart';
 import 'package:get/get.dart';
 import 'package:ovoride/core/helper/string_format_helper.dart';
 import 'package:ovoride/core/route/route.dart';
@@ -75,7 +77,7 @@ class _ProfileCompleteScreenState extends State<ProfileCompleteScreen> {
                             ),
                             child: IconButton(
                               onPressed: () {
-                                Get.offAllNamed(RouteHelper.loginScreen);
+                                Get.offAllNamed(RouteHelper.getLoginScreen());
                               },
                               icon: Icon(
                                 Icons.close,

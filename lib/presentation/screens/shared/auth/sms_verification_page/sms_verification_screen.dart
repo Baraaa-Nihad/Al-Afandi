@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ovoride/core/helper/shared_preference_helper.dart';
 import 'package:get/get.dart';
 import 'package:ovoride/core/utils/util.dart';
 import 'package:ovoride/presentation/components/annotated_region/annotated_region_widget.dart';
@@ -44,7 +46,7 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
   @override
   Widget build(BuildContext context) {
     return WillPopWidget(
-      nextRoute: RouteHelper.loginScreen,
+      nextRoute: RouteHelper.getLoginScreen(),
       child: AnnotatedRegionWidget(
         statusBarColor: MyColor.screenBgColor,
         systemNavigationBarColor: MyColor.screenBgColor,
@@ -72,7 +74,7 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
                               ),
                               child: IconButton(
                                 onPressed: () {
-                                  Get.offAllNamed(RouteHelper.loginScreen);
+                                  Get.offAllNamed(RouteHelper.getLoginScreen());
                                 },
                                 icon: Icon(
                                   Icons.close,

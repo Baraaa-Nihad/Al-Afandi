@@ -68,7 +68,8 @@ class InnerShadowContainer extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(borderRadius),
         child: Stack(
-          fit: StackFit.expand, // يضمن أن المحتوى يملأ الحاوية بالكامل
+          fit: StackFit.loose, // يضمن أن المحتوى يملأ الحاوية بالكامل
+          // fit: StackFit.expand, // يضمن أن المحتوى يملأ الحاوية بالكامل
           children: [
             // الطبقة الأساسية (الخلفية والحدود)
             Container(

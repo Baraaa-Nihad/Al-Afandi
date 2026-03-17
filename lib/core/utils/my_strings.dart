@@ -45,6 +45,12 @@ class MyStrings {
 
   static const String regScreenSubTitle = "سجل عشان تبدأ تقدم مشاوير مريحة وتكسب في الوقت اللي يناسبك";
 
+
+  static const String regRiderScreenTitle = "انضم لينا";
+
+  static const String regRiderScreenSubTitle = "سجل حساب جديد وابدأ استمتع بمشاوير مريحة في أي وقت تحتاجه";
+
+
   static const String selectService = "اختار الخدمة";
 
   static const String selectBrand = "اختار الماركة";

@@ -48,7 +48,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return WillPopWidget(
-      nextRoute: RouteHelper.loginScreen,
+      nextRoute: RouteHelper.getLoginScreen(),
       child: AnnotatedRegionWidget(
         child: Scaffold(
           backgroundColor: MyColor.colorWhite,
@@ -72,7 +72,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                               ),
                               child: IconButton(
                                 onPressed: () {
-                                  Get.offAllNamed(RouteHelper.loginScreen);
+                                  Get.offAllNamed(RouteHelper.getLoginScreen());
                                 },
                                 icon: Icon(
                                   Icons.close,
