@@ -1036,7 +1036,7 @@ class MyStrings {
   static const String addTip = "إضافة بقشيش";
   static const String additionalInformation = "معلومات إضافية";
   static const String additionalInformationHint = "اكتب أي معلومات زيادة";
-  static const String allRides = "كل الرحلات";
+  static const String allRides = "كل المشاوير";
   static const String anyPickUpNotes = "أي ملاحظات للسواق؟";
   static const String areYouSureReject = "متأكد إنك عايز ترفض؟";
   static const String availableBids = "العروض المتاحة";
