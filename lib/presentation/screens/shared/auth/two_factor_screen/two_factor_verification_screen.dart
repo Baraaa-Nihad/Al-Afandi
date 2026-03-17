@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ovoride/core/helper/shared_preference_helper.dart';
 import 'package:get/get.dart';
 import 'package:ovoride/core/route/route.dart';
 import 'package:ovoride/core/utils/dimensions.dart';
@@ -39,7 +41,7 @@ class _TwoFactorVerificationScreenState extends State<TwoFactorVerificationScree
   @override
   Widget build(BuildContext context) {
     return WillPopWidget(
-      nextRoute: RouteHelper.loginScreen,
+      nextRoute: RouteHelper.getLoginScreen(),
       child: Scaffold(
         backgroundColor: MyColor.getScreenBgColor(),
         appBar: CustomAppBar(title: MyStrings.twoFactorAuth.tr, fromAuth: true),

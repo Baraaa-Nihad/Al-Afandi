@@ -47,7 +47,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   @override
   Widget build(BuildContext context) {
     return WillPopWidget(
-      nextRoute: RouteHelper.loginScreen,
+      nextRoute: RouteHelper.getLoginScreen(),
       child: AnnotatedRegionWidget(
         statusBarColor: MyColor.transparentColor,
         child: Scaffold(
@@ -84,7 +84,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                                     child: IconButton(
                                       onPressed: () {
                                         Get.offAllNamed(
-                                          RouteHelper.loginScreen,
+                                          RouteHelper.getLoginScreen(),
                                         );
                                       },
                                       icon: Icon(

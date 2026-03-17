@@ -14,6 +14,7 @@ import 'package:ovoride/presentation/screens/shared/auth/forget_password/reset_p
 import 'package:ovoride/presentation/screens/shared/auth/forget_password/verify_forget_password/verify_forget_password_screen.dart';
 import 'package:ovoride/presentation/screens/shared/auth/login/login_screen.dart';
 import 'package:ovoride/presentation/screens/rider/auth/login/login_screen.dart' as riderLogin;
+import 'package:ovoride/presentation/screens/rider/auth/registration/registration_screen.dart' as riderRegistration;
 import 'package:ovoride/presentation/screens/shared/auth/profile_complete/profile_complete_screen.dart';
 import 'package:ovoride/presentation/screens/shared/auth/registration/registration_screen.dart';
 import 'package:ovoride/presentation/screens/shared/auth/sms_verification_page/sms_verification_screen.dart';
@@ -77,6 +78,12 @@ import 'package:ovoride/presentation/screens/rider/web_view/web_view_screen.dart
 
 class RouteHelper {
   // ── Shared ──
+  static String getLoginScreen() {
+    final prefs = Get.find<SharedPreferences>();
+    final role = prefs.getString(SharedPreferenceHelper.userRoleKey) ?? 'driver';
+    return role == 'rider' ? riderLoginScreen : loginScreen;
+  }
+
   static const String splashScreen = "/splash_screen";
   static const String onboardScreen = "/onboard_screen";
   static const String userRoleScreen = "/user_role_screen";
@@ -85,7 +92,7 @@ class RouteHelper {
   static const String forgotPasswordScreen = "/forgot_password_screen";
   static const String changePasswordScreen = "/change_password_screen";
   static const String registrationScreen = "/registration_screen";
-  // static const String riderRegistartionScreen = "/rider_registration_screen";
+  static const String riderRegistartionScreen = "/rider_registration_screen";
   static const String profileCompleteScreen = "/profile_complete_screen";
   static const String emailVerificationScreen = "/verify_email_screen";
   static const String smsVerificationScreen = "/verify_sms_screen";
@@ -153,6 +160,7 @@ class RouteHelper {
     GetPage(name: onboardScreen, page: () => const OnBoardIntroScreen()),
     GetPage(name: userRoleScreen, page: () => const UserRoleScreen()),
     GetPage(name: loginScreen, page: () => const LoginScreen()),
+    GetPage(name: riderRegistartionScreen, page: () => const riderRegistration.RegistrationScreen()),
     GetPage(name: riderLoginScreen, page: () => const riderLogin.LoginScreen()),
     GetPage(name: forgotPasswordScreen, page: () => const ForgetPasswordScreen()),
     GetPage(name: changePasswordScreen, page: () => const ChangePasswordScreen()),

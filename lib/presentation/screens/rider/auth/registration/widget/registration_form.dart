@@ -7,11 +7,13 @@ import 'package:ovoride/core/utils/my_color.dart';
 import 'package:ovoride/core/utils/my_icons.dart';
 import 'package:ovoride/core/utils/my_strings.dart';
 import 'package:ovoride/core/utils/style.dart';
-import 'package:ovoride/data/controller/shared/auth/auth/registration_controller.dart';
+import 'package:ovoride/data/controller/rider/auth/registration_controller.dart';
 import 'package:ovoride/presentation/components/buttons/rounded_button.dart';
 import 'package:ovoride/presentation/components/image/custom_svg_picture.dart';
 import 'package:ovoride/presentation/components/text-form-field/custom_text_field.dart';
-import 'package:ovoride/presentation/screens/shared/auth/registration/widget/validation_widget.dart';
+
+import '../../../../shared/auth/registration/widget/validation_widget.dart';
+// import 'package:ovoride/presentation/screens/auth/registration/widget/validation_widget.dart';
 
 class RegistrationForm extends StatefulWidget {
   const RegistrationForm({super.key});
@@ -25,7 +27,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<RegistrationController>(
+    return GetBuilder<RegistrationController>(tag: 'rider',
       builder: (controller) {
         return Form(
           key: formKey,
@@ -39,10 +41,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
                 textInputType: TextInputType.text,
                 nextFocus: controller.lastNameFocusNode,
                 prefixIcon: Padding(
-                  padding: EdgeInsetsDirectional.only(
-                    start: Dimensions.space12,
-                    end: Dimensions.space8,
-                  ),
+                  padding: EdgeInsetsDirectional.only(start: Dimensions.space12, end: Dimensions.space8),
                   child: CustomSvgPicture(
                     image: MyIcons.user,
                     color: MyColor.primaryColor,
@@ -68,10 +67,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
                 textInputType: TextInputType.text,
                 nextFocus: controller.emailFocusNode,
                 prefixIcon: Padding(
-                  padding: EdgeInsetsDirectional.only(
-                    start: Dimensions.space12,
-                    end: Dimensions.space8,
-                  ),
+                  padding: EdgeInsetsDirectional.only(start: Dimensions.space12, end: Dimensions.space8),
                   child: CustomSvgPicture(
                     image: MyIcons.user,
                     color: MyColor.primaryColor,
@@ -98,10 +94,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
                 textInputType: TextInputType.emailAddress,
                 inputAction: TextInputAction.next,
                 prefixIcon: Padding(
-                  padding: EdgeInsetsDirectional.only(
-                    start: Dimensions.space12,
-                    end: Dimensions.space8,
-                  ),
+                  padding: EdgeInsetsDirectional.only(start: Dimensions.space12, end: Dimensions.space8),
                   child: CustomSvgPicture(
                     image: MyIcons.email,
                     color: MyColor.primaryColor,
@@ -137,10 +130,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
                   nextFocus: controller.confirmPasswordFocusNode,
                   textInputType: TextInputType.text,
                   prefixIcon: Padding(
-                    padding: EdgeInsetsDirectional.only(
-                      start: Dimensions.space12,
-                      end: Dimensions.space8,
-                    ),
+                    padding: EdgeInsetsDirectional.only(start: Dimensions.space12, end: Dimensions.space8),
                     child: CustomSvgPicture(
                       image: MyIcons.password,
                       color: MyColor.primaryColor,
@@ -173,10 +163,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
                 isShowSuffixIcon: true,
                 isPassword: true,
                 prefixIcon: Padding(
-                  padding: EdgeInsetsDirectional.only(
-                    start: Dimensions.space12,
-                    end: Dimensions.space8,
-                  ),
+                  padding: EdgeInsetsDirectional.only(start: Dimensions.space12, end: Dimensions.space8),
                   child: CustomSvgPicture(
                     image: MyIcons.password,
                     color: MyColor.primaryColor,
@@ -245,7 +232,9 @@ class _RegistrationFormState extends State<RegistrationForm> {
                                   ),
                                   recognizer: TapGestureRecognizer()
                                     ..onTap = () {
-                                      Get.toNamed(RouteHelper.privacyScreen);
+                                      Get.toNamed(
+                                        RouteHelper.privacyScreen,
+                                      );
                                     },
                                 ),
                               ],
@@ -283,7 +272,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
                   const SizedBox(width: Dimensions.space5),
                   TextButton(
                     onPressed: () {
-                      Get.offAllNamed(RouteHelper.getLoginScreen());
+                      Get.offAllNamed(RouteHelper.riderLoginScreen);
                     },
                     child: Text(
                       MyStrings.logIn.tr,

@@ -33,7 +33,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final formKey = GlobalKey<FormState>();
-  String userRole = 'rider'; // الافتراضي راكب
+  final String userRole = 'rider';
 
   @override
   void initState() {
@@ -43,20 +43,13 @@ class _LoginScreenState extends State<LoginScreen> {
     Get.put(SocialAuthController(authRepo: Get.find()));
 
     super.initState();
-    _loadUserRole(); // تحميل الدور المختار من الشاشة السابقة
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Get.find<LoginController>().remember = true;
     });
   }
 
-  // دالة لتحميل الدور لضمان عرض النصوص الصحيحة (النقطة 2)
-  Future<void> _loadUserRole() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      userRole = prefs.getString(SharedPreferenceHelper.userRoleKey) ?? 'rider';
-    });
-  }
+
 
   @override
   void dispose() {
@@ -266,7 +259,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     const SizedBox(width: Dimensions.space5),
                                     TextButton(
                                       onPressed: () {
-                                        Get.offAndToNamed(RouteHelper.registrationScreen);
+                                        Get.offAndToNamed(RouteHelper.riderRegistartionScreen);
                                       },
                                       child: Text(
                                         MyStrings.register.tr,

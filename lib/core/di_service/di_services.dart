@@ -27,6 +27,8 @@ import 'package:ovoride/data/controller/rider/ride/all_ride_controller.dart';
 import 'package:ovoride/data/controller/rider/map/ride_map_controller.dart';
 import 'package:ovoride/data/controller/rider/review/review_controller.dart';
 import 'package:ovoride/data/controller/rider/menu/my_menu_controller.dart';
+import 'package:ovoride/data/repo/rider/auth/signup_repo.dart' as riderSignUp;
+import 'package:ovoride/data/controller/rider/auth/registration_controller.dart' as riderRegistration;
 // Driver repos (aliased to avoid name conflicts)
 import 'package:ovoride/data/repo/driver/ride/ride_repo.dart' as driverRide;
 import 'package:ovoride/data/repo/driver/review/review_repo.dart' as driverReview;
@@ -66,6 +68,8 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.lazyPut(() => riderProfile.ProfileRepo(apiClient: Get.find()), fenix: true, tag: 'rider');
   Get.lazyPut(() => riderProfileCtrl.ProfileController(profileRepo: Get.find(tag: 'rider')), fenix: true, tag: 'rider');
   Get.lazyPut(() => MyMenuController(menuRepo: Get.find(), repo: Get.find()), fenix: true);
+  Get.lazyPut(() => riderSignUp.RegistrationRepo(apiClient: Get.find()), fenix: true, tag: 'rider');
+  Get.lazyPut(() => riderRegistration.RegistrationController(registrationRepo: Get.find(tag: 'rider'), generalSettingRepo: Get.find()), fenix: true, tag: 'rider');
 
   // Driver repos with 'driver' tag
   Get.lazyPut(() => driverRide.RideRepo(apiClient: Get.find()), fenix: true, tag: 'driver');
