@@ -91,7 +91,7 @@ class MyStrings {
 
   static const String rides = "المشاوير";
 
-  static const String newRide = "مشوار جديد";
+  static const String newRide = "المشاوير الجديدة";
 
   static const String acceptedRide = "مشوار مقبول";
 
@@ -121,16 +121,16 @@ class MyStrings {
   static const String rideCancel = "إلغاء المشوار";
   static const String rideCancelMsg = "يا ريت تكتب سبب الإلغاء";
 
-  static const String activeRide = "المشوار الحالي";
+  static const String activeRide = "المشاوير الحالية";
 
   static const String acceptRide = "قبول المشوار";
 
   static const String completeRide = "إنهاء المشوار";
 
   static const String cancelRide = "إلغاء المشوار";
-  static const String completedRides = "المشاوير اللي خلصت";
+  static const String completedRides = "المشاوير اللي تمت";
   static const String canceledRides = "المشاوير الملغية";
-  static const String runningRide = "مشوار شغال";
+  static const String runningRide = "المشاوير الشغالة";
 
   static const String allRide = "كل المشاوير";
 
@@ -583,7 +583,7 @@ class MyStrings {
 
   static const String addWithdraw = "طلب سحب جديد";
 
-  static const String receipt = "الإيصال";
+  static const String receipt = "الوَصـل";
 
   static const String enterAmount = "دخل المبلغ";
 
@@ -607,7 +607,7 @@ class MyStrings {
 
   static const String rideUid = "رقم المشوار";
 
-  static const String completed = "خلصت";
+  static const String completed = "خِـلصَت";
 
   static const String cancel = "إلغاء";
 

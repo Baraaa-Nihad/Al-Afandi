@@ -74,10 +74,10 @@ class _RoundedButtonState extends State<RoundedButton> {
     // Define the main content of the button (text or loading indicator)
     Widget buttonContent = widget.isLoading
         ? SpinKitFadingCircle(
-            color: widget.isOutlined ? widget.textColor ?? widget.bgColor ?? const Color.fromARGB(255, 44, 14, 124) : widget.textColor ?? const Color.fromARGB(6, 255, 255, 255),
+            color: widget.isOutlined ? widget.textColor ?? widget.bgColor ?? MyColor.primaryButtonColor : widget.textColor ?? MyColor.colorWhite,
             size: 25.0,
           )
-        : widget.child ?? Text("الوصل", style: effectiveTextStyle);
+        : widget.child ?? Text(widget.text.tr, style: effectiveTextStyle);
 
     return Listener(
       onPointerDown: _onPointerDown,

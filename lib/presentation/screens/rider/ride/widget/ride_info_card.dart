@@ -19,6 +19,19 @@ import 'package:ovoride/presentation/components/card/custom_app_card.dart';
 import 'package:ovoride/presentation/components/image/my_local_image_widget.dart';
 import 'package:ovoride/presentation/components/timeline/custom_time_line.dart';
 
+// دالة مساعدة لتحويل الأرقام إلى العربية
+extension ArabicNumbers on String {
+  String toArabicNumbers() {
+    const english = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    const arabic = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+    String result = this;
+    for (int i = 0; i < english.length; i++) {
+      result = result.replaceAll(english[i], arabic[i]);
+    }
+    return result;
+  }
+}
+
 class RiderRideInfoCard extends StatefulWidget {
   final AllRideController controller;
   final RideModel ride;
@@ -69,7 +82,8 @@ class _RiderRideInfoCardState extends State<RiderRideInfoCard> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    "${widget.controller.defaultCurrencySymbol}${StringConverter.formatNumber(widget.ride.offerAmount.toString())}",
+                    // تحويل رقم السعر للعربي
+                    "${widget.controller.defaultCurrencySymbol}${StringConverter.formatNumber(widget.ride.offerAmount.toString())}".toArabicNumbers(),
                     style: boldExtraLarge.copyWith(
                       color: MyColor.getPrimaryColor(),
                       fontSize: 18,
@@ -116,26 +130,33 @@ class _RiderRideInfoCardState extends State<RiderRideInfoCard> {
   }
 
   Widget _buildLocationInfo({required String title, required String address, required String timePrefix, required IconData icon, String? time}) {
-    // 1. استخدام الدالة الأصلية لضمان بقاء الساعة 12
     String originalRawDate = DateConverter.estimatedDate(DateTime.tryParse(time ?? '') ?? DateTime.now());
     List<String> parts = originalRawDate.split(' ');
 
-    // 2. تصحيح الوقت (صباحاً / مساءً)
     String timePart = "";
     if (parts.length >= 5) {
-      timePart = "${parts[3]} ${parts[4]}";
-      timePart = timePart.replaceAll("AM", "صباحاً").replaceAll("PM", "مساءً"); // التعديل المطلوب هنا
+      // إزالة الثواني: نأخذ الساعة والدقيقة فقط
+      List<String> timeSplit = parts[3].split(':');
+      String hourAndMinute = "${timeSplit[0]}:${timeSplit[1]}";
+
+      timePart = "$hourAndMinute ${parts[4]}";
+      timePart = timePart.replaceAll("AM", "صباحاً").replaceAll("PM", "مساءً");
+
+      timePart = timePart.toArabicNumbers();
     }
 
-    // 3. تنسيق التاريخ الرقمي (2026-3-11)
     DateTime parsedDate = DateTime.tryParse(time ?? '') ?? DateTime.now();
-    String numericDate = "${parsedDate.year}-${parsedDate.month}-${parsedDate.day}";
+
+    // إضافة حرف "م" بعد السنة وتحويل الكل للأرقام العربية
+    // استخدمنا String interpolation لإضافة حرف الميم بعد الرقم مباشرة
+    String numericDate = "${parsedDate.day}-${parsedDate.month}-${parsedDate.year} م".toArabicNumbers();
 
     return Padding(
       padding: const EdgeInsets.only(left: 12, bottom: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // العنوان (نقطة الركوب / الوجهة)
           Text(title, style: regularSmall.copyWith(color: MyColor.getGreyColor(), fontSize: 11)),
           const SizedBox(height: 4),
           Text(
@@ -161,11 +182,12 @@ class _RiderRideInfoCardState extends State<RiderRideInfoCard> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // عرض وقت الركوب/الوصول بدون ثواني
                       Row(
                         children: [
                           Text(
                             "$timePrefix: ",
-                            style: regularDefault.copyWith(fontSize: 10, color: MyColor.getGreyColor()),
+                            style: regularDefault.copyWith(fontSize: 11, color: MyColor.getGreyColor()),
                           ),
                           Text(
                             timePart,
@@ -174,16 +196,17 @@ class _RiderRideInfoCardState extends State<RiderRideInfoCard> {
                         ],
                       ),
                       const SizedBox(height: 2),
+                      // عرض التاريخ مع حرف "م"
                       Row(
                         children: [
                           Text(
                             "بتاريخ: ",
-                            style: regularDefault.copyWith(fontSize: 9, color: MyColor.getGreyColor().withOpacity(0.7)),
+                            style: regularDefault.copyWith(fontSize: 11, color: MyColor.getGreyColor()),
                           ),
                           const SizedBox(width: 4),
                           Text(
                             numericDate,
-                            style: regularDefault.copyWith(fontSize: 10, color: MyColor.getGreyColor()),
+                            style: regularDefault.copyWith(fontSize: 11, color: MyColor.getPrimaryColor()),
                           ),
                         ],
                       ),
@@ -207,7 +230,8 @@ class _RiderRideInfoCardState extends State<RiderRideInfoCard> {
       );
     } else if (widget.ride.status == AppStatus.RIDE_PENDING) {
       return RoundedButton(
-        text: "${MyStrings.viewBids.tr} (${widget.ride.bidsCount ?? 0})",
+        // تحويل عدد المزايدات للعربي
+        text: "${MyStrings.viewBids.tr} (${widget.ride.bidsCount ?? 0})".toArabicNumbers(),
         press: () => Get.toNamed(RouteHelper.rideBidScreen, arguments: widget.ride.id.toString()),
       );
     } else if (widget.ride.status == AppStatus.RIDE_COMPLETED) {
