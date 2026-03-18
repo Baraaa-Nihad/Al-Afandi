@@ -77,12 +77,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           Center(
                             child: Image.asset(
                               MyImages.appLogoWhite,
-                              color: MyColor.colorWhite,
-                              width: MediaQuery.of(context).size.width / 2.5,
+                              width: MediaQuery.of(context).size.width / 2,
                             ),
                           ),
                           spaceDown(Dimensions.space15),
-                          // تعديل العنوان بناءً على براند Saro الجديد
+                          // تعديل العنوان بناءً على براند الأفنـدي الجديد
                           Text(
                             userRole == 'driver' ? "أهلاً بك يا كابتن" : "جاهز لمشوارك؟",
                             style: boldExtraLarge.copyWith(
@@ -93,7 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           spaceDown(Dimensions.space5),
                           Text(
-                            userRole == 'driver' ? "سجل دخولك وابدأ في تحقيق الأرباح" : "سجل دخولك واستمتع برحلة آمنة مع Saro",
+                            userRole == 'driver' ? "سجل دخولك وابدأ في تحقيق الأرباح" : "سجل دخولك واستمتع برحلة آمنة مع الأفنـدي",
                             style: regularDefault.copyWith(
                               color: MyColor.colorWhite,
                               fontSize: Dimensions.fontLarge,

@@ -2,9 +2,9 @@ class MyStrings {
   //APP Name
   static const String appName = "OvoRide Driver";
 
-  static const String onboardTitle1 = "خليك جزء من عالم Saro"; //Title 1
+  static const String onboardTitle1 = "خليك جزء من عالم الأفنـدي"; //Title 1
 
-  static const String onboardDescription1 = "سواء كنت بتدور على مشوار مريح أو عايز تزود دخلك بذكاء، Saro بيجمعنا في شبكة واحدة بتكبر بيك.";
+  static const String onboardDescription1 = "سواء كنت بتدور على مشوار مريح أو عايز تزود دخلك بذكاء، الأفنـدي بيجمعنا في شبكة واحدة بتكبر بيك.";
 
   static const String onboardTitle2 = "سُوق، اكسَب، وعيش"; //Title 2
 
@@ -45,11 +45,9 @@ class MyStrings {
 
   static const String regScreenSubTitle = "سجل عشان تبدأ تقدم مشاوير مريحة وتكسب في الوقت اللي يناسبك";
 
-
   static const String regRiderScreenTitle = "انضم لينا";
 
   static const String regRiderScreenSubTitle = "سجل حساب جديد وابدأ استمتع بمشاوير مريحة في أي وقت تحتاجه";
-
 
   static const String selectService = "اختار الخدمة";
 

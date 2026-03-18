@@ -47,6 +47,6 @@ class DefaultFirebaseOptions {
     storageBucket: 'ovo-ride.firebasestorage.app',
     androidClientId: '1037368853288-52v19o4a590lmsfvqbh12iks1jf55727.apps.googleusercontent.com',
     iosClientId: '1037368853288-m5sd6u7i1euq16eojtdken8g3jrouru3.apps.googleusercontent.com',
-    iosBundleId: 'com.saro.app',
+    iosBundleId: 'com.afandi.app',
   );
 }

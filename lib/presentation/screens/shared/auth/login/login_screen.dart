@@ -78,8 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     Center(
                                       child: Image.asset(
                                         MyImages.appLogoWhite,
-                                        color: MyColor.colorWhite,
-                                        width: MediaQuery.of(context).size.width / 2.5,
+                                        width: MediaQuery.of(context).size.width / 2,
                                       ),
                                     ),
                                     spaceDown(Dimensions.space15),

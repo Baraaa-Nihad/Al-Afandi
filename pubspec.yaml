@@ -67,6 +67,7 @@ dev_dependencies:
     sdk: flutter
   flutter_launcher_icons: "^0.13.1"
   change_app_package_name: ^1.1.0
+  rename: ^3.0.1
 
 dependency_overrides:
   intl: any
@@ -100,5 +101,4 @@ flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
   image_path: "assets/images/logo/appIcon.png" # مسار صورتك الجديد
-  adaptive_icon_background: "#FFFFFF" # لون الخلفية للأندرويد (اختياري)
   adaptive_icon_foreground: "assets/images/logo/appIcon.png" # اللوجو للأندرويد

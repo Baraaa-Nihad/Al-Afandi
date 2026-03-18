@@ -11,7 +11,6 @@ import 'package:ovoride/presentation/components/divider/custom_spacer.dart';
 import 'package:ovoride/presentation/screens/shared/auth/auth_background.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 class UserRoleScreen extends StatelessWidget {
   const UserRoleScreen({super.key});
 
@@ -48,11 +47,10 @@ class UserRoleScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         spaceDown(Dimensions.space15),
-                        // شعار Saro الجديد الموحد
+                        // شعار الأفنـدي الجديد الموحد
                         Image.asset(
                           MyImages.appLogoWhite,
-                          color: MyColor.colorWhite,
-                          width: MediaQuery.of(context).size.width / 2.5,
+                          width: MediaQuery.of(context).size.width / 2,
                         ),
                         spaceDown(Dimensions.space20),
                         Text(
@@ -98,7 +96,7 @@ class UserRoleScreen extends StatelessWidget {
                     children: [
                       spaceDown(Dimensions.space10),
                       Text(
-                        "اختار دورك في Saro", // تخصيص العنوان باسم البراند الجديد
+                        "اختار دورك في الأفنـدي", // تخصيص العنوان باسم البراند الجديد
                         style: boldExtraLarge.copyWith(
                           color: MyColor.getTextColor(),
                           fontSize: 22,

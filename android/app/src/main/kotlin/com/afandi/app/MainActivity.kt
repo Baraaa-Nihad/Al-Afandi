@@ -1,4 +1,4 @@
-package com.saro.app
+package com.afandi.app
 
 import io.flutter.embedding.android.FlutterActivity
 

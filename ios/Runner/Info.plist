@@ -37,9 +37,9 @@
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<!-- Change App Name and bundle name here -->
 	<key>CFBundleDisplayName</key>
-	<string>Saro</string>
+	<string>الأفندي</string>
 	<key>CFBundleName</key>
-	<string>Saro</string>
+	<string>الأفندي</string>
 
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
