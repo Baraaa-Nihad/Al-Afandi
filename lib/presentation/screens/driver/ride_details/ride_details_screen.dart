@@ -37,7 +37,8 @@ class _RideDetailsScreenState extends State<RideDetailsScreen> {
     Get.put(MessageRepo(apiClient: Get.find()), tag: 'driver');
     Get.put(RideMessageController(repo: Get.find(tag: 'driver')), tag: 'driver');
     final controller = Get.put(
-      RideDetailsController(repo: Get.find(tag: 'driver'), mapController: Get.find(tag: 'driver')), tag: 'driver',
+      RideDetailsController(repo: Get.find(tag: 'driver'), mapController: Get.find(tag: 'driver')),
+      tag: 'driver',
     );
     Get.put(
       PusherRideController(
@@ -74,7 +75,8 @@ class _RideDetailsScreenState extends State<RideDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<RideDetailsController>(tag: 'driver', 
+    return GetBuilder<RideDetailsController>(
+      tag: 'driver',
       builder: (controller) {
         return AnnotatedRegion<SystemUiOverlayStyle>(
           value: const SystemUiOverlayStyle(
@@ -119,7 +121,7 @@ class _RideDetailsScreenState extends State<RideDetailsScreen> {
                           ),
                           color: MyColor.colorBlack,
                           onPressed: () => Get.back(result: true),
-                          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+                          icon: const Icon(Icons.arrow_forward_ios_outlined),
                         ),
                       ),
                     ),

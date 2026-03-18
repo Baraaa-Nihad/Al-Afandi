@@ -39,6 +39,7 @@ class RideDetailsBottomSheetWidget extends StatelessWidget {
       builder: (controller) {
         final ride = controller.ride;
         final currency = controller.currency;
+        bool isCancelled = ride.status == AppStatus.RIDE_CANCELED;
 
         return Stack(
           children: [
@@ -60,7 +61,7 @@ class RideDetailsBottomSheetWidget extends StatelessWidget {
                 controller: scrollController,
                 children: [
                   // Handle Bar
-                  if (ride.status != AppStatus.RIDE_COMPLETED && ride.status != AppStatus.RIDE_CANCELED && ride.status != AppStatus.RIDE_PAYMENT_REQUESTED) ...[
+                  if (ride.status != AppStatus.RIDE_COMPLETED && !isCancelled && ride.status != AppStatus.RIDE_PAYMENT_REQUESTED) ...[
                     Align(
                       alignment: Alignment.topCenter,
                       child: Container(
@@ -75,11 +76,12 @@ class RideDetailsBottomSheetWidget extends StatelessWidget {
                     const SizedBox(height: Dimensions.space15),
                   ],
 
-                  if (ride.status == AppStatus.RIDE_PAYMENT_REQUESTED || (ride.status == AppStatus.RIDE_COMPLETED) || (ride.status == AppStatus.RIDE_CANCELED)) ...[
+                  if (ride.status == AppStatus.RIDE_PAYMENT_REQUESTED || (ride.status == AppStatus.RIDE_COMPLETED) || isCancelled) ...[
                     const SizedBox(height: Dimensions.space70),
                   ],
 
                   if (ride.user != null) ...[
+                    // تخصيص عرض المستخدم: إخفاء أزرار الاتصال إذا كان المشوار ملغياً
                     UserDetailsWidget(
                       ride: ride,
                       imageUrl: controller.userImageUrl,
@@ -87,118 +89,73 @@ class RideDetailsBottomSheetWidget extends StatelessWidget {
                     const SizedBox(height: Dimensions.space25),
                   ],
 
-                  // بطاقة العداد (المسافة، الوقت، السعر)
-                  buildRideCounterWidget(ride, currency),
+                  // بطاقة العداد: تختفي تماماً في حالة الإلغاء لزيادة الاحترافية
+                  if (!isCancelled) ...[
+                    buildRideCounterWidget(ride, currency),
+                    const SizedBox(height: Dimensions.space25),
+                  ],
 
-                  const SizedBox(height: Dimensions.space25),
-
-                  // قسم العناوين (نقطة الركوب والوجهة) - تم الإصلاح هنا
+                  // قسم العناوين (نقطة الركوب والوجهة)
                   buildLocationSection(ride),
 
                   const SizedBox(height: Dimensions.space25),
 
-                  // منطقة الأزرار
-                  if (controller.ride.status == AppStatus.RIDE_COMPLETED) ...[
-                    if (controller.ride.userReview == null) ...[
-                      RoundedButton(
-                        text: MyStrings.review.tr,
-                        press: () {
-                          CustomBottomSheet(
-                            child: RideDetailsReviewSection(),
-                          ).customBottomSheet(context);
-                        },
-                      ),
-                    ] else ...[
-                      buildReceiptButton(ride),
-                    ],
-                  ],
+                  // منطقة الأزرار والتحكم بالرحلة
+                  _buildActionButtons(context, controller, ride),
 
-                  if (controller.ride.status == AppStatus.RIDE_ACTIVE) ...[
-                    RoundedButton(
-                      text: MyStrings.pickupPassenger.tr,
-                      press: () {
-                        CustomBottomSheet(
-                          child: PickUpRiderBottomSheet(ride: ride),
-                        ).customBottomSheet(context);
-                      },
-                      isLoading: controller.isStartBtnLoading,
-                    ),
-                    const SizedBox(height: Dimensions.space15),
-                    RoundedButton(
-                      text: MyStrings.cancelRide.tr,
-                      press: () {
-                        CustomBottomSheet(
-                          child: RideCancelBottomSheet(ride: controller.ride),
-                        ).customBottomSheet(context);
-                      },
-                      bgColor: Colors.transparent,
-                      textColor: MyColor.redCancelTextColor,
-                      isOutlined: true,
-                    ),
-                  ],
-
-                  if (controller.ride.status == AppStatus.RIDE_RUNNING) ...[
-                    RoundedButton(
-                      text: MyStrings.endRide.tr,
-                      press: () {
-                        AppDialog().showRideDetailsDialog(
-                          context,
-                          title: MyStrings.pleaseConfirm.tr,
-                          description: MyStrings.youWantToEndTheRide.tr,
-                          onTap: () async {
-                            await controller.endRide(ride.id ?? '-1');
-                          },
-                        );
-                      },
-                      isLoading: controller.isEndBtnLoading,
-                    ),
-                  ],
-
-                  if (controller.ride.status == AppStatus.RIDE_PAYMENT_REQUESTED) ...[
-                    RideDetailsPaymentSection(),
-                  ],
                   const SizedBox(height: Dimensions.space30),
                 ],
               ),
             ),
 
-            // هيدر الحالة (المشوار خلص / ملغي)
-            if (ride.status == AppStatus.RIDE_PAYMENT_REQUESTED || (ride.status == AppStatus.RIDE_COMPLETED) || (ride.status == AppStatus.RIDE_CANCELED)) ...[
-              Positioned(
-                top: 0,
-                right: 0,
-                left: 0,
-                child: IgnorePointer(
-                  child: Container(
-                    height: 60,
-                    decoration: BoxDecoration(
-                      color: (ride.status == AppStatus.RIDE_CANCELED) ? MyColor.redCancelTextColor.withOpacity(0.9) : MyColor.getPrimaryColor().withOpacity(0.9),
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(Dimensions.moreRadius),
-                        topRight: Radius.circular(Dimensions.moreRadius),
-                      ),
-                    ),
-                    child: Center(
-                      child: Text(
-                        (ride.status == AppStatus.RIDE_COMPLETED)
-                            ? MyStrings.rideCompleted.tr
-                            : (ride.status == AppStatus.RIDE_CANCELED)
-                                ? MyStrings.rideCanceled.tr
-                                : MyStrings.arriveAtMsg.tr,
-                        style: boldExtraLarge.copyWith(color: Colors.white),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+            // هيدر الحالة الاحترافي (براند الأفندي)
+            _buildStatusHeader(ride),
           ],
         );
       },
     );
   }
 
-  // دالة عرض المواقع (تم إصلاح الأخطاء البرمجية الموضحة في الصورة)
+  // دالة بناء هيدر الحالة العلوي
+  Widget _buildStatusHeader(RideModel ride) {
+    bool isCompleted = ride.status == AppStatus.RIDE_COMPLETED;
+    bool isCancelled = ride.status == AppStatus.RIDE_CANCELED;
+    bool isPaymentReq = ride.status == AppStatus.RIDE_PAYMENT_REQUESTED;
+
+    if (isCompleted || isCancelled || isPaymentReq) {
+      return Positioned(
+        top: 0,
+        right: 0,
+        left: 0,
+        child: IgnorePointer(
+          child: Container(
+            height: 60,
+            decoration: BoxDecoration(
+              // استخدام اللون البنفسجي للنجاح والأحمر الباهت للإلغاء
+              color: isCancelled ? Colors.redAccent.withOpacity(0.9) : MyColor.getPrimaryColor().withOpacity(0.9),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(Dimensions.moreRadius),
+                topRight: Radius.circular(Dimensions.moreRadius),
+              ),
+            ),
+            child: Center(
+              child: Text(
+                isCompleted
+                    ? MyStrings.rideCompleted.tr
+                    : isCancelled
+                        ? "تم إلغاء هذا الطلب يا أفندي"
+                        : MyStrings.arriveAtMsg.tr,
+                style: boldExtraLarge.copyWith(color: Colors.white, fontSize: 18),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+    return const SizedBox.shrink();
+  }
+
+  // دالة عرض المواقع
   Widget buildLocationSection(RideModel ride) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -208,11 +165,7 @@ class RideDetailsBottomSheetWidget extends StatelessWidget {
           Column(
             children: [
               const Icon(Icons.radio_button_checked, size: 20, color: MyColor.primaryColor),
-              Container(
-                width: 1,
-                height: 50,
-                color: MyColor.neutral300,
-              ),
+              Container(width: 1, height: 50, color: MyColor.neutral300),
               const Icon(Icons.location_on, size: 20, color: Colors.redAccent),
             ],
           ),
@@ -221,47 +174,84 @@ class RideDetailsBottomSheetWidget extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // نقطة الركوب
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      MyStrings.pickUpLocation.tr,
-                      style: regularSmall.copyWith(color: const Color.fromARGB(255, 47, 10, 209)),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      ride.pickupLocation ?? '',
-                      style: boldDefault.copyWith(color: MyColor.titleColor),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
+                _buildLocationItem(MyStrings.pickUpLocation.tr, ride.pickupLocation ?? '', MyColor.getPrimaryColor()),
                 const SizedBox(height: 25),
-                // الوجهة
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      MyStrings.destination.tr,
-                      style: regularSmall.copyWith(color: const Color.fromARGB(255, 215, 54, 29)),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      ride.destination ?? '',
-                      style: boldDefault.copyWith(color: MyColor.titleColor),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
+                _buildLocationItem(MyStrings.destination.tr, ride.destination ?? '', Colors.redAccent),
               ],
             ),
           ),
         ],
       ),
     );
+  }
+
+  Widget _buildLocationItem(String label, String address, Color labelColor) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: regularSmall.copyWith(color: labelColor, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 4),
+        Text(
+          address,
+          style: boldDefault.copyWith(color: MyColor.titleColor),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
+    );
+  }
+
+  // دالة بناء أزرار التحكم بناءً على الحالة
+  Widget _buildActionButtons(BuildContext context, RideDetailsController controller, RideModel ride) {
+    if (ride.status == AppStatus.RIDE_COMPLETED) {
+      if (ride.userReview == null) {
+        return RoundedButton(
+          text: MyStrings.review.tr,
+          press: () => CustomBottomSheet(child: RideDetailsReviewSection()).customBottomSheet(context),
+        );
+      } else {
+        return buildReceiptButton(ride);
+      }
+    }
+
+    if (ride.status == AppStatus.RIDE_ACTIVE) {
+      return Column(
+        children: [
+          RoundedButton(
+            text: MyStrings.pickupPassenger.tr,
+            press: () => CustomBottomSheet(child: PickUpRiderBottomSheet(ride: ride)).customBottomSheet(context),
+            isLoading: controller.isStartBtnLoading,
+          ),
+          const SizedBox(height: 15),
+          RoundedButton(
+            text: MyStrings.cancelRide.tr,
+            press: () => CustomBottomSheet(child: RideCancelBottomSheet(ride: ride)).customBottomSheet(context),
+            bgColor: Colors.transparent,
+            textColor: MyColor.redCancelTextColor,
+            isOutlined: true,
+          ),
+        ],
+      );
+    }
+
+    if (ride.status == AppStatus.RIDE_RUNNING) {
+      return RoundedButton(
+        text: MyStrings.endRide.tr,
+        press: () => AppDialog().showRideDetailsDialog(
+          context,
+          title: MyStrings.pleaseConfirm.tr,
+          description: MyStrings.youWantToEndTheRide.tr,
+          onTap: () async => await controller.endRide(ride.id ?? '-1'),
+        ),
+        isLoading: controller.isEndBtnLoading,
+      );
+    }
+
+    if (ride.status == AppStatus.RIDE_PAYMENT_REQUESTED) {
+      return RideDetailsPaymentSection();
+    }
+
+    return const SizedBox.shrink();
   }
 
   Widget buildRideCounterWidget(RideModel ride, String currency) {
@@ -288,9 +278,7 @@ class RideDetailsBottomSheetWidget extends StatelessWidget {
     return Expanded(
       child: Column(
         children: [
-          FittedBox(
-            child: Text(value, style: boldMediumLarge.copyWith(color: isAmount ? MyColor.getPrimaryColor() : MyColor.titleColor)),
-          ),
+          FittedBox(child: Text(value, style: boldMediumLarge.copyWith(color: isAmount ? MyColor.getPrimaryColor() : MyColor.titleColor))),
           const SizedBox(height: 4),
           Text(label, style: regularSmall.copyWith(color: MyColor.getBodyTextColor())),
         ],

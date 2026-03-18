@@ -17,8 +17,9 @@ class RoundedButton extends StatefulWidget {
   final Widget? child;
   final TextStyle? textStyle;
   final bool isLoading;
-  final Color borderColor; // Added for outlined button border color
-  final bool isDisabled; // Added to handle disabled state
+  final Color borderColor;
+  final bool isDisabled;
+
   const RoundedButton({
     super.key,
     this.isColorChange = false,
@@ -30,10 +31,10 @@ class RoundedButton extends StatefulWidget {
     required this.press,
     this.isOutlined = false,
     this.bgColor,
-    this.textColor = MyColor.colorWhite,
+    this.textColor,
     this.textStyle,
     this.isLoading = false,
-    this.borderColor = MyColor.primaryButtonColor, // Default border color
+    this.borderColor = MyColor.primaryButtonColor,
     this.isDisabled = false,
   });
 
@@ -45,16 +46,13 @@ class _RoundedButtonState extends State<RoundedButton> {
   bool _isPressed = false;
 
   void _onPointerDown(PointerDownEvent event) {
-    // printX("_onPointerDown");
     if (widget.isDisabled || widget.isLoading) return;
     setState(() => _isPressed = true);
   }
 
   void _onPointerUp(PointerUpEvent event) {
-    // printX("_onPointerUp");
     if (widget.isDisabled || widget.isLoading) return;
     setState(() => _isPressed = false);
-    // widget.press();
   }
 
   @override
@@ -62,19 +60,30 @@ class _RoundedButtonState extends State<RoundedButton> {
     final double buttonScale = _isPressed ? 0.95 : 1.0;
     final double buttonOpacity = widget.isDisabled ? 0.6 : 1.0;
 
-    // Define the text style for the button
+    // دالة ذكية لتحديد لون المحتوى (نص أو مؤشر تحميل) لضمان التباين
+    Color getContentColor() {
+      if (widget.isOutlined) {
+        // إذا كان مفرغاً: الأولوية لـ textColor الممرر، ثم bgColor، ثم اللون الأساسي للتطبيق
+        return widget.textColor ?? widget.bgColor ?? MyColor.primaryButtonColor;
+      } else {
+        // إذا كان ملوناً بالكامل: الأولوية لـ textColor الممرر، وإلا فالأبيض الصريح
+        return widget.textColor ?? MyColor.colorWhite;
+      }
+    }
+
+    final Color contentColor = getContentColor();
+
     final effectiveTextStyle = widget.textStyle ??
         regularDefault.copyWith(
-          color: widget.isOutlined ? widget.textColor ?? widget.bgColor ?? MyColor.primaryButtonColor : widget.textColor ?? const Color.fromARGB(255, 233, 230, 230),
+          color: contentColor,
           fontSize: 16,
-          fontWeight: FontWeight.w500,
-          letterSpacing: 1.2,
+          fontWeight: FontWeight.w600, // زيادة السماكة قليلاً للوضوح
+          letterSpacing: 1.1,
         );
 
-    // Define the main content of the button (text or loading indicator)
     Widget buttonContent = widget.isLoading
         ? SpinKitFadingCircle(
-            color: widget.isOutlined ? widget.textColor ?? widget.bgColor ?? MyColor.primaryButtonColor : widget.textColor ?? MyColor.primaryButtonColor,
+            color: contentColor,
             size: 25.0,
           )
         : widget.child ?? Text(widget.text.tr, style: effectiveTextStyle);
@@ -95,77 +104,35 @@ class _RoundedButtonState extends State<RoundedButton> {
     );
   }
 
+  // تصميم الزر الملون (الأساسي)
   Widget buildButtonStyleWidget(Widget buttonContent) {
     return Container(
       height: widget.height,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(widget.cornerRadius),
         border: Border.all(
-          color: (widget.bgColor ?? MyColor.primaryButtonColor).withValues(
-            alpha: 0.5,
-          ), // border color
+          color: (widget.bgColor ?? MyColor.primaryButtonColor).withValues(alpha: 0.5),
           width: 1.5,
         ),
-        color: (widget.bgColor ?? MyColor.primaryButtonColor), // primary background
+        color: (widget.bgColor ?? MyColor.primaryButtonColor),
       ),
       child: Stack(
         children: [
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(widget.cornerRadius),
-                gradient: LinearGradient(
-                  colors: [
-                    MyColor.secondaryButtonColor.withValues(alpha: 0.2),
-                    Color.fromRGBO(255, 255, 255, 0.0),
-                  ],
-                  begin: Alignment(0.0, -1.0),
-                  end: Alignment(0.0, -0.7),
-                ),
-              ),
-            ),
-          ),
+          // إضافة تأثيرات التدرج (Gradients) كما في الكود الأصلي
+          _buildGradientLayer(Alignment(0.0, -1.0), Alignment(0.0, -0.7)),
+          _buildGradientLayer(Alignment(1.0, 0.0), Alignment(0.97, 0.0)),
+          _buildGradientLayer(Alignment(-1.0, 0.0), Alignment(-0.97, 0.0)),
 
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(widget.cornerRadius),
-                gradient: LinearGradient(
-                  colors: [
-                    MyColor.secondaryButtonColor.withValues(alpha: 0.2),
-                    Color.fromRGBO(255, 255, 255, 0.0),
-                  ],
-                  begin: Alignment(1.0, 0.0),
-                  end: Alignment(0.97, 0.0),
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(widget.cornerRadius),
+              onTap: widget.press,
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: buttonContent,
                 ),
-              ),
-            ),
-          ),
-
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(widget.cornerRadius),
-                gradient: LinearGradient(
-                  colors: [
-                    MyColor.secondaryButtonColor.withValues(alpha: 0.2),
-                    Color.fromRGBO(255, 255, 255, 0.0),
-                  ],
-                  begin: Alignment(-1.0, 0.0), // left center (far left)
-                  end: Alignment(-0.97, 0.0), // slightly right of left center
-                ),
-              ),
-            ),
-          ),
-
-          // Button Content
-          InkWell(
-            borderRadius: BorderRadius.circular(widget.cornerRadius),
-            onTap: widget.press,
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: buttonContent,
               ),
             ),
           ),
@@ -174,86 +141,57 @@ class _RoundedButtonState extends State<RoundedButton> {
     );
   }
 
+  // تصميم الزر المفرغ (Outlined)
   Widget buildOutLineButtonStyleWidget(Widget buttonContent) {
     return Container(
       height: widget.height,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(widget.cornerRadius),
         border: Border.all(
-          color: MyColor.colorBlack.withValues(alpha: 0.06),
-          width: 1,
+          color: widget.borderColor.withValues(alpha: 0.3),
+          width: 1.5,
         ),
-        color: (widget.bgColor ?? MyColor.secondaryButtonColor), // primary background
+        color: (widget.bgColor ?? MyColor.colorWhite), // خلفية بيضاء افتراضياً للـ Outlined
         boxShadow: [
           BoxShadow(
             color: MyColor.colorBlack.withValues(alpha: 0.02),
             offset: const Offset(0, 3),
-            blurRadius: 0,
-            spreadRadius: 1.5,
+            blurRadius: 4,
+            spreadRadius: 1,
           ),
         ],
       ),
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(widget.cornerRadius),
-                gradient: LinearGradient(
-                  colors: [
-                    MyColor.colorBlack.withValues(alpha: 0.04),
-                    Color.fromRGBO(255, 255, 255, 0.0),
-                  ],
-                  begin: Alignment(0.0, 1.0),
-                  end: Alignment(0.0, 0.7),
-                ),
-              ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(widget.cornerRadius),
+          onTap: widget.press,
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: buttonContent,
             ),
           ),
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(widget.cornerRadius),
-                gradient: LinearGradient(
-                  colors: [
-                    MyColor.colorBlack.withValues(alpha: 0.04),
-                    Color.fromRGBO(255, 255, 255, 0.0),
-                  ],
-                  begin: Alignment(1.0, 0.0),
-                  end: Alignment(0.97, 0.0),
-                ),
-              ),
-            ),
-          ),
+        ),
+      ),
+    );
+  }
 
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(widget.cornerRadius),
-                gradient: LinearGradient(
-                  colors: [
-                    MyColor.colorBlack.withValues(alpha: 0.04),
-                    Color.fromRGBO(255, 255, 255, 0.0),
-                  ],
-                  begin: Alignment(-1.0, 0.0), // left center (far left)
-                  end: Alignment(-0.97, 0.0), // slightly right of left center
-                ),
-              ),
-            ),
+  // دالة مساعدة لبناء طبقات التدرج
+  Widget _buildGradientLayer(Alignment begin, Alignment end) {
+    return Positioned.fill(
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(widget.cornerRadius),
+          gradient: LinearGradient(
+            colors: [
+              MyColor.secondaryButtonColor.withValues(alpha: 0.2),
+              const Color.fromRGBO(255, 255, 255, 0.0),
+            ],
+            begin: begin,
+            end: end,
           ),
-
-          // Button Content
-          InkWell(
-            borderRadius: BorderRadius.circular(widget.cornerRadius),
-            onTap: widget.press,
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: buttonContent,
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
