@@ -18,8 +18,7 @@ import 'package:ovoride/presentation/components/text/default_text.dart';
 import 'package:ovoride/presentation/components/will_pop_widget.dart';
 import 'package:ovoride/presentation/screens/shared/auth/auth_background.dart';
 import 'package:ovoride/presentation/screens/shared/auth/social_auth/social_auth_section.dart';
-import 'package:ovoride/core/helper/shared_preference_helper.dart'; // مهم للتحقق من الدور
-import 'package:shared_preferences/shared_preferences.dart';
+// مهم للتحقق من الدور
 
 import 'package:ovoride/core/utils/my_images.dart';
 import 'package:ovoride/presentation/components/divider/custom_spacer.dart';
@@ -48,8 +47,6 @@ class _LoginScreenState extends State<LoginScreen> {
       Get.find<LoginController>().remember = true;
     });
   }
-
-
 
   @override
   void dispose() {

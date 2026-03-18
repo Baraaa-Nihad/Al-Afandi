@@ -63,19 +63,19 @@ class _RideActivityScreenState extends State<RideActivityScreen> with SingleTick
   Widget build(BuildContext context) {
     return Scaffold(
       // خلفية فاتحة جداً تعطي شعوراً بالنظافة (تجنب الرمادي الغامق)
-      backgroundColor: const Color.fromARGB(197, 158, 152, 157),
+      backgroundColor: const Color.fromARGB(238, 246, 247, 251),
       body: GetBuilder<AllRideController>(
         tag: 'driver',
         builder: (controller) {
           return Column(
             children: [
               SizedBox(
-                height: 40,
+                height: 30,
               ),
               Container(
                 padding: const EdgeInsets.only(top: 10),
                 decoration: BoxDecoration(
-                  color: MyColor.colorWhite,
+                  color: const Color.fromARGB(239, 246, 247, 251),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.03),
@@ -114,9 +114,23 @@ class _RideActivityScreenState extends State<RideActivityScreen> with SingleTick
               Expanded(
                 child: Container(
                   margin: const EdgeInsets.only(bottom: 10),
-                  child: AllRideListSection(scrollController: scrollController),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF6F7FB),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.04),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: AllRideListSection(
+                    scrollController: scrollController,
+                  ),
                 ),
-              ),
+              )
             ],
           );
         },

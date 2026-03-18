@@ -65,7 +65,7 @@ class _RoundedButtonState extends State<RoundedButton> {
     // Define the text style for the button
     final effectiveTextStyle = widget.textStyle ??
         regularDefault.copyWith(
-          color: widget.isOutlined ? widget.textColor ?? widget.bgColor ?? MyColor.primaryButtonColor : widget.textColor ?? MyColor.colorWhite,
+          color: widget.isOutlined ? widget.textColor ?? widget.bgColor ?? MyColor.primaryButtonColor : widget.textColor ?? const Color.fromARGB(255, 233, 230, 230),
           fontSize: 16,
           fontWeight: FontWeight.w500,
           letterSpacing: 1.2,
@@ -74,7 +74,7 @@ class _RoundedButtonState extends State<RoundedButton> {
     // Define the main content of the button (text or loading indicator)
     Widget buttonContent = widget.isLoading
         ? SpinKitFadingCircle(
-            color: widget.isOutlined ? widget.textColor ?? widget.bgColor ?? MyColor.primaryButtonColor : widget.textColor ?? MyColor.colorWhite,
+            color: widget.isOutlined ? widget.textColor ?? widget.bgColor ?? MyColor.primaryButtonColor : widget.textColor ?? MyColor.primaryButtonColor,
             size: 25.0,
           )
         : widget.child ?? Text(widget.text.tr, style: effectiveTextStyle);

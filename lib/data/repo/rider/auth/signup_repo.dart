@@ -36,7 +36,7 @@ class RegistrationRepo {
       'password': model.password,
       'password_confirmation': model.password,
     };
-    if (model.refference != null && model.refference!.isNotEmpty) {
+    if (model.refference.isNotEmpty) {
       bodyFields['refer_name'] = model.refference;
     }
     return bodyFields;

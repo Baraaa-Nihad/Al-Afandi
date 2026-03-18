@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ovoride/core/helper/string_format_helper.dart';
@@ -16,21 +15,17 @@ import 'package:ovoride/data/services/download_service.dart';
 import 'package:ovoride/environment.dart';
 import 'package:ovoride/presentation/components/bottom-sheet/custom_bottom_sheet.dart';
 import 'package:ovoride/presentation/components/buttons/rounded_button.dart';
-import 'package:ovoride/presentation/components/column_widget/card_column.dart';
 import 'package:ovoride/presentation/components/dialog/app_dialog.dart';
-import 'package:ovoride/presentation/components/divider/custom_spacer.dart';
-import 'package:ovoride/presentation/components/text/header_text.dart';
 import 'package:ovoride/presentation/screens/driver/ride_details/section/ride_details_payment_section.dart';
 import 'package:ovoride/presentation/screens/driver/ride_details/section/ride_details_review_section.dart';
 import 'package:ovoride/presentation/screens/driver/ride_details/widgets/pick_up_rider_bottom_sheet.dart';
 import 'package:ovoride/presentation/screens/driver/ride_details/widgets/ride_cancel_bottom_sheet.dart';
-import 'package:ovoride/presentation/screens/driver/ride_details/widgets/ride_destination_widget.dart';
 import 'package:ovoride/presentation/screens/driver/ride_details/widgets/user_details_widget.dart';
 
 class RideDetailsBottomSheetWidget extends StatelessWidget {
   final ScrollController scrollController;
-
   final DraggableScrollableController draggableScrollableController;
+
   const RideDetailsBottomSheetWidget({
     super.key,
     required this.scrollController,
@@ -39,7 +34,8 @@ class RideDetailsBottomSheetWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<RideDetailsController>(tag: 'driver', 
+    return GetBuilder<RideDetailsController>(
+      tag: 'driver',
       builder: (controller) {
         final ride = controller.ride;
         final currency = controller.currency;
@@ -54,7 +50,7 @@ class RideDetailsBottomSheetWidget extends StatelessWidget {
                   topRight: Radius.circular(Dimensions.moreRadius),
                 ),
               ),
-              padding: EdgeInsets.only(
+              padding: const EdgeInsets.only(
                 top: Dimensions.space10,
                 left: Dimensions.space16,
                 right: Dimensions.space16,
@@ -63,23 +59,24 @@ class RideDetailsBottomSheetWidget extends StatelessWidget {
                 clipBehavior: Clip.none,
                 controller: scrollController,
                 children: [
+                  // Handle Bar
                   if (ride.status != AppStatus.RIDE_COMPLETED && ride.status != AppStatus.RIDE_CANCELED && ride.status != AppStatus.RIDE_PAYMENT_REQUESTED) ...[
-                    spaceDown(Dimensions.space10),
                     Align(
                       alignment: Alignment.topCenter,
                       child: Container(
                         height: 5,
-                        width: 50,
+                        width: 45,
                         decoration: BoxDecoration(
-                          color: MyColor.neutral300,
-                          borderRadius: BorderRadius.circular(15),
+                          color: MyColor.neutral300.withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
                     ),
-                    spaceDown(Dimensions.space10),
+                    const SizedBox(height: Dimensions.space15),
                   ],
+
                   if (ride.status == AppStatus.RIDE_PAYMENT_REQUESTED || (ride.status == AppStatus.RIDE_COMPLETED) || (ride.status == AppStatus.RIDE_CANCELED)) ...[
-                    spaceDown(Dimensions.space70),
+                    const SizedBox(height: Dimensions.space70),
                   ],
 
                   if (ride.user != null) ...[
@@ -87,68 +84,35 @@ class RideDetailsBottomSheetWidget extends StatelessWidget {
                       ride: ride,
                       imageUrl: controller.userImageUrl,
                     ),
-                    spaceDown(Dimensions.space25),
+                    const SizedBox(height: Dimensions.space25),
                   ],
+
+                  // بطاقة العداد (المسافة، الوقت، السعر)
                   buildRideCounterWidget(ride, currency),
 
-                  spaceDown(Dimensions.space20),
+                  const SizedBox(height: Dimensions.space25),
 
-                  RideDestination(ride: controller.ride),
+                  // قسم العناوين (نقطة الركوب والوجهة) - تم الإصلاح هنا
+                  buildLocationSection(ride),
 
-                  //OLD CODE
-                  const SizedBox(height: Dimensions.space20),
+                  const SizedBox(height: Dimensions.space25),
+
+                  // منطقة الأزرار
                   if (controller.ride.status == AppStatus.RIDE_COMPLETED) ...[
                     if (controller.ride.userReview == null) ...[
                       RoundedButton(
-                        text: MyStrings.review,
-                        isOutlined: false,
+                        text: MyStrings.review.tr,
                         press: () {
                           CustomBottomSheet(
                             child: RideDetailsReviewSection(),
                           ).customBottomSheet(context);
                         },
-                        textColor: MyColor.colorWhite,
                       ),
                     ] else ...[
-                      const SizedBox(height: Dimensions.space20),
-                      Builder(
-                        builder: (context) {
-                          bool isDownLoadLoading = false;
-                          return StatefulBuilder(
-                            builder: (context, setState) {
-                              return RoundedButton(
-                                isOutlined: true,
-                                text: MyStrings.receipt,
-                                isLoading: isDownLoadLoading,
-                                press: () async {
-                                  setState(() {
-                                    isDownLoadLoading = true;
-                                  });
-                                  await DownloadService.downloadPDF(
-                                    url: "${UrlContainer.rideReceipt}/${ride.id}",
-                                    fileName: "${Environment.appName}_receipt_${ride.id}.pdf",
-                                  );
-                                  setState(() {
-                                    isDownLoadLoading = false;
-                                  });
-                                },
-                                bgColor: MyColor.getPrimaryColor().withValues(
-                                  alpha: 0.1,
-                                ),
-                                textColor: MyColor.getPrimaryColor(),
-                                textStyle: regularDefault.copyWith(
-                                  color: MyColor.getPrimaryColor(),
-                                  fontSize: Dimensions.fontLarge,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
-                      SizedBox(height: Dimensions.space15),
+                      buildReceiptButton(ride),
                     ],
                   ],
+
                   if (controller.ride.status == AppStatus.RIDE_ACTIVE) ...[
                     RoundedButton(
                       text: MyStrings.pickupPassenger.tr,
@@ -159,7 +123,7 @@ class RideDetailsBottomSheetWidget extends StatelessWidget {
                       },
                       isLoading: controller.isStartBtnLoading,
                     ),
-                    spaceDown(Dimensions.space20),
+                    const SizedBox(height: Dimensions.space15),
                     RoundedButton(
                       text: MyStrings.cancelRide.tr,
                       press: () {
@@ -167,18 +131,20 @@ class RideDetailsBottomSheetWidget extends StatelessWidget {
                           child: RideCancelBottomSheet(ride: controller.ride),
                         ).customBottomSheet(context);
                       },
-                      bgColor: MyColor.redCancelTextColor,
+                      bgColor: Colors.transparent,
+                      textColor: MyColor.redCancelTextColor,
+                      isOutlined: true,
                     ),
-                    spaceDown(Dimensions.space20),
                   ],
+
                   if (controller.ride.status == AppStatus.RIDE_RUNNING) ...[
                     RoundedButton(
-                      text: MyStrings.endRide,
+                      text: MyStrings.endRide.tr,
                       press: () {
                         AppDialog().showRideDetailsDialog(
                           context,
-                          title: MyStrings.pleaseConfirm,
-                          description: MyStrings.youWantToEndTheRide,
+                          title: MyStrings.pleaseConfirm.tr,
+                          description: MyStrings.youWantToEndTheRide.tr,
                           onTap: () async {
                             await controller.endRide(ride.id ?? '-1');
                           },
@@ -187,15 +153,16 @@ class RideDetailsBottomSheetWidget extends StatelessWidget {
                       isLoading: controller.isEndBtnLoading,
                     ),
                   ],
+
                   if (controller.ride.status == AppStatus.RIDE_PAYMENT_REQUESTED) ...[
                     RideDetailsPaymentSection(),
-                    const SizedBox(height: Dimensions.space25),
                   ],
+                  const SizedBox(height: Dimensions.space30),
                 ],
               ),
             ),
 
-            //show arriving message
+            // هيدر الحالة (المشوار خلص / ملغي)
             if (ride.status == AppStatus.RIDE_PAYMENT_REQUESTED || (ride.status == AppStatus.RIDE_COMPLETED) || (ride.status == AppStatus.RIDE_CANCELED)) ...[
               Positioned(
                 top: 0,
@@ -203,31 +170,22 @@ class RideDetailsBottomSheetWidget extends StatelessWidget {
                 left: 0,
                 child: IgnorePointer(
                   child: Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: Dimensions.space20,
-                      vertical: Dimensions.space15,
-                    ),
-                    width: double.infinity,
+                    height: 60,
                     decoration: BoxDecoration(
-                      color: (ride.status == AppStatus.RIDE_CANCELED) ? MyColor.redCancelTextColor.withValues(alpha: 0.2) : MyColor.getPrimaryColor().withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.only(
+                      color: (ride.status == AppStatus.RIDE_CANCELED) ? MyColor.redCancelTextColor.withOpacity(0.9) : MyColor.getPrimaryColor().withOpacity(0.9),
+                      borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(Dimensions.moreRadius),
                         topRight: Radius.circular(Dimensions.moreRadius),
                       ),
                     ),
                     child: Center(
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: HeaderText(
-                          text: (ride.status == AppStatus.RIDE_COMPLETED)
-                              ? MyStrings.rideCompleted
-                              : (ride.status == AppStatus.RIDE_CANCELED)
-                                  ? MyStrings.rideCanceled.tr
-                                  : MyStrings.arriveAtMsg.tr,
-                          style: boldExtraLarge.copyWith(
-                            color: (ride.status == AppStatus.RIDE_CANCELED) ? MyColor.redCancelTextColor : MyColor.getPrimaryColor(),
-                          ),
-                        ),
+                      child: Text(
+                        (ride.status == AppStatus.RIDE_COMPLETED)
+                            ? MyStrings.rideCompleted.tr
+                            : (ride.status == AppStatus.RIDE_CANCELED)
+                                ? MyStrings.rideCanceled.tr
+                                : MyStrings.arriveAtMsg.tr,
+                        style: boldExtraLarge.copyWith(color: Colors.white),
                       ),
                     ),
                   ),
@@ -240,59 +198,65 @@ class RideDetailsBottomSheetWidget extends StatelessWidget {
     );
   }
 
-  Container buildRideCounterWidget(RideModel ride, String currency) {
+  // دالة عرض المواقع (تم إصلاح الأخطاء البرمجية الموضحة في الصورة)
+  Widget buildLocationSection(RideModel ride) {
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        horizontal: Dimensions.space15,
-        vertical: Dimensions.space15,
-      ),
-      decoration: BoxDecoration(
-        color: MyColor.neutral50,
-        borderRadius: BorderRadius.circular(Dimensions.largeRadius),
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 5),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: rideCardDetails(
-                title: '${ride.getDistance()} ${MyUtils.getDistanceLabel(distance: ride.distance, unit: Get.find<ApiClient>().getDistanceUnit())}',
-                description: MyStrings.distance,
+          Column(
+            children: [
+              const Icon(Icons.radio_button_checked, size: 20, color: MyColor.primaryColor),
+              Container(
+                width: 1,
+                height: 50,
+                color: MyColor.neutral300,
               ),
-            ),
+              const Icon(Icons.location_on, size: 20, color: Colors.redAccent),
+            ],
           ),
-          Container(
-            color: MyColor.neutral200,
-            height: Dimensions.space50,
-            margin: const EdgeInsets.symmetric(horizontal: Dimensions.space10),
-            width: 1,
-          ),
+          const SizedBox(width: 15),
           Expanded(
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: rideCardDetails(
-                title: '${ride.duration}',
-                description: MyStrings.estimatedTime,
-              ),
-            ),
-          ),
-          Container(
-            color: MyColor.neutral200,
-            height: Dimensions.space50,
-            margin: const EdgeInsets.symmetric(horizontal: Dimensions.space10),
-            width: 1,
-          ),
-          Expanded(
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: rideCardDetails(
-                title: '${StringConverter.formatNumber(ride.amount.toString())} $currency',
-                description: MyStrings.rideFare,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // نقطة الركوب
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      MyStrings.pickUpLocation.tr,
+                      style: regularSmall.copyWith(color: const Color.fromARGB(255, 47, 10, 209)),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      ride.pickupLocation ?? '',
+                      style: boldDefault.copyWith(color: MyColor.titleColor),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 25),
+                // الوجهة
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      MyStrings.destination.tr,
+                      style: regularSmall.copyWith(color: const Color.fromARGB(255, 215, 54, 29)),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      ride.destination ?? '',
+                      style: boldDefault.copyWith(color: MyColor.titleColor),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ],
@@ -300,18 +264,60 @@ class RideDetailsBottomSheetWidget extends StatelessWidget {
     );
   }
 
-  CardColumn rideCardDetails({
-    required String title,
-    required String description,
-  }) {
-    return CardColumn(
-      header: title.tr,
-      body: description.tr,
-      headerTextStyle: boldMediumLarge.copyWith(
-        color: MyColor.getPrimaryColor(),
+  Widget buildRideCounterWidget(RideModel ride, String currency) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: Dimensions.space20),
+      decoration: BoxDecoration(
+        color: MyColor.neutral50,
+        borderRadius: BorderRadius.circular(Dimensions.largeRadius),
       ),
-      bodyTextStyle: regularDefault.copyWith(color: MyColor.getBodyTextColor()),
-      alignmentCenter: true,
+      child: Row(
+        children: [
+          _buildInfoItem('${ride.getDistance()} ${MyUtils.getDistanceLabel(distance: ride.distance, unit: Get.find<ApiClient>().getDistanceUnit())}', MyStrings.distance.tr),
+          _buildDivider(),
+          _buildInfoItem('${ride.duration}', MyStrings.estimatedTime.tr),
+          _buildDivider(),
+          _buildInfoItem('${StringConverter.formatNumber(ride.amount.toString())} $currency', MyStrings.rideFare.tr, isAmount: true),
+        ],
+      ),
     );
+  }
+
+  Widget _buildInfoItem(String value, String label, {bool isAmount = false}) {
+    return Expanded(
+      child: Column(
+        children: [
+          FittedBox(
+            child: Text(value, style: boldMediumLarge.copyWith(color: isAmount ? MyColor.getPrimaryColor() : MyColor.titleColor)),
+          ),
+          const SizedBox(height: 4),
+          Text(label, style: regularSmall.copyWith(color: MyColor.getBodyTextColor())),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDivider() => Container(height: 30, width: 1, color: MyColor.neutral200);
+
+  Widget buildReceiptButton(RideModel ride) {
+    return Builder(builder: (context) {
+      bool isLoading = false;
+      return StatefulBuilder(builder: (context, setState) {
+        return RoundedButton(
+          text: MyStrings.receipt.tr,
+          isOutlined: true,
+          isLoading: isLoading,
+          press: () async {
+            setState(() => isLoading = true);
+            await DownloadService.downloadPDF(
+              url: "${UrlContainer.rideReceipt}/${ride.id}",
+              fileName: "${Environment.appName}_receipt_${ride.id}.pdf",
+            );
+            setState(() => isLoading = false);
+          },
+        );
+      });
+    });
   }
 }
