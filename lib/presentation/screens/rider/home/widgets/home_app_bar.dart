@@ -9,15 +9,17 @@ import 'package:ovoride/core/utils/my_icons.dart';
 import 'package:ovoride/core/utils/style.dart';
 import 'package:ovoride/core/utils/url_container.dart';
 import 'package:ovoride/data/controller/rider/home/home_controller.dart';
+import 'package:ovoride/data/services/notification_controller.dart';
 import 'package:ovoride/presentation/components/divider/custom_spacer.dart';
 import 'package:ovoride/presentation/components/image/custom_svg_picture.dart';
 import 'package:ovoride/presentation/components/image/my_network_image_widget.dart';
 import 'package:ovoride/presentation/components/text/header_text.dart';
 
 class RiderHomeScreenAppBar extends StatelessWidget {
-  HomeController controller;
-  Function openDrawer;
-  RiderHomeScreenAppBar({
+  final HomeController controller; // إضافة final للممارسات الجيدة
+  final Function openDrawer;
+
+  const RiderHomeScreenAppBar({
     super.key,
     required this.controller,
     required this.openDrawer,
@@ -38,11 +40,9 @@ class RiderHomeScreenAppBar extends StatelessWidget {
                   child: Row(
                     children: [
                       GestureDetector(
-                        onTap: () {
-                          Get.toNamed(RouteHelper.riderProfileScreen);
-                        },
+                        onTap: () => Get.toNamed(RouteHelper.riderProfileScreen),
                         child: MyImageWidget(
-                          imageUrl: '${UrlContainer.domainUrl}/${controller.userImagePath}/${controller.user.image}',
+                          imageUrl: controller.user.image != null ? '${UrlContainer.domainUrl}/${controller.userImagePath}/${controller.user.image}' : '', // سيقوم MyImageWidget بعرض صورة افتراضية في هذه الحالة
                           height: 50,
                           width: 50,
                           radius: 50,
@@ -57,7 +57,7 @@ class RiderHomeScreenAppBar extends StatelessWidget {
                             FittedBox(
                               fit: BoxFit.scaleDown,
                               child: HeaderText(
-                                text: controller.user.id == '-1' ? controller.homeRepo.apiClient.getUserName().toTitleCase() : controller.user.getFullName(),
+                                text: (controller.user.id == '-1' || controller.user.id == null) ? "الأفندي" : controller.user.getFullName(),
                                 style: boldLarge.copyWith(
                                   color: MyColor.getTextColor(),
                                   fontSize: Dimensions.fontLarge,
@@ -66,8 +66,6 @@ class RiderHomeScreenAppBar extends StatelessWidget {
                             ),
                             spaceDown(Dimensions.space3),
                             Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 CustomSvgPicture(
                                   image: MyIcons.currentLocation,
@@ -88,14 +86,63 @@ class RiderHomeScreenAppBar extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            spaceDown(Dimensions.space2),
                           ],
                         ),
                       ),
                     ],
                   ),
                 ),
-                SizedBox(width: Dimensions.space30),
+
+                // --- الجزء المضاف: أيقونة الإشعارات الذكية ---
+                GetBuilder<NotificationController>(builder: (notificationController) {
+                  return InkWell(
+                    onTap: () => Get.toNamed(RouteHelper.notificationScreen),
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: MyColor.cardBgColor,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: MyColor.naturalTextColor.withOpacity(0.2)),
+                          ),
+                          child: Icon(
+                            Icons.notifications_none_rounded,
+                            color: MyColor.primaryColor,
+                            size: 24,
+                          ),
+                        ),
+                        if (notificationController.unreadCount > 0)
+                          Positioned(
+                            top: -2,
+                            right: -2,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: const BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                              ),
+                              constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+                              child: Text(
+                                '${notificationController.unreadCount}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  );
+                }),
+                // ------------------------------------------
+
+                spaceSide(Dimensions.space10),
+
                 InkWell(
                   onTap: () => openDrawer(),
                   splashFactory: NoSplash.splashFactory,
@@ -105,9 +152,7 @@ class RiderHomeScreenAppBar extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: MyColor.cardBgColor,
                       border: Border.all(color: MyColor.naturalTextColor),
-                      borderRadius: BorderRadius.circular(
-                        Dimensions.largeRadius,
-                      ),
+                      borderRadius: BorderRadius.circular(Dimensions.largeRadius),
                     ),
                     child: SvgPicture.asset(MyIcons.sideMenu),
                   ),

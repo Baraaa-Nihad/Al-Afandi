@@ -1,3 +1,4 @@
+import 'dart:async'; // ضروري للـ Timer
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
@@ -16,7 +17,6 @@ import 'package:ovoride/data/repo/driver/dashboard/dashboard_repo.dart';
 import 'package:ovoride/environment.dart';
 import 'package:ovoride/presentation/components/snack_bar/show_custom_snackbar.dart';
 import 'package:ovoride/presentation/screens/driver/dashboard/forground_task_widget.dart';
-
 import 'package:ovoride/core/utils/url_container.dart';
 
 class DashBoardController extends GetxController {
@@ -41,10 +41,61 @@ class DashBoardController extends GetxController {
   String currencySym = '';
   String userImagePath = '';
 
+  List<RideModel> rideList = [];
+  List<RideModel> pendingRidesList = [];
+  RideModel? runningRide;
+  GlobalDriverInfoModel driver = GlobalDriverInfoModel(id: '-1');
+
+  // مؤقت للتحديث التلقائي الصامت
+  Timer? _periodicTimer;
+
+  @override
+  void onInit() {
+    super.onInit();
+    // تشغيل التحديث التلقائي كل 15 ثانية لضمان السرعة دون الحاجة لضغط ريفرش
+    _startAutoSync();
+  }
+
+  @override
+  void onClose() {
+    _periodicTimer?.cancel();
+    super.onClose();
+  }
+
+  void addNewRideDirectly(RideModel newRide) {
+    // نضيف شرط الـ userOnline لضمان عدم ظهور طلبات والسائق "أوفلاين"
+    if (!userOnline) return;
+
+    bool exists = rideList.any((element) => element.id == newRide.id);
+    if (!exists) {
+      rideList.insert(0, newRide);
+      update();
+    }
+  }
+
+  // دالة التحديث التلقائي (السر في السرعة)
+  void _startAutoSync() {
+    _periodicTimer = Timer.periodic(const Duration(seconds: 15), (timer) {
+      // نحدث فقط إذا كان السائق أونلاين ولا يوجد تحميل حالي
+      if (userOnline && !isLoading) {
+        loadData(shouldLoad: false);
+      }
+    });
+  }
+
+  // تحديث البيانات عند وصول إشارة Socket (اختياري لو فعلت Pusher)
+  void handleNewRideFromSocket(RideModel newRide) {
+    bool exists = rideList.any((r) => r.id == newRide.id);
+    if (!exists) {
+      rideList.insert(0, newRide);
+      update();
+    }
+  }
+
   Future<void> initialData({bool shouldLoad = true}) async {
     isLoading = shouldLoad;
     page = 0;
-    nextPageUrl;
+    nextPageUrl = null;
     bidAmountController.text = '';
     currency = repo.apiClient.getCurrency();
     currencySym = repo.apiClient.getCurrency(isSymbol: true);
@@ -54,19 +105,12 @@ class DashBoardController extends GetxController {
     update();
   }
 
-  GlobalDriverInfoModel driver = GlobalDriverInfoModel(id: '-1');
-
-  // Start location permission check but don't await yet
   Future<void> fetchLocation() async {
     bool hasPermission = await MyUtils.checkAppLocationPermission(
-      onsuccess: () {
-        initialData();
-      },
+      onsuccess: () => initialData(),
     );
-    printX(hasPermission);
     if (hasPermission) {
       getCurrentLocationAddress();
-      update(); // Ensure UI reflects added location
     }
   }
 
@@ -74,111 +118,81 @@ class DashBoardController extends GetxController {
     try {
       final GeolocatorPlatform geolocator = GeolocatorPlatform.instance;
       currentPosition = await geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.best,
-        ),
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.best),
       );
 
       if (currentPosition != null) {
         if (Environment.addressPickerFromGoogleMapApi) {
           currentAddress = await repo.getActualAddress(currentPosition!.latitude, currentPosition!.longitude) ?? 'Unknown location..';
         } else {
-          // Use local reverse geocoding
           final placemarks = await placemarkFromCoordinates(currentPosition!.latitude, currentPosition!.longitude);
           if (placemarks.isNotEmpty) {
             currentAddress = _formatAddress(placemarks.first);
-          } else {
-            currentAddress = 'Unknown location..';
           }
         }
       }
       update();
     } catch (e) {
-      printX("Error: $e");
-      CustomSnackBar.error(
-        errorList: [MyStrings.somethingWentWrongWhileTakingLocation],
-      );
+      printX("Location Error: $e");
     }
   }
 
-  /// Format address from placemark components
   String _formatAddress(Placemark placemark) {
-    // Safely format address components, checking for nulls
-    final street = placemark.street ?? '';
-    final subLocality = placemark.subLocality ?? '';
-    final locality = placemark.locality ?? '';
-    // final subAdministrativeArea = placemark.subAdministrativeArea ?? '';
-    // final administrativeArea = placemark.administrativeArea ?? '';
-    final country = placemark.country ?? '';
-
-    // return [street, subLocality, locality, subAdministrativeArea, administrativeArea, country].where((part) => part.isNotEmpty).join(', ');
     return [
-      street,
-      subLocality,
-      locality,
-      country,
+      placemark.street ?? '',
+      placemark.subLocality ?? '',
+      placemark.locality ?? '',
+      placemark.country ?? '',
     ].where((part) => part.isNotEmpty).join(', ');
   }
 
-  List<RideModel> rideList = [];
-  List<RideModel> pendingRidesList = [];
-  RideModel? runningRide;
-
   Future<void> loadData({bool shouldLoad = true}) async {
     try {
-      page = page + 1;
-      if (page == 1) {
-        isLoading = shouldLoad;
-        update();
+      if (shouldLoad) {
+        page = page + 1;
+        if (page == 1) {
+          isLoading = true;
+          update();
+        }
+      } else {
+        // في حالة التحديث التلقائي الصامت، نبقى في الصفحة الأولى لمزامنة الجديد
+        page = 1;
       }
 
-      ResponseModel responseModel = await repo.getDashboardData(
-        page: page.toString(),
-      );
+      ResponseModel responseModel = await repo.getDashboardData(page: page.toString());
 
       if (responseModel.statusCode == 200) {
-        DashBoardRideResponseModel model = DashBoardRideResponseModel.fromJson(
-          (responseModel.responseJson),
-        );
+        DashBoardRideResponseModel model = DashBoardRideResponseModel.fromJson(responseModel.responseJson);
         if (model.status == MyStrings.success) {
           nextPageUrl = model.data?.ride?.nextPageUrl;
           userImagePath = '${UrlContainer.domainUrl}/${model.data?.userImagePath}';
+
           if (page == 1) {
             rideList.clear();
           }
-          rideList.addAll(model.data?.ride?.data ?? []);
 
+          rideList.addAll(model.data?.ride?.data ?? []);
           pendingRidesList = model.data?.pendingRides ?? [];
 
-          isDriverVerified = model.data?.driverInfo?.dv == "1" ? true : false;
-          isVehicleVerified = model.data?.driverInfo?.vv == "1" ? true : false;
+          isDriverVerified = model.data?.driverInfo?.dv == "1";
+          isVehicleVerified = model.data?.driverInfo?.vv == "1";
+          isVehicleVerificationPending = model.data?.driverInfo?.vv == "2";
+          isDriverVerificationPending = model.data?.driverInfo?.dv == "2";
 
-          isVehicleVerificationPending = model.data?.driverInfo?.vv == "2" ? true : false;
-          isDriverVerificationPending = model.data?.driverInfo?.dv == "2" ? true : false;
-
-          userOnline = model.data?.driverInfo?.onlineStatus == "1" ? true : false;
+          userOnline = model.data?.driverInfo?.onlineStatus == "1";
           startForegroundTask();
+
           repo.apiClient.setOnlineStatus(userOnline);
           driver = model.data?.driverInfo ?? GlobalDriverInfoModel(id: '-1');
           runningRide = model.data?.runningRide;
-          repo.apiClient.sharedPreferences.setString(
-            SharedPreferenceHelper.userProfileKey,
-            model.data?.driverInfo?.imageWithPath ?? '',
-          );
 
           profileImageUrl = "${UrlContainer.domainUrl}/${model.data?.driverImagePath}/${model.data?.driverInfo?.image}";
 
           update();
-        } else {
-          CustomSnackBar.error(
-            errorList: model.message ?? [MyStrings.somethingWentWrong],
-          );
         }
-      } else {
-        CustomSnackBar.error(errorList: [responseModel.message]);
       }
     } catch (e) {
-      printE(e);
+      printX("LoadData Error: $e");
     } finally {
       isLoading = false;
       update();
@@ -186,50 +200,23 @@ class DashBoardController extends GetxController {
   }
 
   bool hasNext() {
-    return nextPageUrl != null && nextPageUrl!.isNotEmpty && nextPageUrl != 'null' ? true : false;
+    return nextPageUrl != null && nextPageUrl!.isNotEmpty && nextPageUrl != 'null';
   }
 
   bool isSendBidLoading = false;
-  Future<void> sendBid(
-    String rideId, {
-    String? amount,
-    VoidCallback? onActon,
-  }) async {
+  Future<void> sendBid(String rideId, {String? amount, VoidCallback? onActon}) async {
     isSendBidLoading = true;
     update();
-
     try {
-      ResponseModel responseModel = await repo.createBid(
-        amount: amount?.toString() ?? "",
-        id: rideId,
-      );
+      ResponseModel responseModel = await repo.createBid(amount: amount ?? "", id: rideId);
       if (responseModel.statusCode == 200) {
-        AuthorizationResponseModel model = AuthorizationResponseModel.fromJson(
-          (responseModel.responseJson),
-        );
-
+        AuthorizationResponseModel model = AuthorizationResponseModel.fromJson(responseModel.responseJson);
         if (model.status == "success") {
-          if (onActon != null) {
-            onActon();
-          }
-          initialData(shouldLoad: false);
-          // CustomSnackBar.success(successList: model.message ?? [MyStrings.somethingWentWrong], dismissAll: false);
-          Get.toNamed(RouteHelper.driverRideDetailsScreen, arguments: rideId)?.then((
-            v,
-          ) {
-            initialData(shouldLoad: false);
-          });
+          if (onActon != null) onActon();
+          Get.toNamed(RouteHelper.driverRideDetailsScreen, arguments: rideId)?.then((v) => initialData(shouldLoad: false));
         } else {
-          CustomSnackBar.error(
-            errorList: model.message ?? [MyStrings.somethingWentWrong],
-            dismissAll: false,
-          );
+          CustomSnackBar.error(errorList: model.message ?? [MyStrings.somethingWentWrong]);
         }
-      } else {
-        CustomSnackBar.error(
-          errorList: [responseModel.message],
-          dismissAll: false,
-        );
       }
     } catch (e) {
       printX(e);
@@ -243,38 +230,22 @@ class DashBoardController extends GetxController {
     update();
   }
 
-  //Driver Online Status Change
-  bool isChangingOnlineStatusLoading = false;
-  Future<void> onlineStatusSubmit({bool isFromRideDetails = false}) async {
+  Future<void> onlineStatusSubmit() async {
     try {
+      isChangingOnlineStatusLoading = true;
+      update();
       ResponseModel responseModel = await repo.onlineStatus(
         lat: currentPosition?.latitude.toString() ?? "",
         long: currentPosition?.longitude.toString() ?? "",
       );
       if (responseModel.statusCode == 200) {
-        AuthorizationResponseModel model = AuthorizationResponseModel.fromJson(
-          (responseModel.responseJson),
-        );
+        AuthorizationResponseModel model = AuthorizationResponseModel.fromJson(responseModel.responseJson);
         if (model.status == MyStrings.success) {
-          repo.apiClient.setOnlineStatus(
-            model.data?.online.toString() == 'true',
-          );
-          if (model.data?.online.toString() == 'true') {
-            userOnline = true;
-          } else {
-            userOnline = false;
-          }
+          userOnline = model.data?.online.toString() == 'true';
+          repo.apiClient.setOnlineStatus(userOnline);
           startForegroundTask();
-          isChangingOnlineStatusLoading = false;
           await loadData(shouldLoad: true);
-          update();
-        } else {
-          CustomSnackBar.error(
-            errorList: model.message ?? [MyStrings.somethingWentWrong],
-          );
         }
-      } else {
-        CustomSnackBar.error(errorList: [responseModel.message]);
       }
     } catch (e) {
       printE(e);
@@ -284,6 +255,7 @@ class DashBoardController extends GetxController {
     }
   }
 
+  bool isChangingOnlineStatusLoading = false;
   Future<void> startForegroundTask() async {
     try {
       if (userOnline) {
@@ -298,16 +270,12 @@ class DashBoardController extends GetxController {
 
   Future<void> changeOnlineStatus(bool value) async {
     bool hasPermission = await MyUtils.checkAppLocationPermission(
-      onsuccess: () async {
-        await onlineStatusSubmit();
-      },
+      onsuccess: () async => await onlineStatusSubmit(),
     );
-    printX(hasPermission);
     if (hasPermission) {
       userOnline = value;
       update();
       await onlineStatusSubmit();
-      update(); // Ensure UI reflects added location
     }
   }
 }

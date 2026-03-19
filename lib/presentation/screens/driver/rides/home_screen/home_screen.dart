@@ -7,6 +7,9 @@ import 'package:ovoride/core/utils/my_color.dart';
 import 'package:ovoride/core/utils/my_strings.dart';
 import 'package:ovoride/core/utils/style.dart';
 import 'package:ovoride/data/controller/driver/dashboard/dashboard_controller.dart';
+import 'package:ovoride/data/controller/driver/pusher/global_pusher_controller.dart';
+import 'package:ovoride/data/services/notification_controller.dart';
+// تأكد من استيراد الكنترولر المسؤول عن Pusher
 import 'package:ovoride/presentation/components/bottom-sheet/custom_bottom_sheet.dart';
 import 'package:ovoride/presentation/components/divider/custom_spacer.dart';
 import 'package:ovoride/presentation/components/no_data.dart';
@@ -33,6 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
+    Get.put(NotificationController(localStorageService: Get.find(), apiClient: Get.find()));
     super.initState();
     _initData();
   }
@@ -68,21 +72,28 @@ class _HomeScreenState extends State<HomeScreen> {
           extendBody: true,
           backgroundColor: MyColor.transparentColor,
           appBar: _buildAppBar(controller),
-          body: RefreshIndicator(
-            edgeOffset: 80,
-            backgroundColor: MyColor.colorWhite,
-            color: MyColor.primaryColor,
-            onRefresh: () async => controller.initialData(shouldLoad: true),
-            child: CustomScrollView(
-              physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-              controller: scrollController,
-              slivers: [
-                _buildKYCSections(),
-                if (!controller.isLoading) _buildRunningRideSection(controller),
-                _buildRideListSection(controller),
-                const SliverToBoxAdapter(child: SizedBox(height: Dimensions.space100)),
-              ],
-            ),
+          body: Stack(
+            // تم استخدام Stack لإظهار مؤشر الحالة فوق المحتوى
+            children: [
+              RefreshIndicator(
+                edgeOffset: 80,
+                backgroundColor: MyColor.colorWhite,
+                color: MyColor.primaryColor,
+                onRefresh: () async => controller.initialData(shouldLoad: true),
+                child: CustomScrollView(
+                  physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+                  controller: scrollController,
+                  slivers: [
+                    _buildKYCSections(),
+                    if (!controller.isLoading) _buildRunningRideSection(controller),
+                    _buildRideListSection(controller),
+                    const SliverToBoxAdapter(child: SizedBox(height: Dimensions.space100)),
+                  ],
+                ),
+              ),
+              // --- إضافة رادار حالة اتصال Pusher هنا ---
+              _buildPusherStatusMonitor(),
+            ],
           ),
         ),
       ),
@@ -95,6 +106,38 @@ class _HomeScreenState extends State<HomeScreen> {
     return PreferredSize(
       preferredSize: Size.fromHeight(appBarSize),
       child: HomeScreenAppBar(controller: controller),
+    );
+  }
+
+  // ودجت مراقبة حالة اتصال Pusher
+  Widget _buildPusherStatusMonitor() {
+    return GetBuilder<GlobalPusherController>(
+      builder: (pusherController) {
+        bool isConnected = pusherController.connectionState == "CONNECTED";
+        return Positioned(
+          top: 10,
+          right: 10,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: isConnected ? Colors.green.withOpacity(0.9) : Colors.red.withOpacity(0.9),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(isConnected ? Icons.bolt : Icons.bolt_outlined, color: Colors.white, size: 12),
+                const SizedBox(width: 4),
+                Text(
+                  pusherController.connectionState,
+                  style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ).animate(target: isConnected ? 0 : 1).shimmer(duration: 1000.ms),
+        );
+      },
     );
   }
 
@@ -175,32 +218,37 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
 
-    return SliverList.separated(
-      itemCount: controller.rideList.length + (controller.hasNext() ? 1 : 0),
-      separatorBuilder: (context, index) => spaceDown(Dimensions.space10),
-      itemBuilder: (context, index) {
-        if (index == controller.rideList.length) {
-          return const Padding(
-            padding: EdgeInsets.symmetric(horizontal: Dimensions.space16),
-            child: RideShimmer(),
-          );
-        }
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+        (context, index) {
+          if (index == controller.rideList.length) {
+            return const Padding(
+              padding: EdgeInsets.symmetric(horizontal: Dimensions.space16, vertical: Dimensions.space5),
+              child: RideShimmer(),
+            );
+          }
 
-        final ride = controller.rideList[index];
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: Dimensions.space16),
-          child: NewRideCardWidget(
-            isActive: true,
-            ride: ride,
-            currency: controller.currencySym,
-            driverImagePath: '${controller.userImagePath}/${ride.user?.avatar}',
-            press: () {
-              controller.updateMainAmount(StringConverter.formatDouble(ride.amount.toString()));
-              CustomBottomSheet(child: OfferBidBottomSheet(ride: ride)).customBottomSheet(context);
-            },
-          ),
-        );
-      },
+          final ride = controller.rideList[index];
+
+          return Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: Dimensions.space16,
+              vertical: Dimensions.space5,
+            ),
+            child: NewRideCardWidget(
+              isActive: true,
+              ride: ride,
+              currency: controller.currencySym,
+              driverImagePath: '${controller.userImagePath}/${ride.user?.avatar}',
+              press: () {
+                controller.updateMainAmount(StringConverter.formatDouble(ride.amount.toString()));
+                CustomBottomSheet(child: OfferBidBottomSheet(ride: ride)).customBottomSheet(context);
+              },
+            ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.2, end: 0, curve: Curves.easeOutQuad),
+          );
+        },
+        childCount: controller.rideList.length + (controller.hasNext() ? 1 : 0),
+      ),
     );
   }
 }

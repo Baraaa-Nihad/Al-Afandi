@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ovoride/core/route/route.dart';
 import 'package:ovoride/core/utils/my_icons.dart';
 import 'package:ovoride/data/controller/rider/home/home_controller.dart';
 import 'package:ovoride/presentation/components/card/inner_shadow_container.dart';
@@ -54,12 +53,19 @@ class _LocationPickUpHomeWidgetState extends State<LocationPickUpHomeWidget> {
           spaceDown(Dimensions.space15),
           InkWell(
             onTap: () {
+              // widget.controller.updateIsServiceShake(false);
+              // Get.toNamed(RouteHelper.locationPickUpScreen, arguments: [1])?.then((v) {
+              //   if (widget.controller.selectedLocations.length > 1) {
+              //     widget.controller.getRideFare();
+              //   }
+              // });
+
               widget.controller.updateIsServiceShake(false);
-              Get.toNamed(RouteHelper.locationPickUpScreen, arguments: [1])?.then((v) {
-                if (widget.controller.selectedLocations.length > 1) {
-                  widget.controller.getRideFare();
-                }
-              });
+
+              // استدعاء البيانات الوهمية بدلاً من فتح الخريطة
+              widget.controller.fillMockLocationData();
+
+              // إذا كنت تريد محاكاة الانتقال والرجوع، اتركها هكذا أو أضف Loading بسيط
             },
             child: InnerShadowContainer(
               width: double.infinity,

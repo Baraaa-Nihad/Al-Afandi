@@ -18,15 +18,15 @@ class LiteRollingSwitch extends StatefulWidget {
   const LiteRollingSwitch({
     super.key,
     this.tValue = false,
-    this.width = 130,
-    this.textOff = "Offline",
-    this.textOn = "Online",
-    this.textSize = 14.0,
-    this.colorOn = Colors.green,
-    this.colorOff = Colors.red,
-    this.iconOff = Icons.signal_wifi_off,
-    this.iconOn = Icons.network_check,
-    this.animationDuration = const Duration(milliseconds: 300),
+    this.width = 110, // عرض أنيق ومناسب للـ AppBar بجانب الجرس
+    this.textOff = "أوفلاين",
+    this.textOn = "أونلاين",
+    this.textSize = 12.0, // حجم خط مدروس ليكون واضحاً ومتناسقاً
+    this.colorOn = const Color(0xFF00C853), // لون أخضر "أفندي" زاهي للـ Online
+    this.colorOff = const Color(0xFF607D8B), // لون رمادي-أزرق هادئ للـ Offline
+    this.iconOff = Icons.power_settings_new_rounded,
+    this.iconOn = Icons.check_circle_rounded,
+    this.animationDuration = const Duration(milliseconds: 250), // حركة أسرع وأنعم (ملاحظة 1)
     this.textOffColor = Colors.white,
     this.textOnColor = Colors.white,
     this.onToggle,
@@ -54,7 +54,7 @@ class _LiteRollingSwitchState extends State<LiteRollingSwitch> with SingleTicker
 
     _animation = CurvedAnimation(
       parent: _controller,
-      curve: Curves.easeInOut,
+      curve: Curves.easeOutBack, // تأثير حركة "ارتداد" خفيف لاحترافية أكبر
     );
   }
 
@@ -67,8 +67,10 @@ class _LiteRollingSwitchState extends State<LiteRollingSwitch> with SingleTicker
   }
 
   void _updateState(bool state) {
-    setState(() => _isON = state);
-    state ? _controller.forward() : _controller.reverse();
+    if (mounted) {
+      setState(() => _isON = state);
+      state ? _controller.forward() : _controller.reverse();
+    }
   }
 
   Future<void> _handleToggle() async {
@@ -85,7 +87,7 @@ class _LiteRollingSwitchState extends State<LiteRollingSwitch> with SingleTicker
     if (success) {
       _updateState(newValue);
     }
-    setState(() => _isLoading = false);
+    if (mounted) setState(() => _isLoading = false);
   }
 
   @override
@@ -96,9 +98,8 @@ class _LiteRollingSwitchState extends State<LiteRollingSwitch> with SingleTicker
 
   @override
   Widget build(BuildContext context) {
-    // حسابات دقيقة لمنع خروج الأيقونة
-    const double padding = 4.0;
-    const double height = 45.0; // ارتفاع ثابت واحترافي
+    const double padding = 2; // تقليل البادينج الداخلي قليلاً لمظهر أرشق
+    const double height = 25.0; // ارتفاع أنيق يتماشى مع جرس الإشعارات وصورة الـ Profile
     final double handleSize = height - (padding * 2);
     final double maxMovement = widget.width - handleSize - (padding * 2);
 
@@ -107,6 +108,7 @@ class _LiteRollingSwitchState extends State<LiteRollingSwitch> with SingleTicker
       child: AnimatedBuilder(
         animation: _animation,
         builder: (context, child) {
+          // دمج الألوان بذكاء بناءً على حالة الأنيماشين (ملاحظة 2)
           final Color bgColor = Color.lerp(widget.colorOff, widget.colorOn, _animation.value)!;
 
           return Container(
@@ -117,36 +119,38 @@ class _LiteRollingSwitchState extends State<LiteRollingSwitch> with SingleTicker
               borderRadius: BorderRadius.circular(height / 2),
               boxShadow: [
                 BoxShadow(
-                  color: bgColor.withOpacity(0.2),
+                  color: bgColor.withOpacity(0.3),
                   blurRadius: 10,
-                  offset: const Offset(0, 4),
+                  spreadRadius: 1,
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
             child: Stack(
-              alignment: Alignment.center,
               children: [
-                // نصوص الحالة
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Opacity(
-                        opacity: _animation.value.clamp(0.0, 1.0),
-                        child: Text(widget.textOn, style: _textStyle(widget.textOnColor)),
+                // النص العربي الديناميكي - حل عبقري لمشكلة الـ Overflow (ملاحظة 3)
+                AnimatedAlign(
+                  duration: widget.animationDuration,
+                  alignment: _isON ? Alignment.centerLeft : Alignment.centerRight,
+                  child: Padding(
+                    // ترك مسافة آمنة للأيقونة المنزلقة
+                    padding: EdgeInsets.symmetric(horizontal: handleSize + 5),
+                    child: FittedBox(
+                      // النص سيصغر تلقائياً ولن يكسر التصميم أبداً
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        _isON ? widget.textOn : widget.textOff,
+                        style: _textStyle(_isON ? widget.textOnColor : widget.textOffColor),
+                        textAlign: TextAlign.center,
                       ),
-                      Opacity(
-                        opacity: (1 - _animation.value).clamp(0.0, 1.0),
-                        child: Text(widget.textOff, style: _textStyle(widget.textOffColor)),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
 
-                // زر التحكم (Handle)
+                // الدائرة المتحركة (The Handle)
                 Positioned(
                   left: padding + (maxMovement * _animation.value),
+                  top: padding,
                   child: Container(
                     width: handleSize,
                     height: handleSize,
@@ -154,26 +158,18 @@ class _LiteRollingSwitchState extends State<LiteRollingSwitch> with SingleTicker
                       shape: BoxShape.circle,
                       color: Colors.white,
                       boxShadow: [
-                        BoxShadow(color: Colors.black12, blurRadius: 4, spreadRadius: 1),
+                        BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(0, 1)),
                       ],
                     ),
                     child: _isLoading
                         ? Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding: const EdgeInsets.all(6.0),
                             child: CircularProgressIndicator(strokeWidth: 2, color: bgColor),
                           )
-                        : Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              Opacity(
-                                opacity: (1 - _animation.value).clamp(0.0, 1.0),
-                                child: Icon(widget.iconOff, size: 20, color: widget.colorOff),
-                              ),
-                              Opacity(
-                                opacity: _animation.value.clamp(0.0, 1.0),
-                                child: Icon(widget.iconOn, size: 20, color: widget.colorOn),
-                              ),
-                            ],
+                        : Icon(
+                            _isON ? widget.iconOn : widget.iconOff,
+                            size: 18,
+                            color: bgColor,
                           ),
                   ),
                 ),
@@ -189,5 +185,6 @@ class _LiteRollingSwitchState extends State<LiteRollingSwitch> with SingleTicker
         color: color,
         fontWeight: FontWeight.bold,
         fontSize: widget.textSize,
+        fontFamily: 'Cairo', // يفضل استخدام خط يدعم العربية بشكل جميل واحترافي
       );
 }

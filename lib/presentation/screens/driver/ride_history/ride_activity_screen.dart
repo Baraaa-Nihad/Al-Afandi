@@ -78,7 +78,7 @@ class _RideActivityScreenState extends State<RideActivityScreen> with SingleTick
                   color: const Color.fromARGB(239, 246, 247, 251),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.03),
+                      color: const Color.fromARGB(255, 235, 230, 230).withOpacity(0.03),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     )

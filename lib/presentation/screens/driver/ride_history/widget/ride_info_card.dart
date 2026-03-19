@@ -38,6 +38,7 @@ class RideInfoCard extends StatefulWidget {
 class _RideInfoCardState extends State<RideInfoCard> {
   bool isDownLoadLoading = false;
 
+  // تحويل الأرقام إلى العربية
   String _toArabicNumbers(String input) {
     const english = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
     const arabic = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
@@ -45,6 +46,13 @@ class _RideInfoCardState extends State<RideInfoCard> {
       input = input.replaceAll(english[i], arabic[i]);
     }
     return input;
+  }
+
+  // تقريب المسافة لخانة عشرية واحدة
+  String _formatDistance(String? distance) {
+    if (distance == null || distance.isEmpty) return _toArabicNumbers("0");
+    double d = double.tryParse(distance) ?? 0;
+    return _toArabicNumbers(d.toStringAsFixed(1));
   }
 
   Widget _buildDateTimeSection(String isoDate) {
@@ -60,7 +68,7 @@ class _RideInfoCardState extends State<RideInfoCard> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Text(timeStr, style: boldDefault.copyWith(color: const Color(0xFF6C5CE7), fontSize: 13)),
+          Text(timeStr, style: boldDefault.copyWith(color: MyColor.getPrimaryColor(), fontSize: 13)),
           Text("بتاريخ: $dateStr", style: regularSmall.copyWith(color: MyColor.colorGrey, fontSize: 10)),
         ],
       );
@@ -71,6 +79,9 @@ class _RideInfoCardState extends State<RideInfoCard> {
 
   @override
   Widget build(BuildContext context) {
+    // تحديد إذا كان المشوار ملغياً
+    bool isCancelled = widget.ride.status == AppStatus.RIDE_CANCELED;
+
     return CustomAppCard(
       padding: const EdgeInsets.all(16),
       onPressed: () {
@@ -89,14 +100,14 @@ class _RideInfoCardState extends State<RideInfoCard> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // اسم الراكب بخط عريض
                     HeaderText(text: widget.ride.user?.getFullName() ?? "", style: boldDefault.copyWith(fontSize: 16)),
                     const SizedBox(height: 4),
-                    // توضيح المسافة ونوع الخدمة بشكل مقروء
-                    Text(
-                      _toArabicNumbers("${widget.ride.service?.name ?? ''} • المسافة: ${widget.ride.getDistance()} كيلومتر"),
-                      style: regularDefault.copyWith(color: MyColor.colorGrey, fontSize: 13),
-                    ),
+                    // لا تظهر المسافة إذا كان المشوار ملغياً
+                    if (!isCancelled)
+                      Text(
+                        _toArabicNumbers("${widget.ride.service?.name ?? ''} • المسافة: ${_formatDistance(widget.ride.distance)} كيلومتر"),
+                        style: regularDefault.copyWith(color: MyColor.colorGrey, fontSize: 13),
+                      ),
                   ],
                 ),
               ),
@@ -104,30 +115,36 @@ class _RideInfoCardState extends State<RideInfoCard> {
           ),
           const SizedBox(height: 15),
 
-          // القسم الجديد: السعر وحالة الدفع تحت الاسم
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: MyColor.getPrimaryColor().withOpacity(0.05),
-              borderRadius: BorderRadius.circular(8),
+          // قسم التكلفة والحالة: يختفي قسم التكلفة في الإلغاء وتظهر الحالة فقط
+          if (!isCancelled)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: MyColor.getPrimaryColor().withOpacity(0.05),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("إجمالي التكلفة", style: regularSmall.copyWith(color: MyColor.colorGrey)),
+                      Text(
+                        _toArabicNumbers("${widget.currency}${StringConverter.formatNumber(widget.ride.amount.toString())}"),
+                        style: boldLarge.copyWith(fontSize: 18, color: MyColor.getPrimaryColor()),
+                      ),
+                    ],
+                  ),
+                  _buildStatusBadge(),
+                ],
+              ),
+            )
+          else
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [_buildStatusBadge()],
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("إجمالي التكلفة", style: regularSmall.copyWith(color: MyColor.colorGrey)),
-                    Text(
-                      _toArabicNumbers("${widget.currency}${StringConverter.formatNumber(widget.ride.amount.toString())}"),
-                      style: boldLarge.copyWith(fontSize: 18, color: MyColor.getPrimaryColor()),
-                    ),
-                  ],
-                ),
-                _buildStatusBadge(),
-              ],
-            ),
-          ),
 
           const Divider(height: 30, thickness: 0.5),
 
@@ -139,12 +156,14 @@ class _RideInfoCardState extends State<RideInfoCard> {
               address: widget.ride.pickupLocation ?? '',
               time: widget.ride.startTime,
               isPickup: true,
+              isCancelled: isCancelled,
             ),
             secondWidget: _buildLocationStep(
               title: MyStrings.destination.tr,
               address: widget.ride.destination ?? '',
               time: widget.ride.endTime,
               isPickup: false,
+              isCancelled: isCancelled,
             ),
           ),
           const SizedBox(height: 16),
@@ -154,7 +173,13 @@ class _RideInfoCardState extends State<RideInfoCard> {
     );
   }
 
-  Widget _buildLocationStep({required String title, required String address, String? time, required bool isPickup}) {
+  Widget _buildLocationStep({
+    required String title,
+    required String address,
+    String? time,
+    required bool isPickup,
+    required bool isCancelled,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(left: 12.0, bottom: 20),
       child: Column(
@@ -163,7 +188,8 @@ class _RideInfoCardState extends State<RideInfoCard> {
           Text(title, style: boldDefault.copyWith(color: isPickup ? MyColor.colorGreen : MyColor.colorRed, fontSize: 12)),
           const SizedBox(height: 4),
           Text(address, style: regularDefault.copyWith(fontSize: 14), maxLines: 2, overflow: TextOverflow.ellipsis),
-          if (time != null) ...[
+          // لا نظهر "وقت الركوب/الوصول" إذا كان المشوار ملغياً (إلا لو رغبت بتوثيق وقت الإلغاء)
+          if (time != null && !isCancelled) ...[
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -192,8 +218,15 @@ class _RideInfoCardState extends State<RideInfoCard> {
     Color statusColor = MyUtils.getRideStatusColor(widget.ride.status ?? '9');
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(color: statusColor.withOpacity(0.1), borderRadius: BorderRadius.circular(20), border: Border.all(color: statusColor.withOpacity(0.5))),
-      child: Text(MyUtils.getRideStatus(widget.ride.status ?? '9').tr, style: boldDefault.copyWith(color: statusColor, fontSize: 12)),
+      decoration: BoxDecoration(
+        color: statusColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: statusColor.withOpacity(0.5)),
+      ),
+      child: Text(
+        MyUtils.getRideStatus(widget.ride.status ?? '9').tr,
+        style: boldDefault.copyWith(color: statusColor, fontSize: 12),
+      ),
     );
   }
 
@@ -230,14 +263,16 @@ class _RideInfoCardState extends State<RideInfoCard> {
     return Row(
       children: [
         Expanded(
-            child: _buildCircleAction(MyIcons.message, MyStrings.message, () {
-          Get.toNamed(RouteHelper.rideMessageScreen, arguments: [widget.ride.id.toString(), widget.ride.user?.getFullName(), widget.ride.status.toString()]);
-        })),
+          child: _buildCircleAction(MyIcons.message, MyStrings.message, () {
+            Get.toNamed(RouteHelper.rideMessageScreen, arguments: [widget.ride.id.toString(), widget.ride.user?.getFullName(), widget.ride.status.toString()]);
+          }),
+        ),
         const SizedBox(width: 12),
         Expanded(
-            child: _buildCircleAction(MyIcons.callIcon, MyStrings.call, () {
-          MyUtils.launchPhone('${widget.ride.user?.mobile}');
-        })),
+          child: _buildCircleAction(MyIcons.callIcon, MyStrings.call, () {
+            MyUtils.launchPhone('${widget.ride.user?.mobile}');
+          }),
+        ),
       ],
     );
   }
@@ -247,7 +282,10 @@ class _RideInfoCardState extends State<RideInfoCard> {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), border: Border.all(color: MyColor.getPrimaryColor().withOpacity(0.3))),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: MyColor.getPrimaryColor().withOpacity(0.3)),
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

@@ -10,6 +10,31 @@ class LocalStorageService {
   final SharedPreferences sharedPreferences;
 
   LocalStorageService({required this.sharedPreferences});
+  void storeNotifications(List<String> notificationsJsonList) {
+    sharedPreferences.setStringList('notification_list_key', notificationsJsonList);
+  }
+
+  // جلب قائمة الإشعارات المخزنة
+  List<String> getStoredNotifications() {
+    return sharedPreferences.getStringList('notification_list_key') ?? [];
+  }
+
+  // إضافة إشعار واحد جديد للقائمة (Update)
+  void addNewNotification(String notificationJson) {
+    List<String> currentList = getStoredNotifications();
+    currentList.insert(0, notificationJson); // إضافته في البداية ليظهر كأحدث إشعار
+
+    // الاحتفاظ بآخر 50 إشعاراً فقط لضمان سرعة التطبيق
+    if (currentList.length > 50) {
+      currentList = currentList.sublist(0, 50);
+    }
+    storeNotifications(currentList);
+  }
+
+  // مسح جميع الإشعارات
+  void clearNotifications() {
+    sharedPreferences.remove('notification_list_key');
+  }
 
   // Token Management
   String getToken() {

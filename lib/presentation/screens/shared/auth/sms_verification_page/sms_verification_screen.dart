@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:ovoride/core/helper/shared_preference_helper.dart';
 import 'package:get/get.dart';
 import 'package:ovoride/core/utils/util.dart';
 import 'package:ovoride/presentation/components/annotated_region/annotated_region_widget.dart';

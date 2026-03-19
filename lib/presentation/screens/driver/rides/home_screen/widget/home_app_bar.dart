@@ -9,12 +9,13 @@ import 'package:ovoride/core/utils/my_strings.dart';
 import 'package:ovoride/core/utils/style.dart';
 import 'package:ovoride/core/utils/url_container.dart';
 import 'package:ovoride/data/controller/driver/dashboard/dashboard_controller.dart';
+import 'package:ovoride/data/services/notification_controller.dart';
 import 'package:ovoride/presentation/components/image/custom_svg_picture.dart';
 import 'package:ovoride/presentation/components/image/my_network_image_widget.dart';
 import 'package:ovoride/presentation/components/switch/lite_rolling_switch.dart';
 
 class HomeScreenAppBar extends StatelessWidget {
-  final DashBoardController controller; // أضفت final للممارسة البرمجية الصحيحة
+  final DashBoardController controller;
   const HomeScreenAppBar({super.key, required this.controller});
 
   @override
@@ -24,19 +25,18 @@ class HomeScreenAppBar extends StatelessWidget {
         width: double.infinity,
         padding: EdgeInsets.symmetric(
           horizontal: Dimensions.space16,
-          vertical: Dimensions.space12, // تقليل الـ vertical قليلاً لرشاقة التصميم
+          vertical: Dimensions.space12,
         ),
         decoration: BoxDecoration(
-          color: MyColor.getCardBgColor(), // اختيار لون خلفية متناسق
+          color: MyColor.getCardBgColor(),
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             // 1. قسم بيانات السائق (صورة + اسم + موقع)
             Expanded(
+              flex: 3, // إعطاء مساحة أكبر قليلاً لبيانات السائق
               child: Row(
                 children: [
-                  // صورة البروفايل
                   GestureDetector(
                     onTap: () => Get.toNamed(RouteHelper.profileScreen),
                     child: MyImageWidget(
@@ -48,7 +48,6 @@ class HomeScreenAppBar extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 10),
-                  // النصوص (الاسم والموقع)
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -92,17 +91,53 @@ class HomeScreenAppBar extends StatelessWidget {
               ),
             ),
 
-            // 2. فاصل مرن لضمان عدم التلامس
-            const SizedBox(width: 12),
+            // 2. أيقونة الإشعارات الذكية للسائق
+            GetBuilder<NotificationController>(builder: (notificationController) {
+              return GestureDetector(
+                onTap: () => Get.toNamed(RouteHelper.notificationScreen),
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Icon(
+                        Icons.notifications_none_rounded,
+                        color: MyColor.primaryColor,
+                        size: 28,
+                      ),
+                      if (notificationController.unreadCount > 0)
+                        Positioned(
+                          top: -2,
+                          right: -2,
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: const BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                            ),
+                            constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                            child: Text(
+                              '${notificationController.unreadCount}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              );
+            }),
 
             // 3. قسم السويتش (أونلاين / أوفلاين)
-            // تحديد SizedBox ثابت هنا هو السر في منع الـ Overflow
             SizedBox(
-              width: 115,
-              height: 42,
               child: LiteRollingSwitch(
                 tValue: controller.userOnline,
-                width: 115,
+                width: 105,
                 textOn: MyStrings.onLine.tr,
                 textOff: MyStrings.offLine.tr,
                 textOnColor: MyColor.colorWhite,
