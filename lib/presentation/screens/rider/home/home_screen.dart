@@ -6,6 +6,7 @@ import 'package:ovoride/data/repo/rider/home/home_repo.dart';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:ovoride/data/services/notification_controller.dart';
 import 'package:ovoride/presentation/components/divider/custom_spacer.dart';
 import 'package:ovoride/presentation/screens/rider/dashboard/dashboard_background.dart';
 import 'package:ovoride/presentation/screens/rider/home/widgets/home_app_bar.dart';
@@ -27,11 +28,13 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> with SingleTickerProv
 
   @override
   void initState() {
+    Get.put(NotificationController(localStorageService: Get.find(), apiClient: Get.find()));
     Get.put(HomeRepo(apiClient: Get.find()));
     Get.put(AppLocationController());
     final controller = Get.put(
       HomeController(homeRepo: Get.find(), appLocationController: Get.find()),
     );
+    Get.put(NotificationController(localStorageService: Get.find(), apiClient: Get.find()));
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {

@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:get/get.dart';
 import 'package:ovoride/core/helper/string_format_helper.dart';
 import 'package:ovoride/core/utils/method.dart';
 import 'package:ovoride/core/helper/shared_preference_helper.dart';
 import 'package:ovoride/data/controller/driver/pusher/global_pusher_controller.dart';
+import 'package:ovoride/data/services/local_storage_service.dart';
+import 'package:ovoride/data/services/notification_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ovoride/data/model/global/response_model/response_model.dart';
 import 'package:ovoride/data/services/api_client.dart';
@@ -114,6 +118,28 @@ class PusherManager {
   }
 
   void _dispatchEvent(PusherEvent event) {
+    // --- الشغل الاحترافي للأفندي ---
+    try {
+      // 1. تحويل الحدث إلى نص JSON
+      String notificationData = jsonEncode({
+        "title": event.eventName, // مثلاً: New Bid
+        "body": event.data, // تفاصيل السعر والرحلة
+        "time": DateTime.now().toString(),
+        "is_read": false
+      });
+
+      // 2. حفظه فوراً في المخزن المحلي الذي جهزناه
+      Get.find<LocalStorageService>().addNewNotification(notificationData);
+
+      // 3. تحديث واجهة المستخدم (أيقونة الجرس)
+      if (Get.isRegistered<NotificationController>()) {
+        Get.find<NotificationController>().getNotifications();
+      }
+    } catch (e) {
+      printE("Error processing real-time notification: $e");
+    }
+    // ----------------------------
+
     for (var listener in _listeners) {
       listener(event);
     }

@@ -8,6 +8,7 @@ import 'package:ovoride/core/utils/my_strings.dart';
 import 'package:ovoride/core/utils/style.dart';
 import 'package:ovoride/data/controller/driver/dashboard/dashboard_controller.dart';
 import 'package:ovoride/data/controller/driver/pusher/global_pusher_controller.dart';
+import 'package:ovoride/data/services/notification_controller.dart';
 // تأكد من استيراد الكنترولر المسؤول عن Pusher
 import 'package:ovoride/presentation/components/bottom-sheet/custom_bottom_sheet.dart';
 import 'package:ovoride/presentation/components/divider/custom_spacer.dart';
@@ -35,6 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
+    Get.put(NotificationController(localStorageService: Get.find(), apiClient: Get.find()));
     super.initState();
     _initData();
   }

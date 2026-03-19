@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:ovoride/presentation/screens/shared/notification/notification.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ovoride/core/helper/shared_preference_helper.dart';
 import 'package:ovoride/data/model/deposit/deposit_insert_response_model.dart';
@@ -176,6 +177,7 @@ class RouteHelper {
       transition: Transition.fadeIn,
       transitionDuration: const Duration(milliseconds: 300),
     ),
+    GetPage(name: notificationScreen, page: () => const NotificationScreen()),
     GetPage(name: rideMessageScreen, page: () => driver_inbox.RideMessageScreen(rideID: '-1')),
     GetPage(name: languageScreen, page: () => const LanguageScreen()),
     GetPage(name: paymentHistoryScreen, page: () => const driver_payment_history.PaymentHistoryScreen()),
