@@ -135,8 +135,6 @@ class HomeScreenAppBar extends StatelessWidget {
 
             // 3. قسم السويتش (أونلاين / أوفلاين)
             SizedBox(
-              width: 105, // تقليل العرض قليلاً لتوفير مساحة للجرس
-              height: 38,
               child: LiteRollingSwitch(
                 tValue: controller.userOnline,
                 width: 105,
