@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:ovoride/core/helper/string_format_helper.dart';
 import 'package:ovoride/core/utils/method.dart';
 import 'package:ovoride/core/helper/shared_preference_helper.dart';
+import 'package:ovoride/data/controller/driver/pusher/global_pusher_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ovoride/data/model/global/response_model/response_model.dart';
 import 'package:ovoride/data/services/api_client.dart';
@@ -94,6 +95,17 @@ class PusherManager {
 
   void _onConnectionStateChange(String current, String previous) {
     printX("🔁 State: $previous → $current");
+
+    // --- السطر الجديد للربط مع الواجهة ---
+    try {
+      if (Get.isRegistered<GlobalPusherController>()) {
+        Get.find<GlobalPusherController>().updateConnectionState(current.toUpperCase());
+      }
+    } catch (e) {
+      printE("Error updating connection state: $e");
+    }
+    // -------------------------------------
+
     if (current.toLowerCase() == 'disconnected' && previous.toLowerCase() == 'connected' && !_isConnecting) {
       Future.delayed(const Duration(seconds: 3), () {
         if (!isConnected() && !_isConnecting) _connect(_channelName);

@@ -55,6 +55,46 @@ class HomeController extends GetxController {
   bool isKycVerified = true;
   bool isKycPending = false;
 
+  void fillMockLocationData() {
+    selectedLocations.clear();
+
+    // 1. إعداد بيانات نقطة البداية (دكا - بنغلاديش)
+    var pickup = SelectedLocationInfo(
+      address: "United Hospital Emergency Rd, Dhaka 1212, Bangladesh",
+      fullAddress: "United Hospital Emergency Rd, Dhaka 1212, Bangladesh", // ضروري لـ createRide
+      city: "Dhaka", // ضروري لـ getRideFare
+      latitude: 23.7997,
+      longitude: 90.4206,
+    );
+
+    // 2. إعداد بيانات وجهة الوصول (دكا - بنغلاديش)
+    var destination = SelectedLocationInfo(
+      address: "Dhanmondi, Dhaka, Bangladesh",
+      fullAddress: "Dhanmondi, Dhaka, Bangladesh", // ضروري لـ createRide
+      city: "Dhaka", // ضروري لـ getRideFare
+      latitude: 23.7383,
+      longitude: 90.3733,
+    );
+
+    // 3. إضافة المواقع للقائمة الأساسية
+    selectedLocations.add(pickup); // Index 0 (Pickup)
+    selectedLocations.add(destination); // Index 1 (Destination)
+
+    // 4. اختيار أول خدمة تلقائياً (سيارة مثلاً) إذا كانت القائمة محملة
+    // هذا يحل مشكلة "Please select a service"
+    if (appServicesList.isNotEmpty) {
+      selectService(appServicesList.first);
+    }
+
+    // 5. تحديث الواجهة
+    update();
+
+    // 6. جلب الأسعار فوراً
+    getRideFare();
+
+    printX("Mock Data Loaded Successfully");
+  }
+
   void updatePassenger(bool isIncrement) {
     if (isIncrement) {
       passenger = passenger + 1;

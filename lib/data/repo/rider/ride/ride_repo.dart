@@ -19,6 +19,24 @@ class RideRepo {
     return responseModel;
   }
 
+// دالة التفاوض (Counter Offer)
+  Future<ResponseModel> counterOffer({
+    required String bidId,
+    required String amount,
+  }) async {
+    // تأكد من وجود counterOffer داخل UrlContainer
+    String url = "${UrlContainer.baseUrl}${UrlContainer.counterOffer}/$bidId";
+    Map<String, String> params = {'amount': amount};
+
+    ResponseModel responseModel = await apiClient.request(
+      url,
+      Method.postMethod,
+      params,
+      passHeader: true,
+    );
+    return responseModel;
+  }
+
   Future<ResponseModel> getRideList({
     required String rideType,
     required String status,

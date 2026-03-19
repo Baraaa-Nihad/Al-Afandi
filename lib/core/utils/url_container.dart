@@ -6,7 +6,7 @@ class UrlContainer {
   static const String depositHistoryUrl = 'driver/deposit/history';
   static const String depositMethodUrl = 'driver/deposit/methods';
   static const String depositInsertUrl = 'driver/deposit/insert';
-
+  static const String counterOffer = "رابط_التفاوض_هنا"; // مثال: rider/ride/counter-offer
   static const String registrationEndPoint = 'driver/register';
   static const String loginEndPoint = 'driver/login';
   static const String socialLoginEndPoint = 'driver/social-login';
@@ -106,7 +106,6 @@ class UrlContainer {
   static const String rideReceipt = "${baseUrl}driver/rides/receipt";
   static const String riderRideReceipt = "${baseUrl}ride/receipt";
 
-
   // ── Rider-only URLs ──
   static const String riderDashBoardUrl = 'dashboard';
   static const String riderLoginEndPoint = 'login';
@@ -138,7 +137,6 @@ class UrlContainer {
   static const String riderRideMessageList = 'ride/messages';
   static const String riderSendMessage = 'ride/send/message';
 
-
   // ── Rider-only URLs ──
   static const String ride = 'ride';
   static const String ridePayment = 'ride/payment';
@@ -159,7 +157,6 @@ class UrlContainer {
   static const String paymentGateways = 'payment-gateways';
   static const String submitPayment = 'payment';
   static const String serviceImagePath = 'assets/images/service/';
-
 
   // others url
   static const String countryFlagImageLink = 'https://flagpedia.net/data/flags/h60/{countryCode}.webp';
