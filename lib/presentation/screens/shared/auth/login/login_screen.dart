@@ -31,13 +31,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
-    Get.put(LoginRepo(apiClient: Get.find()));
-    Get.put(LoginController(loginRepo: Get.find()));
+    Get.put(LoginRepo(apiClient: Get.find()), tag: 'driver');
+    Get.put(LoginController(loginRepo: Get.find(tag: 'driver')), tag: 'driver');
 
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Get.find<LoginController>().remember = true;
+      Get.find<LoginController>(tag: 'driver').remember = true;
     });
   }
 
@@ -49,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
         statusBarColor: Colors.transparent,
         child: Scaffold(
           backgroundColor: MyColor.colorWhite,
-          body: GetBuilder<LoginController>(
+          body: GetBuilder<LoginController>(tag: 'driver',
             builder: (controller) {
               return SafeArea(
                 child: LayoutBuilder(

@@ -27,6 +27,7 @@ import 'package:ovoride/data/controller/rider/ride/all_ride_controller.dart';
 import 'package:ovoride/data/controller/rider/map/ride_map_controller.dart';
 import 'package:ovoride/data/controller/rider/review/review_controller.dart';
 import 'package:ovoride/data/controller/rider/menu/my_menu_controller.dart';
+import 'package:ovoride/data/controller/rider/account/profile_complete_controller.dart' as riderProfileCompleteCtrl;
 import 'package:ovoride/data/repo/rider/auth/signup_repo.dart' as riderSignUp;
 import 'package:ovoride/data/controller/rider/auth/registration_controller.dart' as riderRegistration;
 // Driver repos (aliased to avoid name conflicts)

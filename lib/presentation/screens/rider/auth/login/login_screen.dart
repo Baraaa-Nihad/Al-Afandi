@@ -36,15 +36,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
-    Get.put(LoginRepo(apiClient: Get.find()));
-    Get.put(LoginController(loginRepo: Get.find()));
+    Get.put(LoginRepo(apiClient: Get.find()), tag: 'rider');
+    Get.put(LoginController(loginRepo: Get.find(tag: 'rider')), tag: 'rider');
     Get.put(SocialAuthRepo(apiClient: Get.find()));
     Get.put(SocialAuthController(authRepo: Get.find()));
 
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Get.find<LoginController>().remember = true;
+      Get.find<LoginController>(tag: 'rider').remember = true;
     });
   }
 
@@ -61,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
         statusBarColor: Colors.transparent,
         child: Scaffold(
           backgroundColor: MyColor.colorWhite,
-          body: GetBuilder<LoginController>(
+          body: GetBuilder<LoginController>(tag: 'rider',
             builder: (controller) => SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -218,7 +218,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     InkWell(
                                       onTap: () {
                                         controller.clearTextField();
-                                        Get.toNamed(RouteHelper.forgotPasswordScreen);
+                                        Get.toNamed(RouteHelper.riderForgetPasswordScreen);
                                       },
                                       child: DefaultText(
                                         text: MyStrings.forgotPassword.tr,

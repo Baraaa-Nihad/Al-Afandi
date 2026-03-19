@@ -51,6 +51,7 @@ class ApiClient extends LocalStorageService {
     bool passHeader = false,
     bool isOnlyAcceptType = false,
   }) async {
+
     try {
       if (passHeader && !isOnlyAcceptType) {
         initToken();
@@ -62,7 +63,7 @@ class ApiClient extends LocalStorageService {
         case Method.postMethod:
           if (passHeader) {
             if (!isOnlyAcceptType) {
-              _dio.options.headers["Authorization"] = "$tokenType $token";
+              _dio.options.headers["Authorization"] = "${getTokenType()} ${getToken()}";
             }
           }
           response = await _dio.post(uri, data: params);
@@ -75,13 +76,13 @@ class ApiClient extends LocalStorageService {
           break;
         default: // GET
           if (passHeader && !isOnlyAcceptType) {
-            _dio.options.headers["Authorization"] = "$tokenType $token";
+            _dio.options.headers["Authorization"] = "${getTokenType()} ${getToken()}";
           }
           response = await _dio.get(uri);
           log("API: $uri Response Code: ${response.statusCode}");
           break;
       }
-
+      log("request ====> ${uri} , ${response.statusCode}");
       printX('url--------------$uri');
       if (uri.contains('driver-info') || uri.contains('driver/save-device')) { printX('STACK: \${StackTrace.current}'); }
       // printX('params-----------${params.toString()}');
@@ -103,12 +104,18 @@ class ApiClient extends LocalStorageService {
           AuthorizationResponseModel model = AuthorizationResponseModel.fromJson(response.data);
 
           if (model.remark == 'profile_incomplete') {
-            Get.toNamed(RouteHelper.profileCompleteScreen);
+            final role = sharedPreferences.getString(SharedPreferenceHelper.userRoleKey) ?? 'driver';
+            Get.toNamed(role == 'rider' ? RouteHelper.riderProfileCompleteScreen : RouteHelper.profileCompleteScreen);
           } else if (model.remark == 'vehicle_verification' || model.remark == 'vehicle_verification_pending') {
             Get.offAndToNamed(RouteHelper.vehicleVerificationScreen);
           } else if (model.remark == 'unverified') {
             UnVerifiedUserResponseModel model = UnVerifiedUserResponseModel.fromJson(response.data);
-            checkAndGotoUnverifiedScreen(model);
+            final role2 = sharedPreferences.getString(SharedPreferenceHelper.userRoleKey) ?? 'driver';
+            if (role2 == 'rider') {
+              RouteHelper.checkRiderStatusAndGoToNextStep(null);
+            } else {
+              checkAndGotoUnverifiedScreen(model);
+            }
           } else if (model.remark == 'unauthenticated') {
             sharedPreferences.setBool(
               SharedPreferenceHelper.rememberMeKey,
@@ -183,7 +190,7 @@ class ApiClient extends LocalStorageService {
     try {
       if (passHeader) {
         initToken();
-        _dio.options.headers["Authorization"] = "$tokenType $token";
+        _dio.options.headers["Authorization"] = "${getTokenType()} ${getToken()}";
       }
 
       final formData = dioX.FormData();
@@ -263,10 +270,12 @@ class ApiClient extends LocalStorageService {
     bool needEmailVerification = data?.emailVerified == "0" ? true : false;
     if (needEmailVerification) {
       sharedPreferences.setBool(SharedPreferenceHelper.rememberMeKey, false);
-      Get.offAllNamed(RouteHelper.emailVerificationScreen);
+      final role = sharedPreferences.getString(SharedPreferenceHelper.userRoleKey) ?? 'driver';
+      Get.offAllNamed(role == 'rider' ? RouteHelper.riderEmailVerificationScreen : RouteHelper.emailVerificationScreen);
     } else if (needSmsVerification) {
       sharedPreferences.setBool(SharedPreferenceHelper.rememberMeKey, false);
-      Get.offAllNamed(RouteHelper.smsVerificationScreen);
+      final role2 = sharedPreferences.getString(SharedPreferenceHelper.userRoleKey) ?? 'driver';
+      Get.offAllNamed(role2 == 'rider' ? RouteHelper.riderSmsVerificationScreen : RouteHelper.smsVerificationScreen);
     } else {
       sharedPreferences.setBool(SharedPreferenceHelper.rememberMeKey, false);
       removeToken();

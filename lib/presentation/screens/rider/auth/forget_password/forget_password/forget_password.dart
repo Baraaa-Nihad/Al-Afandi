@@ -1,22 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:ovoride/core/helper/shared_preference_helper.dart';
 import 'package:get/get.dart';
 import 'package:ovoride/core/route/route.dart';
 import 'package:ovoride/core/utils/dimensions.dart';
 import 'package:ovoride/core/utils/my_color.dart';
+import 'package:ovoride/core/utils/my_icons.dart';
 import 'package:ovoride/core/utils/my_strings.dart';
 import 'package:ovoride/core/utils/style.dart';
-import 'package:ovoride/data/controller/shared/auth/forget_password/forget_password_controller.dart';
-import 'package:ovoride/data/repo/shared/auth/login_repo.dart';
+import 'package:ovoride/data/controller/rider/auth/forget_password/forget_password_controller.dart';
+import 'package:ovoride/data/repo/rider/auth/login_repo.dart';
 import 'package:ovoride/presentation/components/annotated_region/annotated_region_widget.dart';
 import 'package:ovoride/presentation/components/buttons/rounded_button.dart';
 import 'package:ovoride/presentation/components/divider/custom_spacer.dart';
 import 'package:ovoride/presentation/components/image/custom_svg_picture.dart';
 import 'package:ovoride/presentation/components/text-form-field/custom_text_field.dart';
-import 'package:ovoride/presentation/screens/shared/auth/auth_background.dart';
-
-import 'package:ovoride/core/utils/my_icons.dart';
+import 'package:ovoride/presentation/screens/auth/auth_background.dart';
 
 class ForgetPasswordScreen extends StatefulWidget {
   const ForgetPasswordScreen({super.key});
@@ -27,14 +24,11 @@ class ForgetPasswordScreen extends StatefulWidget {
 
 class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
-  String _role = 'driver';
 
   @override
   void initState() {
-    final _prefs = Get.find<SharedPreferences>();
-    _role = _prefs.getString(SharedPreferenceHelper.userRoleKey) ?? 'driver';
-    Get.put<LoginRepo>(LoginRepo(apiClient: Get.find()), tag: 'forget_password', permanent: false);
-    Get.put<ForgetPasswordController>(ForgetPasswordController(loginRepo: Get.find(tag: 'forget_password')), tag: 'forget_password', permanent: false);
+    Get.put(LoginRepo(apiClient: Get.find()));
+    Get.put(ForgetPasswordController(loginRepo: Get.find()));
 
     super.initState();
   }
@@ -50,7 +44,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
       statusBarColor: Colors.transparent,
       child: Scaffold(
         backgroundColor: MyColor.colorWhite,
-        body: GetBuilder<ForgetPasswordController>(tag: 'forget_password',
+        body: GetBuilder<ForgetPasswordController>(
           builder: (auth) => SingleChildScrollView(
             child: Column(
               children: [
@@ -62,12 +56,10 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                       Align(
                         alignment: AlignmentDirectional.centerEnd,
                         child: Padding(
-                          padding: const EdgeInsetsDirectional.only(
-                            end: Dimensions.space5,
-                          ),
+                          padding: const EdgeInsetsDirectional.only(end: Dimensions.space5),
                           child: IconButton(
                             onPressed: () {
-                              Get.offAllNamed(RouteHelper.getLoginScreen());
+                              Get.offAllNamed(RouteHelper.riderLoginScreen);
                             },
                             icon: Icon(
                               Icons.close,
@@ -78,9 +70,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: Dimensions.space20,
-                        ),
+                        padding: EdgeInsets.symmetric(horizontal: Dimensions.space20),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -126,7 +116,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                         ),
                       ],
                     ),
-                    padding: EdgeInsets.symmetric(horizontal: Dimensions.space20, vertical: Dimensions.space20),
+                    padding: EdgeInsets.symmetric(horizontal: Dimensions.space15, vertical: Dimensions.space15),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -143,10 +133,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                                 inputAction: TextInputAction.done,
                                 controller: auth.emailOrUsernameController,
                                 prefixIcon: Padding(
-                                  padding: EdgeInsetsDirectional.only(
-                                    start: Dimensions.space12,
-                                    end: Dimensions.space8,
-                                  ),
+                                  padding: EdgeInsetsDirectional.only(start: Dimensions.space12, end: Dimensions.space8),
                                   child: CustomSvgPicture(
                                     image: MyIcons.user,
                                     color: MyColor.primaryColor,

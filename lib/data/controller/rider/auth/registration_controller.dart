@@ -82,7 +82,12 @@ class RegistrationController extends GetxController {
         CustomSnackBar.success(
           successList: responseModel.message ?? [MyStrings.success.tr],
         );
-        Get.offAllNamed(RouteHelper.riderDashboard);
+        RouteHelper.checkRiderStatusAndGoToNextStep(
+          responseModel.data?.user,
+          accessToken: responseModel.data?.accessToken ?? '',
+          tokenType: responseModel.data?.tokenType ?? 'Bearer',
+          isRemember: true,
+        );
       } else {
         CustomSnackBar.error(
           errorList: responseModel.message ?? [MyStrings.somethingWentWrong.tr],
@@ -132,16 +137,12 @@ class RegistrationController extends GetxController {
     SharedPreferences preferences = registrationRepo.apiClient.sharedPreferences;
 
     await preferences.setString(
+      SharedPreferenceHelper.userRoleKey,
+      'rider',
+    );
+    await preferences.setString(
       SharedPreferenceHelper.userIdKey,
       responseModel.data?.user?.id.toString() ?? '-1',
-    );
-    await preferences.setString(
-      SharedPreferenceHelper.accessTokenKey,
-      responseModel.data?.accessToken ?? '',
-    );
-    await preferences.setString(
-      SharedPreferenceHelper.accessTokenType,
-      responseModel.data?.tokenType ?? '',
     );
     await preferences.setString(
       SharedPreferenceHelper.userEmailKey,
@@ -173,22 +174,22 @@ class RegistrationController extends GetxController {
 
     if (needEmailVerification == false && needSmsVerification == false) {
       if (isProfileCompleteEnable) {
-        Get.offAndToNamed(RouteHelper.profileCompleteScreen);
+        Get.offAndToNamed(RouteHelper.riderProfileCompleteScreen);
       } else {
-        Get.offAndToNamed(RouteHelper.dashboard);
+        Get.offAndToNamed(RouteHelper.riderDashboard);
       }
     } else if (needEmailVerification == true && needSmsVerification == true) {
       Get.offAndToNamed(
-        RouteHelper.emailVerificationScreen,
+        RouteHelper.riderEmailVerificationScreen,
         arguments: [true, isProfileCompleteEnable, isTwoFactorEnable],
       );
     } else if (needEmailVerification) {
       Get.offAndToNamed(
-        RouteHelper.emailVerificationScreen,
+        RouteHelper.riderEmailVerificationScreen,
         arguments: [false, isProfileCompleteEnable, isTwoFactorEnable],
       );
     } else if (needSmsVerification) {
-      Get.offAndToNamed(RouteHelper.smsVerificationScreen);
+      Get.offAndToNamed(RouteHelper.riderSmsVerificationScreen);
     }
   }
 
