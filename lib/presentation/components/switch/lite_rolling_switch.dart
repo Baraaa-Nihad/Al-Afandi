@@ -98,8 +98,8 @@ class _LiteRollingSwitchState extends State<LiteRollingSwitch> with SingleTicker
 
   @override
   Widget build(BuildContext context) {
-    const double padding = 2.5; // تقليل البادينج الداخلي قليلاً لمظهر أرشق
-    const double height = 36.0; // ارتفاع أنيق يتماشى مع جرس الإشعارات وصورة الـ Profile
+    const double padding = 2; // تقليل البادينج الداخلي قليلاً لمظهر أرشق
+    const double height = 25.0; // ارتفاع أنيق يتماشى مع جرس الإشعارات وصورة الـ Profile
     final double handleSize = height - (padding * 2);
     final double maxMovement = widget.width - handleSize - (padding * 2);
 
