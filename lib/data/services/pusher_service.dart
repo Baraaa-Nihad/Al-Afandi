@@ -23,6 +23,15 @@ class PusherManager {
 
   bool _isConnecting = false;
   String _channelName = "";
+  Future<void> subscribeToChannel(String channelName) async {
+    try {
+      // نستخدم الكائن الداخلي للمكتبة (pusher) الموجود داخل المدير
+      await pusher.subscribe(channelName: channelName);
+      printX("Subscribed to extra channel: $channelName");
+    } catch (e) {
+      printX("Error subscribing to $channelName: $e");
+    }
+  }
 
   Future<void> init(String channelName) async {
     if (_isConnecting) return;

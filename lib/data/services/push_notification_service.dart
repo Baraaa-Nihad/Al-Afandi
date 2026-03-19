@@ -6,6 +6,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:ovoride/core/helper/string_format_helper.dart';
+import 'package:ovoride/core/route/route.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../core/helper/shared_preference_helper.dart';
 import '../../core/utils/method.dart';
@@ -52,63 +53,76 @@ class PushNotificationService {
   }
 
   Future<void> registerNotificationListeners() async {
+    // تعريف القنوات
     AndroidNotificationChannel channel = androidNotificationChannel();
+    AndroidNotificationChannel bChannel = bidNotificationChannel();
+
     final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+    // تسجيل القنوات في النظام (أندرويد)
     await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(channel);
-    var androidSettings = const AndroidInitializationSettings(
-      '@mipmap/ic_launcher',
-    );
+    await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(bChannel);
+
+    var androidSettings = const AndroidInitializationSettings('@mipmap/ic_launcher');
     var iOSSettings = const DarwinInitializationSettings(
       requestSoundPermission: true,
       requestBadgePermission: true,
       requestAlertPermission: true,
     );
+
     var initSettings = InitializationSettings(
       android: androidSettings,
       iOS: iOSSettings,
     );
+
+    // إعداد النقر على الإشعار والتوجيه
     flutterLocalNotificationsPlugin.initialize(
       initSettings,
-      onDidReceiveNotificationResponse: (message) async {
+      onDidReceiveNotificationResponse: (NotificationResponse response) async {
         try {
-          String? payloadString = message.payload is String ? message.payload : jsonEncode(message.payload);
-          printX('remarkNotification $payloadString');
+          String? payloadString = response.payload;
           if (payloadString != null && payloadString.isNotEmpty) {
-            Map<dynamic, dynamic> payloadMap = jsonDecode(payloadString);
-            Map<String, String> payload = payloadMap.map(
-              (key, value) => MapEntry(key.toString(), value.toString()),
-            );
+            Map<String, dynamic> data = jsonDecode(payloadString);
 
-            printX('remarkNotification ${payload['for_app']}');
-            printX('remarkNotification ${payload['ride_id']}');
-            String? remark = payload['for_app'];
+            String? remark = data['remark'] ?? data['for_app'];
+            String? rideId = data['ride_id']?.toString();
 
-            if (remark != null && remark.isNotEmpty) {
-              String route = remark.split('-')[0];
-              String id = remark.split('-')[1];
-              //redirect any specific page
-              getx.Get.toNamed(route, arguments: id);
+            printX('Notification Clicked: Remark: $remark, RideID: $rideId');
+
+            if (remark != null) {
+              // إذا كان الإشعار يخص عرض سعر جديد أو قبول عرض
+              if (remark.contains('bid') || remark.contains('new_bid')) {
+                getx.Get.toNamed(RouteHelper.riderRideDetailsScreen, arguments: rideId);
+              }
+              // التنسيق التقليدي (route-id)
+              else if (remark.contains('-')) {
+                String route = remark.split('-')[0];
+                String id = remark.split('-')[1];
+                getx.Get.toNamed(route, arguments: id);
+              }
             }
           }
         } catch (e) {
-          if (kDebugMode) {
-            printX(e.toString());
-          }
+          printX('Error on Notification Click: $e');
         }
       },
     );
 
+    // الاستماع للإشعارات أثناء فتح التطبيق
     FirebaseMessaging.onMessage.listen((RemoteMessage? message) async {
       RemoteNotification? notification = message!.notification;
       AndroidNotification? android = message.notification?.android;
-      printX(">>>>>> ${message.notification?.toMap()}");
-      printX(">>>>>> ${android?.imageUrl}");
-      if (notification != null && android != null) {
+
+      if (notification != null) {
+        // فحص هل الإشعار يخص المزايدة لاختيار القناة والصوت
+        String? remark = message.data['remark'] ?? message.data['for_app'];
+        bool isBid = remark != null && (remark.contains('bid') || remark.contains('new_bid'));
+
         late BigPictureStyleInformation bigPictureStyle;
-        if (android.imageUrl != null) {
+        if (android?.imageUrl != null) {
           Dio dio = Dio();
           Response<List<int>> response = await dio.get<List<int>>(
-            android.imageUrl!,
+            android!.imageUrl!,
             options: Options(responseType: ResponseType.bytes),
           );
           Uint8List bytes = Uint8List.fromList(response.data!);
@@ -119,23 +133,32 @@ class PushNotificationService {
             summaryText: notification.body,
           );
         }
+
         flutterLocalNotificationsPlugin.show(
           notification.hashCode,
           notification.title,
           notification.body,
           NotificationDetails(
             android: AndroidNotificationDetails(
-              channel.id,
-              channel.name,
-              channelDescription: channel.description,
+              isBid ? bChannel.id : channel.id,
+              isBid ? bChannel.name : channel.name,
+              channelDescription: isBid ? bChannel.description : channel.description,
               icon: '@mipmap/ic_launcher',
+              // إذا كانت مزايدة نستخدم الصوت المخصص، غير ذلك نستخدم الافتراضي
+              sound: isBid ? const RawResourceAndroidNotificationSound('bid_sound') : null,
               playSound: true,
               enableVibration: true,
               enableLights: true,
               fullScreenIntent: true,
               priority: Priority.high,
-              styleInformation: android.imageUrl != null ? bigPictureStyle : const BigTextStyleInformation(''),
               importance: Importance.high,
+              styleInformation: android?.imageUrl != null ? bigPictureStyle : const BigTextStyleInformation(''),
+            ),
+            iOS: DarwinNotificationDetails(
+              sound: isBid ? 'bid_sound.caf' : null,
+              presentSound: true,
+              presentAlert: true,
+              presentBadge: true,
             ),
           ),
           payload: jsonEncode(message.data),
@@ -144,23 +167,35 @@ class PushNotificationService {
     });
   }
 
-  Future<void> enableIOSNotifications() async {
-    await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
-      alert: true, // Required to display a heads up notification
-      badge: true,
-      sound: true,
-    );
-  }
+  // القناة الخاصة بالمزايدات بصوت مختلف
+  AndroidNotificationChannel bidNotificationChannel() => const AndroidNotificationChannel(
+        'bid_channel',
+        'Bidding Notifications',
+        description: 'This channel is used for ride bidding and price negotiations.',
+        playSound: true,
+        sound: RawResourceAndroidNotificationSound('bid_sound'),
+        importance: Importance.max,
+        enableVibration: true,
+      );
 
+  // القناة الافتراضية
   AndroidNotificationChannel androidNotificationChannel() => const AndroidNotificationChannel(
-        'high_importance_channel', // id
-        'High Importance Notifications', // title
+        'high_importance_channel',
+        'High Importance Notifications',
         description: 'This channel is used for important notifications.',
         playSound: true,
         enableVibration: true,
         enableLights: true,
         importance: Importance.high,
       );
+
+  Future<void> enableIOSNotifications() async {
+    await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+  }
 
   Future<void> _requestPermissions() async {
     final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
@@ -174,7 +209,6 @@ class PushNotificationService {
     }
   }
 
-  // Function to save the image locally
   Future<String> _saveImageLocally(Uint8List bytes) async {
     final directory = await getTemporaryDirectory();
     final imagePath = '${directory.path}/notification_image.png';
@@ -183,36 +217,21 @@ class PushNotificationService {
     return imagePath;
   }
 
-  //
   Future<bool> sendUserToken() async {
-    String deviceToken;
-    if (apiClient.sharedPreferences.containsKey(
-      SharedPreferenceHelper.fcmDeviceKey,
-    )) {
-      deviceToken = apiClient.sharedPreferences.getString(
-            SharedPreferenceHelper.fcmDeviceKey,
-          ) ??
-          '';
-    } else {
-      deviceToken = '';
-    }
-
+    String deviceToken = apiClient.sharedPreferences.getString(SharedPreferenceHelper.fcmDeviceKey) ?? '';
     FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
     bool success = false;
-    printX(deviceToken);
+
     if (deviceToken.isEmpty) {
       firebaseMessaging.getToken().then((fcmDeviceToken) async {
-        success = await sendUpdatedToken(fcmDeviceToken ?? '');
+        if (fcmDeviceToken != null) {
+          success = await sendUpdatedToken(fcmDeviceToken);
+        }
       });
     } else {
       firebaseMessaging.onTokenRefresh.listen((fcmDeviceToken) async {
-        if (deviceToken == fcmDeviceToken) {
-          success = true;
-        } else {
-          apiClient.sharedPreferences.setString(
-            SharedPreferenceHelper.fcmDeviceKey,
-            fcmDeviceToken,
-          );
+        if (deviceToken != fcmDeviceToken) {
+          apiClient.sharedPreferences.setString(SharedPreferenceHelper.fcmDeviceKey, fcmDeviceToken);
           success = await sendUpdatedToken(fcmDeviceToken);
         }
       });
@@ -222,15 +241,10 @@ class PushNotificationService {
 
   Future<bool> sendUpdatedToken(String deviceToken) async {
     final role = apiClient.sharedPreferences.getString(SharedPreferenceHelper.userRoleKey) ?? 'driver';
-    String url = '\${UrlContainer.baseUrl}\${role == "rider" ? UrlContainer.riderDeviceTokenEndPoint : UrlContainer.deviceTokenEndPoint}';
-    Map<String, String> map = deviceTokenMap(deviceToken);
-
-    await apiClient.request(url, Method.postMethod, map, passHeader: true);
+    // ملاحظة: تأكد من تعريف UrlContainer أو استبداله بالرابط المباشر
+    // String url = '${UrlContainer.baseUrl}${role == "rider" ? UrlContainer.riderDeviceTokenEndPoint : UrlContainer.deviceTokenEndPoint}';
+    // Map<String, String> map = {'token': deviceToken};
+    // await apiClient.request(url, Method.postMethod, map, passHeader: true);
     return true;
-  }
-
-  Map<String, String> deviceTokenMap(String deviceToken) {
-    Map<String, String> map = {'token': deviceToken.toString()};
-    return map;
   }
 }

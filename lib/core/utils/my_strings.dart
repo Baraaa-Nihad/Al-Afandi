@@ -752,7 +752,7 @@ class MyStrings {
 
   static const String succeed = "نجح";
 
-  static const String pending = "تحت المراجعة";
+  static const String pending = "في الانتظار";
 
   static const String rejected = "مرفوض";
 

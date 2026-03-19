@@ -1,9 +1,11 @@
 import 'dart:convert';
 
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:ovoride/core/helper/shared_preference_helper.dart';
 import 'package:ovoride/core/helper/string_format_helper.dart';
 import 'package:ovoride/core/route/route.dart';
+import 'package:ovoride/core/utils/audio_utils.dart';
 import 'package:ovoride/core/utils/my_strings.dart';
 import 'package:ovoride/core/utils/util.dart';
 import 'package:ovoride/data/controller/driver/ride/ride_details/ride_details_controller.dart';
@@ -31,6 +33,20 @@ class PusherRideController extends GetxController {
   void onInit() {
     super.onInit();
     PusherManager().addListener(onEvent);
+  }
+
+  Future<void> subscribeToRide(String rideId, Function(dynamic) onUpdate) async {
+    try {
+      this.rideID = rideId;
+      String channelName = "ride.$rideId";
+
+      // نستخدم PusherManager مباشرة لأنه Singleton ومعرف عالمياً
+      await PusherManager().subscribeToChannel(channelName);
+
+      printX("Subscribed to Ride Channel: $channelName");
+    } catch (e) {
+      printX("Error subscribing to ride channel: $e");
+    }
   }
 
   void onEvent(PusherEvent event) {

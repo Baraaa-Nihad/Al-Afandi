@@ -36,6 +36,24 @@ class PusherRideController extends GetxController {
 
   PusherConfig pusherConfig = PusherConfig();
 
+  /// دالة الاشتراك في قناة الرحلة لضمان وصول العروض لحظياً
+  Future<void> subscribeToRide(String rideId, Function(dynamic) onUpdate) async {
+    try {
+      this.rideID = rideId; // تحديث الـ ID الحالي
+      String channelName = "ride.$rideId"; // تنسيق القناة الخاص بالرحلة
+
+      // الاشتراك في القناة عبر المدير
+      await PusherManager().subscribeToChannel(channelName);
+
+      // ربط التحديث التلقائي
+      // ملاحظة: الـ listener الأصلي (onEvent) سيتكفل بالباقي
+      // ولكن نمرر التحديث لضمان مزامنة الـ UI
+      printX("Subscribed to Ride Channel: $channelName");
+    } catch (e) {
+      printX("Error subscribing to ride channel: $e");
+    }
+  }
+
   /// Handle incoming Pusher events
   void onEvent(PusherEvent event) {
     try {

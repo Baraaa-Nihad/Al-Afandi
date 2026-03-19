@@ -1,6 +1,6 @@
 class Environment {
   // ATTENTION Please update your desired data.
-  static const String appName = 'رَحّال';
+  static const String appName = 'الأفَـندِي';
   static const String version = '1.0.0';
 
   // Ride and Bids
