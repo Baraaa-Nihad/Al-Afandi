@@ -59,15 +59,13 @@ class RiderRideDetailsBottomSheetWidget extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               const BottomSheetBar(),
-              // حالة الرحلة في أعلى الشيت بشكل احترافي
               if (_shouldShowTopOverlay(ride.status ?? "")) _buildStatusBadge(ride),
-
               Expanded(
                 child: ListView(
                   controller: scrollController,
                   padding: const EdgeInsets.fromLTRB(Dimensions.space16, 10, Dimensions.space16, Dimensions.space20),
                   children: [
-                    // ---------------- STATUS: PENDING ----------------
+                    // ---------------- حالة البحث عن سائق (PENDING) ----------------
                     if (ride.status == AppStatus.RIDE_PENDING) ...[
                       _buildSearchingHeader(controller, ride),
                       const SizedBox(height: Dimensions.space20),
@@ -76,7 +74,7 @@ class RiderRideDetailsBottomSheetWidget extends StatelessWidget {
                       _buildCancelButton(context),
                     ],
 
-                    // ---------------- STATUS: ACTIVE (ACCEPTED) ----------------
+                    // ---------------- حالة قبول الرحلة (ACTIVE) ----------------
                     if (ride.status == AppStatus.RIDE_ACTIVE) ...[
                       _buildArrivingSection(),
                       const SizedBox(height: Dimensions.space15),
@@ -93,7 +91,7 @@ class RiderRideDetailsBottomSheetWidget extends StatelessWidget {
                       _buildCancelButton(context),
                     ],
 
-                    // ---------------- STATUS: RUNNING (In Trip) ----------------
+                    // ---------------- حالة الرحلة قيد التنفيذ (RUNNING) ----------------
                     if (ride.status == AppStatus.RIDE_RUNNING) ...[
                       if (ride.driver != null) _buildDriverCard(controller, ride),
                       const SizedBox(height: Dimensions.space15),
@@ -104,7 +102,7 @@ class RiderRideDetailsBottomSheetWidget extends StatelessWidget {
                       _buildSOSButton(context, controller, ride),
                     ],
 
-                    // ---------------- STATUS: PAYMENT REQUESTED ----------------
+                    // ---------------- حالة انتظار الدفع (PAYMENT REQUESTED) ----------------
                     if (ride.status == AppStatus.RIDE_PAYMENT_REQUESTED) ...[
                       _buildPaymentSummaryCard(controller, ride, context),
                       const SizedBox(height: Dimensions.space15),
@@ -113,7 +111,7 @@ class RiderRideDetailsBottomSheetWidget extends StatelessWidget {
                       _buildActionOrWaitPayment(controller, ride),
                     ],
 
-                    // ---------------- STATUS: COMPLETED ----------------
+                    // ---------------- حالة اكتمال الرحلة (COMPLETED) ----------------
                     if (ride.status == AppStatus.RIDE_COMPLETED) ...[
                       _buildTripDetailsCard(ride, currency),
                       const SizedBox(height: Dimensions.space15),
@@ -122,7 +120,7 @@ class RiderRideDetailsBottomSheetWidget extends StatelessWidget {
                       _buildCompletedActions(controller, ride, context),
                     ],
 
-                    // ---------------- STATUS: CANCELED ----------------
+                    // ---------------- حالة الإلغاء (CANCELED) ----------------
                     if (ride.status == AppStatus.RIDE_CANCELED) _buildCanceledCard(ride),
                   ],
                 ),
@@ -134,7 +132,7 @@ class RiderRideDetailsBottomSheetWidget extends StatelessWidget {
     );
   }
 
-  // --- UI Components ---
+  // --- عناصر الواجهة المطورة ---
 
   Widget _buildStatusBadge(RideModel ride) {
     bool isCanceled = ride.status == AppStatus.RIDE_CANCELED;
@@ -145,10 +143,7 @@ class RiderRideDetailsBottomSheetWidget extends StatelessWidget {
       width: double.infinity,
       margin: const EdgeInsets.symmetric(horizontal: Dimensions.space16, vertical: 5),
       padding: const EdgeInsets.symmetric(vertical: 10),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(Dimensions.defaultRadius),
-      ),
+      decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(Dimensions.defaultRadius)),
       child: Center(child: Text(text, style: boldDefault.copyWith(color: color))),
     ).animate().fadeIn().slideY(begin: -0.5);
   }
@@ -179,6 +174,91 @@ class RiderRideDetailsBottomSheetWidget extends StatelessWidget {
     );
   }
 
+  Widget _buildSearchingHeader(RideDetailsController controller, RideModel ride) {
+    return Column(
+      children: [
+        const SearchingForRideAnimation(),
+        const SizedBox(height: 10),
+        // نمط الأفندي: التحديث اللحظي للعنوان بناءً على عدد المزايدات
+        controller.totalBids == 0
+            ? Column(
+                children: [
+                  HeaderText(text: MyStrings.searchingForDriver.tr, style: boldMediumLarge),
+                  SmallText(text: MyStrings.itMayTakeSomeTimes.tr),
+                ],
+              )
+            : _buildBidFoundHeader(controller, ride),
+      ],
+    );
+  }
+
+  Widget _buildBidFoundHeader(RideDetailsController controller, RideModel ride) {
+    return _buildContainerWrapper(
+      color: MyColor.getPrimaryColor().withOpacity(0.08),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const HeaderText(text: "عروض جديدة كابتن!", style: boldMediumLarge),
+                const SizedBox(height: 4),
+                SmallText(text: "لديك ${controller.totalBids} عرضاً متاحاً الآن"),
+              ],
+            ),
+          ),
+          _buildBidBadge(controller, ride),
+        ],
+      ),
+    ).animate().shake(duration: 500.ms);
+  }
+
+  Widget _buildBidBadge(RideDetailsController controller, RideModel ride) {
+    return InkWell(
+      onTap: () => Get.toNamed(RouteHelper.rideBidScreen, arguments: ride.id.toString()),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: MyColor.primaryColor, borderRadius: BorderRadius.circular(15), boxShadow: [BoxShadow(color: MyColor.primaryColor.withOpacity(0.3), blurRadius: 10)]),
+            child: const Icon(Icons.local_taxi, color: Colors.white, size: 28),
+          ),
+          Positioned(
+            top: -8,
+            right: -8,
+            child: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+              constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
+              child: Center(child: Text(controller.totalBids.toString(), style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold))),
+            ),
+          ),
+        ],
+      ),
+    ).animate(onPlay: (animController) => animController.repeat()).shimmer(duration: const Duration(seconds: 2));
+  }
+
+  // --- المساعدات الأساسية (Layout Helpers) ---
+
+  Widget _buildContainerWrapper({required Widget child, Color? color}) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(Dimensions.space15),
+      decoration: BoxDecoration(
+        color: color ?? MyColor.colorWhite,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: MyColor.borderColor.withOpacity(0.5)),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4))],
+      ),
+      child: child,
+    );
+  }
+
+  Widget _buildVerticalDivider() {
+    return Container(height: 30, width: 1, color: MyColor.borderColor.withOpacity(0.5));
+  }
+
   Widget _buildSecurityCodeCard(RideModel ride) {
     return _buildContainerWrapper(
       color: MyColor.getPrimaryColor().withOpacity(0.02),
@@ -200,12 +280,7 @@ class RiderRideDetailsBottomSheetWidget extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 4),
       width: 40,
       height: 50,
-      decoration: BoxDecoration(
-        color: MyColor.colorWhite,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: MyColor.getPrimaryColor().withOpacity(0.2)),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 4)],
-      ),
+      decoration: BoxDecoration(color: MyColor.colorWhite, borderRadius: BorderRadius.circular(10), border: Border.all(color: MyColor.getPrimaryColor().withOpacity(0.2))),
       child: Center(child: Text(digit, style: boldExtraLarge.copyWith(color: MyColor.getPrimaryColor()))),
     );
   }
@@ -224,23 +299,9 @@ class RiderRideDetailsBottomSheetWidget extends StatelessWidget {
   Widget _buildActionButtons(RideModel ride) {
     return Row(
       children: [
-        Expanded(
-          child: _buildActionButton(
-            label: MyStrings.message.tr,
-            icon: Icons.chat_bubble_outline_rounded,
-            color: MyColor.getPrimaryColor(),
-            onTap: () => Get.toNamed(RouteHelper.rideMessageScreen, arguments: [ride.id.toString(), ride.driver?.getFullName(), ride.status.toString()]),
-          ),
-        ),
+        Expanded(child: _buildActionButton(label: MyStrings.message.tr, icon: Icons.chat_bubble_outline_rounded, color: MyColor.getPrimaryColor(), onTap: () => Get.toNamed(RouteHelper.rideMessageScreen, arguments: [ride.id.toString(), ride.driver?.getFullName(), ride.status.toString()]))),
         const SizedBox(width: 15),
-        Expanded(
-          child: _buildActionButton(
-            label: MyStrings.call.tr,
-            icon: Icons.call_outlined,
-            color: MyColor.greenSuccessColor,
-            onTap: () => MyUtils.launchPhone(ride.driver?.mobile ?? ''),
-          ),
-        ),
+        Expanded(child: _buildActionButton(label: MyStrings.call.tr, icon: Icons.call_outlined, color: MyColor.greenSuccessColor, onTap: () => MyUtils.launchPhone(ride.driver?.mobile ?? ''))),
       ],
     );
   }
@@ -250,86 +311,9 @@ class RiderRideDetailsBottomSheetWidget extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.2)),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 20, color: color),
-            const SizedBox(width: 8),
-            Text(label, style: boldDefault.copyWith(color: color)),
-          ],
-        ),
+        decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(12), border: Border.all(color: color.withOpacity(0.2))),
+        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(icon, size: 20, color: color), const SizedBox(width: 8), Text(label, style: boldDefault.copyWith(color: color))]),
       ),
-    );
-  }
-
-  // --- Shared Layout Helpers ---
-
-  Widget _buildContainerWrapper({required Widget child, Color? color}) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(Dimensions.space15),
-      decoration: BoxDecoration(
-        color: color ?? MyColor.colorWhite,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: MyColor.borderColor.withOpacity(0.5)),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4)),
-        ],
-      ),
-      child: child,
-    );
-  }
-
-  Widget _buildVerticalDivider() {
-    return Container(height: 30, width: 1, color: MyColor.borderColor.withOpacity(0.5));
-  }
-
-  // الميثودات المساعدة الأخرى (نفس المنطق لكن بتنسيق Wrapper)
-  Widget _buildTripDetailsCard(RideModel ride, String currency) {
-    return _buildContainerWrapper(
-      child: Column(
-        children: [
-          _buildMainStatsCardContent(ride, currency),
-          const CustomDivider(space: Dimensions.space15),
-          buildRideLocationAndDestinationWidget(ride),
-        ],
-      ),
-    );
-  }
-
-  // تم نقل المحتوى ليكون متناسقاً
-  Widget _buildMainStatsCardContent(RideModel ride, String currency) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        CardColumn(header: MyStrings.distance.tr, body: "${ride.distance ?? '0'} KM"),
-        CardColumn(header: MyStrings.duration.tr, body: ride.duration ?? '0'),
-        CardColumn(header: "الأجرة", body: "$currency${ride.amount ?? '0'}"),
-      ],
-    );
-  }
-
-  // ... (بقية ميثودات الأزرار والـ Headers تبقى كما هي مع التأكد من وضعها داخل الأوعية الجديدة)
-
-  Widget _buildSearchingHeader(RideDetailsController controller, RideModel ride) {
-    return Column(
-      children: [
-        const SearchingForRideAnimation(),
-        const SizedBox(height: 10),
-        controller.totalBids == 0
-            ? Column(
-                children: [
-                  HeaderText(text: MyStrings.searchingForDriver.tr, style: boldMediumLarge),
-                  SmallText(text: MyStrings.itMayTakeSomeTimes.tr),
-                ],
-              )
-            : _buildBidFoundHeader(controller, ride),
-      ],
     );
   }
 
@@ -343,51 +327,60 @@ class RiderRideDetailsBottomSheetWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildCanceledCard(RideModel ride) {
+  Widget _buildTripDetailsCard(RideModel ride, String currency) {
     return _buildContainerWrapper(
       child: Column(
         children: [
+          _buildMainStatsCardContent(ride, currency),
+          const CustomDivider(space: Dimensions.space15),
           buildRideLocationAndDestinationWidget(ride),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline, color: MyColor.redCancelTextColor),
-              const SizedBox(width: 8),
-              Text("تم إلغاء هذه الرحلة", style: boldDefault.copyWith(color: MyColor.redCancelTextColor)),
-            ],
-          ),
         ],
       ),
     );
   }
 
-  // الميثودات الأصلية المطلوبة من الكود
+  Widget _buildMainStatsCardContent(RideModel ride, String currency) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        CardColumn(header: MyStrings.distance.tr, body: "${ride.distance ?? '0'} KM"),
+        CardColumn(header: MyStrings.duration.tr, body: ride.duration ?? '0'),
+        CardColumn(header: "الأجرة", body: "$currency${ride.amount ?? '0'}"),
+      ],
+    );
+  }
+
   Widget _buildPaymentSummaryCard(RideDetailsController controller, RideModel ride, BuildContext context) {
     return _buildContainerWrapper(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SmallText(text: MyStrings.billToPay.tr),
-              Text(
-                "${controller.currencySym}${StringConverter.formatNumber(ride.amount.toString())}",
-                style: boldExtraLarge.copyWith(fontSize: 28, color: MyColor.getHeadingTextColor()),
-              ),
-            ],
-          ),
+          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            SmallText(text: MyStrings.billToPay.tr),
+            Text("${controller.currencySym}${StringConverter.formatNumber(ride.amount.toString())}", style: boldExtraLarge.copyWith(fontSize: 28, color: MyColor.getHeadingTextColor())),
+          ]),
           _buildTipButton(controller, context),
         ],
       ),
     );
   }
 
-  // الميثودات المساعدة (UI Logic)
+  Widget _buildCanceledCard(RideModel ride) {
+    return _buildContainerWrapper(
+      child: Column(children: [
+        buildRideLocationAndDestinationWidget(ride),
+        const SizedBox(height: 20),
+        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          const Icon(Icons.error_outline, color: MyColor.redCancelTextColor),
+          const SizedBox(width: 8),
+          Text("تم إلغاء هذه الرحلة", style: boldDefault.copyWith(color: MyColor.redCancelTextColor)),
+        ]),
+      ]),
+    );
+  }
+
   bool _shouldShowTopOverlay(String status) => status == AppStatus.RIDE_PAYMENT_REQUESTED || status == AppStatus.RIDE_COMPLETED || status == AppStatus.RIDE_CANCELED;
 
-  // -- ميثودات الأزرار والوظائف (نفس المنطق الأصلي لكن مع تحسين التصميم)
   Widget _buildCancelButton(BuildContext context) {
     return RoundedButton(
       text: MyStrings.cancelRide.tr,
@@ -406,51 +399,32 @@ class RiderRideDetailsBottomSheetWidget extends StatelessWidget {
     );
   }
 
-  // بقية الميثودات (buildRideLocationAndDestinationWidget, _buildTipButton, الخ) تبقى كما هي مع تغيير الستايلات لتناسب التصميم الجديد.
-
-  Widget _buildBidFoundHeader(RideDetailsController controller, RideModel ride) {
-    return _buildContainerWrapper(
-      color: MyColor.getPrimaryColor().withOpacity(0.05),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                HeaderText(text: "وصلتك عروض جديدة!", style: boldMediumLarge),
-                SmallText(text: "اضغط على الأيقونة لرؤية عروض السائقين"),
-              ],
-            ),
-          ),
-          _buildBidBadge(controller, ride),
-        ],
-      ),
+  Widget _buildTipButton(RideDetailsController controller, BuildContext context) {
+    bool hasTip = controller.tipsController.text.isNotEmpty;
+    return RoundedButton(
+      text: hasTip ? "+${controller.currencySym}${controller.tipsController.text}" : MyStrings.addTip.tr,
+      width: 100,
+      press: () => CustomBottomSheet(child: const RideDetailsTipsBottomSheet()).customBottomSheet(context),
+      bgColor: MyColor.getPrimaryColor().withOpacity(0.1),
+      textColor: MyColor.getPrimaryColor(),
     );
   }
 
-  Widget _buildBidBadge(RideDetailsController controller, RideModel ride) {
-    return InkWell(
-      onTap: () => Get.toNamed(RouteHelper.rideBidScreen, arguments: ride.id.toString()),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: MyColor.primaryColor, borderRadius: BorderRadius.circular(12)),
-            child: const Icon(Icons.local_taxi, color: Colors.white),
-          ),
-          Positioned(
-            top: -5,
-            right: -5,
-            child: CircleAvatar(
-              radius: 10,
-              backgroundColor: Colors.red,
-              child: Text(controller.totalBids.toString(), style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
-            ),
-          ),
-        ],
-      ),
-    );
+  Widget _buildActionOrWaitPayment(RideDetailsController controller, RideModel ride) {
+    if (ride.paymentStatus == '2' && !controller.isPaymentRequested) {
+      return RoundedButton(text: MyStrings.payNow.tr, press: () => Get.toNamed(RouteHelper.paymentScreen, arguments: [ride, controller.tipsController.text])).animate().shimmer(duration: 1500.ms);
+    }
+    return Column(children: [
+      const RippleAnimation(color: MyColor.primaryColor, minRadius: 20, child: SizedBox(height: 40, width: 40)),
+      const SizedBox(height: 15),
+      Text(MyStrings.waitForDriverResponse.tr, style: boldDefault.copyWith(color: MyColor.getPrimaryColor())),
+    ]);
+  }
+
+  Widget _buildCompletedActions(RideDetailsController controller, RideModel ride, BuildContext context) {
+    return Column(children: [
+      if (ride.driverReview == null) RoundedButton(text: MyStrings.review.tr, press: () => CustomBottomSheet(child: RideDetailsReviewBottomSheet(ride: ride)).customBottomSheet(context)) else RoundedButton(text: MyStrings.receipt.tr, isOutlined: true, press: () => DownloadService.downloadPDF(url: "${UrlContainer.riderRideReceipt}/${ride.id}", fileName: "Receipt_${ride.id}.pdf")),
+    ]);
   }
 
   CustomTimeLine buildRideLocationAndDestinationWidget(RideModel ride) {
@@ -466,58 +440,10 @@ class RiderRideDetailsBottomSheetWidget extends StatelessWidget {
   Widget _buildTimelineText(String title, String sub) {
     return Padding(
       padding: const EdgeInsets.only(left: 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: boldDefault.copyWith(color: MyColor.rideTitle, fontSize: 12)),
-          Text(sub, style: regularDefault.copyWith(color: MyColor.getHeadingTextColor()), maxLines: 1, overflow: TextOverflow.ellipsis),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTipButton(RideDetailsController controller, BuildContext context) {
-    bool hasTip = controller.tipsController.text.isNotEmpty;
-    return RoundedButton(
-      text: hasTip ? "+${controller.currencySym}${controller.tipsController.text}" : MyStrings.addTip.tr,
-      width: 100,
-      press: () => CustomBottomSheet(child: const RideDetailsTipsBottomSheet()).customBottomSheet(context),
-      bgColor: MyColor.getPrimaryColor().withOpacity(0.1),
-      textColor: MyColor.getPrimaryColor(),
-    );
-  }
-
-  Widget _buildActionOrWaitPayment(RideDetailsController controller, RideModel ride) {
-    if (ride.paymentStatus == '2' && !controller.isPaymentRequested) {
-      return RoundedButton(
-        text: MyStrings.payNow.tr,
-        press: () => Get.toNamed(RouteHelper.paymentScreen, arguments: [ride, controller.tipsController.text]),
-      ).animate().shimmer(duration: 1500.ms);
-    }
-    return Column(
-      children: [
-        const RippleAnimation(color: MyColor.primaryColor, minRadius: 20, child: SizedBox(height: 40, width: 40)),
-        const SizedBox(height: 15),
-        Text(MyStrings.waitForDriverResponse.tr, style: boldDefault.copyWith(color: MyColor.getPrimaryColor())),
-      ],
-    );
-  }
-
-  Widget _buildCompletedActions(RideDetailsController controller, RideModel ride, BuildContext context) {
-    return Column(
-      children: [
-        if (ride.driverReview == null)
-          RoundedButton(
-            text: MyStrings.review.tr,
-            press: () => CustomBottomSheet(child: RideDetailsReviewBottomSheet(ride: ride)).customBottomSheet(context),
-          )
-        else
-          RoundedButton(
-            text: MyStrings.receipt.tr,
-            isOutlined: true,
-            press: () => DownloadService.downloadPDF(url: "${UrlContainer.riderRideReceipt}/${ride.id}", fileName: "Receipt_${ride.id}.pdf"),
-          ),
-      ],
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(title, style: boldDefault.copyWith(color: MyColor.rideTitle, fontSize: 12)),
+        Text(sub, style: regularDefault.copyWith(color: MyColor.getHeadingTextColor()), maxLines: 1, overflow: TextOverflow.ellipsis),
+      ]),
     );
   }
 }
