@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:ovoride/core/helper/shared_preference_helper.dart';
 import 'package:ovoride/core/route/route.dart';
 import 'package:ovoride/core/utils/dimensions.dart';
 import 'package:ovoride/core/utils/my_color.dart';
@@ -15,6 +16,7 @@ import 'package:ovoride/presentation/components/text-form-field/custom_text_fiel
 import 'package:ovoride/presentation/screens/shared/auth/auth_background.dart';
 
 import 'package:ovoride/core/utils/my_icons.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ForgetPasswordScreen extends StatefulWidget {
   const ForgetPasswordScreen({super.key});
@@ -48,7 +50,8 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
       statusBarColor: Colors.transparent,
       child: Scaffold(
         backgroundColor: MyColor.colorWhite,
-        body: GetBuilder<ForgetPasswordController>(tag: 'forget_password',
+        body: GetBuilder<ForgetPasswordController>(
+          tag: 'forget_password',
           builder: (auth) => SingleChildScrollView(
             child: Column(
               children: [
