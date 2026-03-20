@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:ovoride/core/helper/shared_preference_helper.dart';
 import 'package:ovoride/core/utils/method.dart';
@@ -14,7 +16,7 @@ class RegistrationRepo {
 
   Future<RegistrationResponseModel> registerUser(SignUpModel model) async {
     final map = modelToMap(model);
-    String url = '${UrlContainer.baseUrl}${UrlContainer.registrationEndPoint}';
+    String url = '${UrlContainer.baseUrl}${UrlContainer.riderRegisterEndPoint}';
     final res = await apiClient.request(
       url,
       Method.postMethod,
@@ -22,7 +24,7 @@ class RegistrationRepo {
       passHeader: true,
       isOnlyAcceptType: true,
     );
-
+    log("res.responseJson ${res.responseJson}");
     RegistrationResponseModel responseModel = RegistrationResponseModel.fromJson(res.responseJson);
     return responseModel;
   }

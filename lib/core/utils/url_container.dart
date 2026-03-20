@@ -46,6 +46,7 @@ class UrlContainer {
   static const String riderGetProfileEndPoint = 'user-info';
   static const String updateProfileEndPoint = 'driver/profile-setting';
   static const String riderUpdateProfileEndPoint = 'profile-setting';
+  static const String riderProfileCompleteEndPoint = 'user-data-submit';
   static const String profileCompleteEndPoint = 'driver/driver-data-submit';
 
   static const String changePasswordEndPoint = 'driver/change-password';

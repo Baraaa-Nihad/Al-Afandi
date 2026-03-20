@@ -1,0 +1,150 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:ovoride/core/route/route.dart';
+import 'package:ovoride/core/helper/shared_preference_helper.dart';
+import 'package:ovoride/core/helper/string_format_helper.dart';
+import 'package:ovoride/core/utils/my_strings.dart';
+import 'package:ovoride/data/model/rider/auth/authorization_response_model.dart';
+import 'package:ovoride/data/model/country_model/country_model.dart';
+import 'package:ovoride/data/model/profile/rider_profile_response_model.dart';
+import 'package:ovoride/data/model/user_post_model/user_post_model.dart';
+import 'package:ovoride/data/repo/rider/account/profile_repo.dart';
+import 'package:ovoride/presentation/components/snack_bar/show_custom_snackbar.dart';
+
+class ProfileCompleteController extends GetxController {
+  ProfileRepo profileRepo;
+  ProfileCompleteController({required this.profileRepo});
+
+  RiderProfileResponseModel model = RiderProfileResponseModel();
+
+  TextEditingController userNameController = TextEditingController();
+  TextEditingController firstNameController = TextEditingController();
+  TextEditingController lastNameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController mobileNoController = TextEditingController();
+  TextEditingController addressController = TextEditingController();
+  TextEditingController stateController = TextEditingController();
+  TextEditingController zipCodeController = TextEditingController();
+  TextEditingController cityController = TextEditingController();
+  TextEditingController searchController = TextEditingController();
+  TextEditingController referController = TextEditingController();
+
+  FocusNode userNameFocusNode = FocusNode();
+  FocusNode firstNameFocusNode = FocusNode();
+  FocusNode lastNameFocusNode = FocusNode();
+  FocusNode emailFocusNode = FocusNode();
+  FocusNode mobileNoFocusNode = FocusNode();
+  FocusNode addressFocusNode = FocusNode();
+  FocusNode stateFocusNode = FocusNode();
+  FocusNode zipCodeFocusNode = FocusNode();
+  FocusNode cityFocusNode = FocusNode();
+  FocusNode countryFocusNode = FocusNode();
+
+  bool isLoading = false;
+
+  Future<void> initialData() async {
+    //    await loadProfileInfo();
+    countryList = profileRepo.apiClient.getOperatingCountries();
+    update();
+    if (countryList.isNotEmpty) {
+      selectCountryData(countryList.first);
+    }
+  }
+
+  RiderProfileResponseModel profileResponseModel = RiderProfileResponseModel();
+
+  String imageUrl = '';
+
+  File? imageFile;
+  String emailData = '';
+  String countryData = '';
+  String countryCodeData = '';
+  String phoneCodeData = '';
+  String phoneData = '';
+
+  String loginType = '';
+
+  Future<void> loadProfileInfo() async {
+    isLoading = true;
+    update();
+    try {
+      profileResponseModel = await profileRepo.loadProfileInfo();
+      if (profileResponseModel.data != null && profileResponseModel.status?.toLowerCase() == MyStrings.success.toLowerCase()) {
+        emailData = profileResponseModel.data?.user?.email ?? '';
+        countryData = profileResponseModel.data?.user?.country ?? '';
+        countryCodeData = profileResponseModel.data?.user?.countryCode ?? '';
+        phoneData = profileResponseModel.data?.user?.mobile ?? '';
+        loginType = '';
+      } else {
+        isLoading = false;
+        update();
+      }
+    } catch (e) {
+      isLoading = false;
+      update();
+    }
+    isLoading = false;
+    update();
+  } // country data
+
+  TextEditingController searchCountryController = TextEditingController();
+  bool countryLoading = true;
+  List<Countries> countryList = [];
+  List<Countries> filteredCountries = [];
+
+  Countries selectedCountryData = Countries();
+  void selectCountryData(Countries value) {
+    selectedCountryData = value;
+    update();
+  }
+
+  bool submitLoading = false;
+  Future<void> updateProfile() async {
+    String firstName = firstNameController.text;
+    String lastName = lastNameController.text.toString();
+    String address = addressController.text.toString();
+    String city = cityController.text.toString();
+    String zip = zipCodeController.text.toString();
+    String state = stateController.text.toString();
+    printD("model.username");
+
+    submitLoading = true;
+    update();
+
+    UserPostModel model = UserPostModel(
+      image: null,
+      firstname: firstName,
+      lastName: lastName,
+      mobile: mobileNoController.text,
+      email: '',
+      username: userNameController.text,
+      countryCode: selectedCountryData.countryCode.toString(),
+      country: selectedCountryData.country.toString(),
+      mobileCode: selectedCountryData.dialCode.toString(),
+      address: address,
+      state: state,
+      zip: zip,
+      city: city,
+      refer: referController.text,
+    );
+
+    AuthorizationResponseModel responseModel = await profileRepo.updateProfile(model, false);
+
+    if (responseModel.status == "success") {
+      await profileRepo.apiClient.sharedPreferences.setString(
+        SharedPreferenceHelper.userFullNameKey,
+        '$firstName $lastName',
+      );
+      CustomSnackBar.success(successList: responseModel.message ?? [MyStrings.requestSuccess]);
+      RouteHelper.checkRiderStatusAndGoToNextStep(responseModel.data?.user);
+    } else {
+      CustomSnackBar.error(errorList: responseModel.message ?? [MyStrings.somethingWentWrong]);
+    }
+
+    submitLoading = false;
+    update();
+  }
+}

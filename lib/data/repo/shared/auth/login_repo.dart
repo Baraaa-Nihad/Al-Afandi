@@ -3,6 +3,7 @@ import 'package:ovoride/core/helper/shared_preference_helper.dart';
 import 'package:ovoride/core/utils/method.dart';
 import 'package:ovoride/core/utils/my_strings.dart';
 import 'package:ovoride/core/utils/url_container.dart';
+import 'package:ovoride/core/helper/shared_preference_helper.dart';
 import 'package:ovoride/data/model/auth/verification/email_verification_model.dart';
 import 'package:ovoride/data/model/global/response_model/response_model.dart';
 import 'package:ovoride/data/services/api_client.dart';
@@ -31,7 +32,8 @@ class LoginRepo {
 
   Future<String> forgetPassword(String type, String value) async {
     final map = modelToMap(value, type);
-    String url = '${UrlContainer.baseUrl}${UrlContainer.forgetPasswordEndPoint}';
+    final role = apiClient.sharedPreferences.getString(SharedPreferenceHelper.userRoleKey) ?? 'driver';
+    String url = '${UrlContainer.baseUrl}${role == 'rider' ? UrlContainer.riderForgetPasswordEndPoint : UrlContainer.forgetPasswordEndPoint}';
     final response = await apiClient.request(
       url,
       Method.postMethod,

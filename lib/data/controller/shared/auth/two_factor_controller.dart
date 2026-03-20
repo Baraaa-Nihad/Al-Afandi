@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ovoride/core/helper/shared_preference_helper.dart';
 import 'package:ovoride/core/route/route.dart';
 import 'package:ovoride/core/utils/my_strings.dart';
 import 'package:ovoride/data/model/authorization/authorization_response_model.dart';
@@ -41,7 +43,15 @@ class TwoFactorController extends GetxController {
           successList: model.message ?? [MyStrings.requestSuccess],
         );
         Get.offAndToNamed(
-          isProfileCompleteEnable ? RouteHelper.profileCompleteScreen : RouteHelper.dashboard,
+          (){
+          final _prefs = Get.find<SharedPreferences>();
+          final _role = _prefs.getString(SharedPreferenceHelper.userRoleKey) ?? 'driver';
+          if (_role == 'rider') {
+            return isProfileCompleteEnable ? RouteHelper.riderProfileCompleteScreen : RouteHelper.riderDashboard;
+          } else {
+            return isProfileCompleteEnable ? RouteHelper.profileCompleteScreen : RouteHelper.dashboard;
+          }
+        }(),
         );
       } else {
         CustomSnackBar.error(

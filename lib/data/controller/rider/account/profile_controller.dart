@@ -10,7 +10,7 @@ import 'package:ovoride/core/helper/string_format_helper.dart';
 import 'package:ovoride/core/route/route.dart';
 import 'package:ovoride/core/utils/my_strings.dart';
 import 'package:ovoride/core/utils/url_container.dart';
-import 'package:ovoride/data/model/authorization/authorization_response_model.dart';
+import 'package:ovoride/data/model/rider/auth/authorization_response_model.dart';
 import 'package:ovoride/data/model/general_setting/general_setting_response_model.dart';
 import 'package:ovoride/data/model/global/response_model/response_model.dart';
 import 'package:ovoride/data/model/global/user/global_user_model.dart';

@@ -4,9 +4,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ovoride/core/helper/shared_preference_helper.dart';
 import 'package:ovoride/core/route/route.dart';
 import 'package:ovoride/core/utils/my_strings.dart';
-import 'package:ovoride/data/model/auth/login/login_response_model.dart';
+import 'package:ovoride/data/model/rider/auth/authorization_response_model.dart';
 import 'package:ovoride/data/model/global/response_model/response_model.dart';
-import 'package:ovoride/data/repo/shared/auth/sms_email_verification_repo.dart';
+import 'package:ovoride/data/repo/rider/auth/sms_email_verification_repo.dart';
 import 'package:ovoride/presentation/components/snack_bar/show_custom_snackbar.dart';
 
 class EmailVerificationController extends GetxController {
@@ -33,7 +33,7 @@ class EmailVerificationController extends GetxController {
       ResponseModel responseModel = await repo.sendAuthorizationRequest();
 
       if (responseModel.statusCode == 200) {
-        LoginResponseModel model = LoginResponseModel.fromJson(
+        AuthorizationResponseModel model = AuthorizationResponseModel.fromJson(
           (responseModel.responseJson),
         );
 
@@ -65,11 +65,11 @@ class EmailVerificationController extends GetxController {
     ResponseModel responseModel = await repo.verify(text);
 
     if (responseModel.statusCode == 200) {
-      LoginResponseModel model = LoginResponseModel.fromJson(
+      AuthorizationResponseModel model = AuthorizationResponseModel.fromJson(
         (responseModel.responseJson),
       );
-      if (model.status == 'success') {
-        RouteHelper.checkUserStatusAndGoToNextStep(model.data?.user);
+      if (model.status == MyStrings.success) {
+        RouteHelper.checkRiderStatusAndGoToNextStep(model.data?.user);
         CustomSnackBar.success(
           successList: model.message ?? [(MyStrings.emailVerificationSuccess)],
         );

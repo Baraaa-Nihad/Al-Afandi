@@ -5,9 +5,9 @@ import 'package:ovoride/core/helper/shared_preference_helper.dart';
 import 'package:ovoride/core/helper/shared_preference_helper.dart';
 import 'package:ovoride/core/route/route.dart';
 import 'package:ovoride/core/utils/my_strings.dart';
-import 'package:ovoride/data/model/authorization/authorization_response_model.dart';
+import 'package:ovoride/data/model/rider/auth/authorization_response_model.dart';
 import 'package:ovoride/data/model/global/response_model/response_model.dart';
-import 'package:ovoride/data/repo/shared/auth/sms_email_verification_repo.dart';
+import 'package:ovoride/data/repo/rider/auth/sms_email_verification_repo.dart';
 import 'package:ovoride/presentation/components/snack_bar/show_custom_snackbar.dart';
 
 class SmsVerificationController extends GetxController {
@@ -63,7 +63,7 @@ class SmsVerificationController extends GetxController {
           successList: model.message ?? ['${MyStrings.sms.tr} ${MyStrings.verificationSuccess.tr}'],
         );
         // RouteMiddleware.checkNGotoNext(user: model.data?.user);
-        RouteHelper.checkUserStatusAndGoToNextStep(model.data?.user);
+        RouteHelper.checkRiderStatusAndGoToNextStep(model.data?.user);
       } else {
         CustomSnackBar.error(
           errorList: model.message ?? ['${MyStrings.sms.tr} ${MyStrings.verificationFailed}'],
