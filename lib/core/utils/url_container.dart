@@ -1,5 +1,5 @@
 class UrlContainer {
-  static const String domainUrl = 'https://preview.ovosolution.com/ovoride/demo'; //YOUR WEBSITE DOMAIN URL HERE
+  static const String domainUrl = 'https://appalafandi.com'; //YOUR WEBSITE DOMAIN URL HERE
 
   static const String baseUrl = '$domainUrl/api/';
   static const String dashBoardEndPoint = 'driver/dashboard';
