@@ -13,7 +13,7 @@ import 'package:ovoride/presentation/components/image/my_network_image_widget.da
 class CountryBottomSheet {
   static void bottomSheet(
     BuildContext context,
-    ProfileCompleteController controller,
+    DriverProfileCompleteController controller,
   ) {
     CustomBottomSheet(
       child: StatefulBuilder(
@@ -147,7 +147,7 @@ class CountryBottomSheet {
 
   static void profileBottomSheet(
     BuildContext context,
-    ProfileCompleteController controller,
+    DriverProfileCompleteController controller,
   ) {
     CustomBottomSheet(
       child: StatefulBuilder(

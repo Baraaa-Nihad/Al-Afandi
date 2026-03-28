@@ -17,7 +17,7 @@ import 'package:ovoride/presentation/components/no_data.dart';
 class ZoneBottomSheet {
   static void bottomSheet(
     BuildContext context,
-    ProfileCompleteController controller,
+    DriverProfileCompleteController controller,
   ) {
     final ScrollController scrollController = ScrollController();
 
@@ -33,7 +33,7 @@ class ZoneBottomSheet {
       delay: const Duration(milliseconds: 600),
     );
     CustomBottomSheet(
-      child: GetBuilder<ProfileCompleteController>(initState: (state) {
+      child: GetBuilder<DriverProfileCompleteController>(initState: (state) {
         WidgetsBinding.instance.addPostFrameCallback((v) {
           controller.initZoneData(shouldLoad: true);
         });

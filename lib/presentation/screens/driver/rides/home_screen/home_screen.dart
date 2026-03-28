@@ -92,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               // --- إضافة رادار حالة اتصال Pusher هنا ---
-              _buildPusherStatusMonitor(),
+              //       _buildPusherStatusMonitor(),
             ],
           ),
         ),

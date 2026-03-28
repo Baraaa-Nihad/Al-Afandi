@@ -439,7 +439,7 @@ class MyStrings {
 
   static const String updateProfile = "تحديث البيانات";
 
-  static const String completeProfile = "كمل بياناتك";
+  static const String completeProfile = "تأكـيد";
 
   static const String selectALanguage = 'اختار اللغة';
 
@@ -818,7 +818,7 @@ class MyStrings {
 
   static const String codeHasBeenSendTo = "الكود اتبعث لـ";
 
-  static const String profileCompleteTitle = "جاهز تسوق!";
+  static const String profileCompleteTitle = "جاهز تشتـغَل ؟";
 
   static const String profileCompleteSubTitle = "خلص إعداد ملفك وابدأ اكسب النهاردة!";
 

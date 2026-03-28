@@ -284,24 +284,17 @@ class _RegistrationFormState extends State<RegistrationForm> {
               ),
               const SizedBox(height: Dimensions.space25),
               Text(
-                'حدد موقعك',
+                'الموقع الحـالي : ',
                 style: boldLarge.copyWith(
                   color: MyColor.getHeadingTextColor(),
                   fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: Dimensions.space8),
-              Text(
-                'حرّك الخريطة وضع الدبوس على موقعك الصحيح',
-                style: regularDefault.copyWith(
-                  color: MyColor.getBodyTextColor(),
                 ),
               ),
               const SizedBox(height: Dimensions.space15),
               ClipRRect(
                 borderRadius: BorderRadius.circular(Dimensions.radius25),
                 child: SizedBox(
-                  height: 240,
+                  height: 150,
                   width: double.infinity,
                   child: Stack(
                     alignment: Alignment.center,
@@ -336,52 +329,6 @@ class _RegistrationFormState extends State<RegistrationForm> {
                         ),
                       ),
                     ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: Dimensions.space12),
-              Align(
-                alignment: AlignmentDirectional.centerEnd,
-                child: InkWell(
-                  onTap: controller.moveToCurrentLocation,
-                  borderRadius: BorderRadius.circular(50),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 10,
-                    ),
-                    decoration: BoxDecoration(
-                      color: MyColor.colorWhite,
-                      borderRadius: BorderRadius.circular(50),
-                      border: Border.all(
-                        color: MyColor.primaryColor.withValues(alpha: 0.15),
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: MyColor.colorBlack.withValues(alpha: 0.06),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.my_location,
-                          color: MyColor.primaryColor,
-                          size: 18,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'موقعي الحالي',
-                          style: regularDefault.copyWith(
-                            color: MyColor.getHeadingTextColor(),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
                   ),
                 ),
               ),
