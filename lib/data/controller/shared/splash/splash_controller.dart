@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:ovoride/core/helper/shared_preference_helper.dart';
 import 'package:ovoride/core/helper/string_format_helper.dart';
@@ -17,7 +19,11 @@ import 'package:ovoride/presentation/components/snack_bar/show_custom_snackbar.d
 class SplashController extends GetxController {
   GeneralSettingRepo repo;
   LocalizationController localizationController;
-  SplashController({required this.repo, required this.localizationController});
+
+  SplashController({
+    required this.repo,
+    required this.localizationController,
+  });
 
   bool isLoading = true;
   bool noInternet = false;
@@ -27,13 +33,18 @@ class SplashController extends GetxController {
     await loadLanguage();
 
     bool isRemember = repo.apiClient.sharedPreferences.getBool(
-      SharedPreferenceHelper.rememberMeKey,
-    ) ?? false;
+          SharedPreferenceHelper.rememberMeKey,
+        ) ??
+        false;
 
     noInternet = false;
     update();
 
-    initSharedData();
+    await initSharedData();
+
+    /// ✅ طلب الموقع بعد السبلاش مباشرة
+    await _requestLocationPermissionAndCache();
+
     getGSData(isRemember);
   }
 
@@ -41,10 +52,10 @@ class SplashController extends GetxController {
     ResponseModel response = await repo.getGeneralSetting();
 
     bool isOnboardAlreadyDisplayed = repo.apiClient.sharedPreferences.getBool(
-      SharedPreferenceHelper.onBoardKey,
-    ) ?? false;
+          SharedPreferenceHelper.onBoardKey,
+        ) ??
+        false;
 
-    // Check if user role is already saved
     String? savedRole = repo.apiClient.sharedPreferences.getString(
       SharedPreferenceHelper.userRoleKey,
     );
@@ -91,38 +102,40 @@ class SplashController extends GetxController {
 
     Future.delayed(const Duration(seconds: 1), () {
       if (isOnboardAlreadyDisplayed == false) {
-        // First launch — show onboarding
         Get.offAndToNamed(RouteHelper.onboardScreen);
       } else if (!hasRole) {
-        // Onboard done but no role selected yet — show role screen
         Get.offAndToNamed(RouteHelper.userRoleScreen);
       } else if (isRemember) {
-        // Role saved + logged in — go to correct dashboard
         if (savedRole == 'driver') {
           Get.offAndToNamed(RouteHelper.dashboard);
         } else {
           Get.offAndToNamed(RouteHelper.riderDashboard);
         }
       } else {
-        // Role saved but not logged in — go to role screen
         Get.offAndToNamed(RouteHelper.userRoleScreen);
       }
     });
   }
 
   Future<bool> initSharedData() {
-    if (!repo.apiClient.sharedPreferences.containsKey(SharedPreferenceHelper.countryCode)) {
+    if (!repo.apiClient.sharedPreferences.containsKey(
+      SharedPreferenceHelper.countryCode,
+    )) {
       return repo.apiClient.sharedPreferences.setString(
         SharedPreferenceHelper.countryCode,
         localizationController.defaultLanguage.countryCode,
       );
     }
-    if (!repo.apiClient.sharedPreferences.containsKey(SharedPreferenceHelper.languageCode)) {
+
+    if (!repo.apiClient.sharedPreferences.containsKey(
+      SharedPreferenceHelper.languageCode,
+    )) {
       return repo.apiClient.sharedPreferences.setString(
         SharedPreferenceHelper.languageCode,
         localizationController.defaultLanguage.languageCode,
       );
     }
+
     return Future.value(true);
   }
 
@@ -135,23 +148,29 @@ class SplashController extends GetxController {
       AuthorizationResponseModel model = AuthorizationResponseModel.fromJson(
         response.responseJson,
       );
+
       if (model.remark == "maintenance_mode") {
         Future.delayed(const Duration(seconds: 1), () {
           Get.offAndToNamed(RouteHelper.maintenanceScreen);
         });
         return;
       }
+
       try {
         Map<String, Map<String, String>> language = {};
         var resJson = response.responseJson;
         saveLanguageList(jsonEncode(resJson));
         var value = resJson['data']['file'].toString() == '[]' ? {} : resJson['data']['file'];
+
         Map<String, String> json = {};
         printX(value);
+
         value.forEach((key, value) {
           json[key] = value.toString();
         });
+
         language['${localizationController.locale.languageCode}_${localizationController.locale.countryCode}'] = json;
+
         Get.addTranslations(Messages(languages: language).keys);
       } catch (e) {
         if (kDebugMode) {
@@ -168,5 +187,124 @@ class SplashController extends GetxController {
       SharedPreferenceHelper.languageListKey,
       languageJson,
     );
+  }
+
+  /// =========================
+  /// ✅ Location after splash
+  /// =========================
+  Future<void> _requestLocationPermissionAndCache() async {
+    try {
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        await repo.apiClient.sharedPreferences.setBool(
+          'location_service_enabled',
+          false,
+        );
+        return;
+      }
+
+      await repo.apiClient.sharedPreferences.setBool(
+        'location_service_enabled',
+        true,
+      );
+
+      LocationPermission permission = await Geolocator.checkPermission();
+
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+
+      if (permission == LocationPermission.denied) {
+        await repo.apiClient.sharedPreferences.setString(
+          'location_permission_status',
+          'denied',
+        );
+        return;
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        await repo.apiClient.sharedPreferences.setString(
+          'location_permission_status',
+          'denied_forever',
+        );
+        return;
+      }
+
+      await repo.apiClient.sharedPreferences.setString(
+        'location_permission_status',
+        'granted',
+      );
+
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
+      );
+
+      await repo.apiClient.sharedPreferences.setDouble(
+        'user_current_latitude',
+        position.latitude,
+      );
+      await repo.apiClient.sharedPreferences.setDouble(
+        'user_current_longitude',
+        position.longitude,
+      );
+
+      try {
+        final placemarks = await placemarkFromCoordinates(
+          position.latitude,
+          position.longitude,
+        );
+
+        if (placemarks.isNotEmpty) {
+          final place = placemarks.first;
+
+          final streetAddress = [
+            place.street,
+            place.subLocality,
+          ].where((e) => (e ?? '').trim().isNotEmpty).join(', ');
+
+          final city = (place.locality ?? '').trim();
+          final state = (place.administrativeArea ?? '').trim();
+          final zip = (place.postalCode ?? '').trim();
+          final country = (place.country ?? '').trim();
+
+          final fullAddress = [
+            if (streetAddress.isNotEmpty) streetAddress,
+            if (city.isNotEmpty) city,
+            if (state.isNotEmpty) state,
+          ].join('، ');
+
+          await repo.apiClient.sharedPreferences.setString(
+            'user_current_address',
+            fullAddress,
+          );
+          await repo.apiClient.sharedPreferences.setString(
+            'user_current_city',
+            city,
+          );
+          await repo.apiClient.sharedPreferences.setString(
+            'user_current_state',
+            state,
+          );
+          await repo.apiClient.sharedPreferences.setString(
+            'user_current_zip',
+            zip,
+          );
+          await repo.apiClient.sharedPreferences.setString(
+            'user_current_country',
+            country,
+          );
+          await repo.apiClient.sharedPreferences.setString(
+            'user_current_street_address',
+            streetAddress,
+          );
+        }
+      } catch (_) {
+        // تجاهل فشل reverse geocoding وخلي الإحداثيات محفوظة
+      }
+    } catch (_) {
+      // لا نوقف التطبيق بسبب الموقع
+    }
   }
 }

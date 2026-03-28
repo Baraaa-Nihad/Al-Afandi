@@ -1,292 +1,323 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ovoride/core/helper/string_format_helper.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:ovoride/core/helper/shared_preference_helper.dart';
-import 'package:ovoride/core/route/route.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
 import 'package:ovoride/core/utils/my_strings.dart';
-import 'package:ovoride/data/model/rider/auth/registration_response_model.dart';
-import 'package:ovoride/data/model/auth/sign_up_model/sign_up_model.dart';
-import 'package:ovoride/data/model/general_setting/general_setting_response_model.dart';
-import 'package:ovoride/data/model/global/response_model/response_model.dart';
-import 'package:ovoride/data/model/model/error_model.dart';
-import 'package:ovoride/data/repo/shared/auth/general_setting_repo.dart';
 import 'package:ovoride/data/repo/rider/auth/signup_repo.dart';
+import 'package:ovoride/data/repo/shared/auth/general_setting_repo.dart';
 import 'package:ovoride/presentation/components/snack_bar/show_custom_snackbar.dart';
 
+import 'package:ovoride/data/model/auth/sign_up_model/sign_up_model.dart';
+import 'package:ovoride/data/model/user_post_model/user_post_model.dart';
+import 'package:ovoride/data/model/country_model/country_model.dart';
+import 'package:ovoride/data/model/rider/auth/authorization_response_model.dart';
+
+import 'package:ovoride/data/repo/rider/account/profile_repo.dart';
+
+import 'package:ovoride/core/route/route.dart';
+
 class RegistrationController extends GetxController {
-  RegistrationRepo registrationRepo;
-  GeneralSettingRepo generalSettingRepo;
+  final RegistrationRepo registrationRepo;
+  final GeneralSettingRepo generalSettingRepo;
+  final ProfileRepo profileRepo;
 
   RegistrationController({
     required this.registrationRepo,
     required this.generalSettingRepo,
+    required this.profileRepo,
   });
+  Future<void> initData() async {
+    countryList = profileRepo.apiClient.getOperatingCountries();
 
-  bool isLoading = true;
+    if (countryList.isNotEmpty) {
+      selectedCountryData = countryList.first;
+    }
+
+    update();
+
+    await _prepareInitialLocation();
+  }
+
+  /// =======================
+  /// 🔹 Controllers (الأصلية)
+  /// =======================
+  TextEditingController fNameController = TextEditingController();
+  TextEditingController lNameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController cPasswordController = TextEditingController();
+  TextEditingController referNameController = TextEditingController();
+
+  /// =======================
+  /// 🔹 Controllers (المضافة)
+  /// =======================
+  TextEditingController userNameController = TextEditingController();
+  TextEditingController mobileNoController = TextEditingController();
+  TextEditingController referController = TextEditingController();
+
+  /// =======================
+  /// 🔹 Map + Location
+  /// =======================
+  final Completer<GoogleMapController> mapControllerCompleter = Completer<GoogleMapController>();
+
+  GoogleMapController? googleMapController;
+  LatLng? _cameraTarget;
+
+  double selectedLatitude = 0;
+  double selectedLongitude = 0;
+
+  String selectedAddressText = '';
+  String selectedStreetAddress = '';
+  String selectedCity = '';
+  String selectedState = '';
+  String selectedZipCode = '';
+  String selectedCountryName = '';
+
+  bool hasConfirmedLocation = false;
+  bool isProgrammaticMove = false;
+
+  List<Countries> countryList = [];
+  Countries selectedCountryData = Countries();
+
+  /// =======================
+  /// 🔹 UI State
+  /// =======================
   bool agreeTC = false;
-  bool isReferralEnable = false;
-
-  GeneralSettingResponseModel generalSettingMainModel = GeneralSettingResponseModel();
-
-  bool checkPasswordStrength = false;
-  bool needAgree = true;
-
-  final FocusNode emailFocusNode = FocusNode();
-  final FocusNode passwordFocusNode = FocusNode();
-  final FocusNode confirmPasswordFocusNode = FocusNode();
-  final FocusNode firstNameFocusNode = FocusNode();
-  final FocusNode lastNameFocusNode = FocusNode();
-  final FocusNode mobileFocusNode = FocusNode();
-  final FocusNode userNameFocusNode = FocusNode();
-  final FocusNode companyNameFocusNode = FocusNode();
-  final FocusNode referNameFocusNode = FocusNode();
-
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final TextEditingController cPasswordController = TextEditingController();
-  final TextEditingController fNameController = TextEditingController();
-  final TextEditingController lNameController = TextEditingController();
-  final TextEditingController mobileController = TextEditingController();
-  final TextEditingController userNameController = TextEditingController();
-  final TextEditingController companyNameController = TextEditingController();
-  final TextEditingController referNameController = TextEditingController();
-
-  String? email;
-  String? password;
-  String? confirmPassword;
-  String? countryName;
-  String? countryCode;
-  String? mobileCode;
-  String? userName;
-  String? phoneNo;
-  String? firstName;
-  String? lastName;
-
-  RegExp regex = RegExp(r'[!@#$%^&*(),.?":{}|<>]');
   bool submitLoading = false;
 
+  /// =======================
+  /// 🔹 INIT
+  /// =======================
+
+  /// =======================
+  /// 🔹 REGISTER
+  /// =======================
   Future<void> signUpUser() async {
-    if (needAgree && !agreeTC) {
-      CustomSnackBar.error(errorList: [MyStrings.agreePolicyMessage]);
+    if (!agreeTC) {
+      CustomSnackBar.error(errorList: [MyStrings.accept]);
       return;
     }
 
     submitLoading = true;
     update();
 
-    SignUpModel model = getUserData();
-    final responseModel = await registrationRepo.registerUser(model);
-    try {
-      if (responseModel.status?.toLowerCase() == MyStrings.success.toLowerCase()) {
-        CustomSnackBar.success(
-          successList: responseModel.message ?? [MyStrings.success.tr],
-        );
-        RouteHelper.checkRiderStatusAndGoToNextStep(
-          responseModel.data?.user,
-          accessToken: responseModel.data?.accessToken ?? '',
-          tokenType: responseModel.data?.tokenType ?? 'Bearer',
-          isRemember: true,
-        );
-      } else {
-        CustomSnackBar.error(
-          errorList: responseModel.message ?? [MyStrings.somethingWentWrong.tr],
-        );
-      }
-    } catch (e) {
-      printE(e.toString());
+    final model = SignUpModel(
+      firstName: fNameController.text.trim(),
+      lastName: lNameController.text.trim(),
+      email: emailController.text.trim(),
+      password: passwordController.text.trim(),
+      refference: "",
+      agree: agreeTC,
+    );
+
+    final response = await registrationRepo.registerUser(model);
+
+    if (response.status?.toLowerCase() == 'success') {
+      await completeProfileAfterRegister();
+    } else {
+      CustomSnackBar.error(
+        errorList: response.message ?? [MyStrings.somethingWentWrong],
+      );
     }
 
     submitLoading = false;
     update();
   }
 
-  void setCountryNameAndCode(String cName, String countryCode, String mobileCode) {
-    countryName = cName;
-    this.countryCode = countryCode;
-    this.mobileCode = mobileCode;
-    update();
-  }
-
-  void updateAgreeTC() {
-    agreeTC = !agreeTC;
-    update();
-  }
-
-  SignUpModel getUserData() {
-    SignUpModel model = SignUpModel(
-      refference: referNameController.text.toString(),
-      email: emailController.text.toString(),
-      agree: generalSettingRepo.apiClient.isAgreePolicyEnabled()
-          ? agreeTC
-              ? true
-              : false
-          : false,
-      firstName: fNameController.text.toString(),
-      lastName: lNameController.text.toString(),
-      password: passwordController.text.toString(),
-    );
-
-    return model;
-  }
-
-  void checkAndGotoNextStep(RegistrationResponseModel responseModel) async {
-    bool needEmailVerification = responseModel.data?.user?.ev == "1" ? false : true;
-    bool needSmsVerification = responseModel.data?.user?.sv == "1" ? false : true;
-
-    SharedPreferences preferences = registrationRepo.apiClient.sharedPreferences;
-
-    await preferences.setString(
-      SharedPreferenceHelper.userRoleKey,
-      'rider',
-    );
-    await preferences.setString(
-      SharedPreferenceHelper.userIdKey,
-      responseModel.data?.user?.id.toString() ?? '-1',
-    );
-    await preferences.setString(
-      SharedPreferenceHelper.userEmailKey,
-      responseModel.data?.user?.email ?? '',
-    );
-    await preferences.setString(
-      SharedPreferenceHelper.userNameKey,
-      responseModel.data?.user?.username ?? '',
-    );
-    await preferences.setString(
-      SharedPreferenceHelper.userPhoneNumberKey,
-      responseModel.data?.user?.mobile ?? '',
-    );
-
-    //attention: await registrationRepo.sendUserToken();
-
-    bool isProfileCompleteEnable = responseModel.data?.user?.profileComplete.toString() == '0'
-        ? true
-        : responseModel.data?.user?.profileComplete.toString() == 'null'
-            ? true
-            : false;
-    printX(
-      'responseModel.data?.user?.profileCompleted ${responseModel.data?.user?.profileComplete}',
-    );
-    printX(
-      'responseModel.data?.user?.profileCompleted ${responseModel.data?.user?.profileComplete}',
-    );
-    bool isTwoFactorEnable = false;
-
-    if (needEmailVerification == false && needSmsVerification == false) {
-      if (isProfileCompleteEnable) {
-        Get.offAndToNamed(RouteHelper.riderProfileCompleteScreen);
-      } else {
-        Get.offAndToNamed(RouteHelper.riderDashboard);
-      }
-    } else if (needEmailVerification == true && needSmsVerification == true) {
-      Get.offAndToNamed(
-        RouteHelper.riderEmailVerificationScreen,
-        arguments: [true, isProfileCompleteEnable, isTwoFactorEnable],
-      );
-    } else if (needEmailVerification) {
-      Get.offAndToNamed(
-        RouteHelper.riderEmailVerificationScreen,
-        arguments: [false, isProfileCompleteEnable, isTwoFactorEnable],
-      );
-    } else if (needSmsVerification) {
-      Get.offAndToNamed(RouteHelper.riderSmsVerificationScreen);
-    }
-  }
-
-  void closeAllController() {
-    isLoading = false;
-    emailController.text = '';
-    passwordController.text = '';
-    cPasswordController.text = '';
-    fNameController.text = '';
-    lNameController.text = '';
-    mobileController.text = '';
-    userNameController.text = '';
-    companyNameController.text = '';
-  }
-
-  void clearAllData() {
-    closeAllController();
-  }
-
-  List<ErrorModel> passwordValidationRules = [
-    ErrorModel(text: MyStrings.hasUpperLetter.tr, hasError: true),
-    ErrorModel(text: MyStrings.hasLowerLetter.tr, hasError: true),
-    ErrorModel(text: MyStrings.hasDigit.tr, hasError: true),
-    ErrorModel(text: MyStrings.hasSpecialChar.tr, hasError: true),
-    ErrorModel(text: MyStrings.minSixChar.tr, hasError: true),
-  ];
-
-  bool isCountryLoading = true;
-  void initData() async {
-    isLoading = true;
-    update();
-    //   await getCountryData();
-
-    ResponseModel response = await generalSettingRepo.getGeneralSetting();
-    if (response.statusCode == 200) {
-      GeneralSettingResponseModel model = GeneralSettingResponseModel.fromJson((response.responseJson));
-      if (model.status?.toLowerCase() == 'success') {
-        generalSettingMainModel = model;
-        isReferralEnable = generalSettingMainModel.data?.generalSetting?.riderReferral == '1' ? true : false;
-        registrationRepo.apiClient.storeGeneralSetting(model);
-      } else {
-        List<String> message = [MyStrings.somethingWentWrong.tr];
-        CustomSnackBar.error(errorList: model.message ?? message);
-        return;
-      }
-    } else {
-      if (response.statusCode == 503) {
-        noInternet = true;
-        update();
-      }
-      CustomSnackBar.error(errorList: [response.message]);
+  /// =======================
+  /// 🔥 PROFILE COMPLETE
+  /// =======================
+  Future<void> completeProfileAfterRegister() async {
+    if (!hasConfirmedLocation) {
+      CustomSnackBar.error(errorList: ['حدد موقعك']);
       return;
     }
 
-    needAgree = generalSettingMainModel.data?.generalSetting?.agree.toString() == '0' ? false : true;
-    checkPasswordStrength = generalSettingMainModel.data?.generalSetting?.securePassword.toString() == '0' ? false : true;
+    final userPostModel = UserPostModel(
+      image: null,
+      firstname: fNameController.text.trim(),
+      lastName: lNameController.text.trim(),
+      mobile: mobileNoController.text.trim(),
+      email: '',
+      username: userNameController.text.trim(),
+      countryCode: selectedCountryData.countryCode.toString(),
+      country: selectedCountryData.country.toString(),
+      mobileCode: selectedCountryData.dialCode.toString(),
+      address: selectedStreetAddress.isNotEmpty ? selectedStreetAddress : selectedAddressText,
+      state: selectedState,
+      zip: selectedZipCode,
+      city: selectedCity,
+      refer: "",
+    );
 
-    isLoading = false;
-    update();
-  }
+    final AuthorizationResponseModel response = await profileRepo.updateProfile(userPostModel, false);
 
-  String? validatePassword(String value) {
-    if (value.isEmpty) {
-      return MyStrings.enterYourPassword_.tr;
+    if (response.status == "success") {
+      Get.offAllNamed(RouteHelper.riderDashboard);
     } else {
-      if (checkPasswordStrength) {
-        if (!regex.hasMatch(value)) {
-          return MyStrings.invalidPassMsg.tr;
-        } else {
-          return null;
-        }
-      } else {
-        return null;
-      }
+      CustomSnackBar.error(
+        errorList: response.message ?? ['فشل الإكمال'],
+      );
     }
   }
 
-  bool noInternet = false;
-  void changeInternet(bool hasInternet) {
-    noInternet = false;
-    initData();
-    update();
+  /// =======================
+  /// 🗺️ MAP
+  /// =======================
+  void onMapCreated(GoogleMapController controller) {
+    googleMapController = controller;
+
+    if (!mapControllerCompleter.isCompleted) {
+      mapControllerCompleter.complete(controller);
+    }
   }
 
-  void updateValidationList(String value) {
-    passwordValidationRules[0].hasError = value.contains(RegExp(r'[A-Z]')) ? false : true;
-    passwordValidationRules[1].hasError = value.contains(RegExp(r'[a-z]')) ? false : true;
-    passwordValidationRules[2].hasError = value.contains(RegExp(r'[0-9]')) ? false : true;
-    passwordValidationRules[3].hasError = value.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]')) ? false : true;
-    passwordValidationRules[4].hasError = value.length >= 6 ? false : true;
-
-    update();
+  void onCameraMove(CameraPosition position) {
+    _cameraTarget = position.target;
   }
 
-  bool hasPasswordFocus = false;
-  void changePasswordFocus(bool hasFocus) {
-    hasPasswordFocus = hasFocus;
-    update();
+  void onCameraIdle() {
+    if (_cameraTarget == null) return;
+
+    if (isProgrammaticMove) {
+      isProgrammaticMove = false;
+      return;
+    }
+
+    selectedLatitude = _cameraTarget!.latitude;
+    selectedLongitude = _cameraTarget!.longitude;
+
+    hasConfirmedLocation = true;
+
+    _updateAddressFromCoordinates(
+      latitude: selectedLatitude,
+      longitude: selectedLongitude,
+    );
+  }
+
+  Future<void> moveToCurrentLocation() async {
+    final position = await Geolocator.getCurrentPosition();
+
+    selectedLatitude = position.latitude;
+    selectedLongitude = position.longitude;
+
+    await animateToSelectedLocation();
+  }
+
+  Future<void> animateToSelectedLocation() async {
+    GoogleMapController controller;
+
+    if (googleMapController != null) {
+      controller = googleMapController!;
+    } else {
+      controller = await mapControllerCompleter.future;
+    }
+
+    isProgrammaticMove = true;
+
+    await controller.animateCamera(
+      CameraUpdate.newLatLngZoom(
+        LatLng(selectedLatitude, selectedLongitude),
+        16,
+      ),
+    );
+  }
+
+  /// =======================
+  /// 📍 LOCATION INIT
+  /// =======================
+  Future<void> _prepareInitialLocation() async {
+    try {
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        selectedAddressText = 'يرجى تشغيل خدمة الموقع';
+        update();
+        return;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+        selectedAddressText = 'يرجى السماح بالوصول إلى الموقع';
+        update();
+        return;
+      }
+
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
+      );
+
+      selectedLatitude = position.latitude;
+      selectedLongitude = position.longitude;
+      _cameraTarget = LatLng(selectedLatitude, selectedLongitude);
+      hasConfirmedLocation = true;
+
+      await _updateAddressFromCoordinates(
+        latitude: selectedLatitude,
+        longitude: selectedLongitude,
+      );
+
+      update();
+
+      await Future.delayed(const Duration(milliseconds: 300));
+      await animateToSelectedLocation();
+    } catch (_) {
+      selectedAddressText = 'تعذر تحديد موقعك الحالي';
+      update();
+    }
+  }
+
+  /// =======================
+  /// 📍 ADDRESS
+  /// =======================
+  Future<void> _updateAddressFromCoordinates({
+    required double latitude,
+    required double longitude,
+  }) async {
+    try {
+      final placemarks = await placemarkFromCoordinates(latitude, longitude);
+
+      if (placemarks.isNotEmpty) {
+        final place = placemarks.first;
+
+        selectedStreetAddress = place.street ?? '';
+        selectedCity = place.locality ?? '';
+        selectedState = place.administrativeArea ?? '';
+        selectedZipCode = place.postalCode ?? '';
+
+        selectedAddressText = "${selectedStreetAddress}, ${selectedCity}";
+      }
+    } catch (_) {}
+  }
+
+  /// =======================
+  /// 🔹 DISPOSE
+  /// =======================
+  @override
+  void onClose() {
+    fNameController.dispose();
+    lNameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    cPasswordController.dispose();
+    referNameController.dispose();
+
+    userNameController.dispose();
+    mobileNoController.dispose();
+
+    googleMapController?.dispose();
+
+    super.onClose();
   }
 }

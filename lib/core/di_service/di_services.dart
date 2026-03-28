@@ -70,8 +70,15 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.lazyPut(() => riderProfileCtrl.ProfileController(profileRepo: Get.find(tag: 'rider')), fenix: true, tag: 'rider');
   Get.lazyPut(() => MyMenuController(menuRepo: Get.find(), repo: Get.find()), fenix: true);
   Get.lazyPut(() => riderSignUp.RegistrationRepo(apiClient: Get.find()), fenix: true, tag: 'rider');
-  Get.lazyPut(() => riderRegistration.RegistrationController(registrationRepo: Get.find(tag: 'rider'), generalSettingRepo: Get.find()), fenix: true, tag: 'rider');
-
+  Get.lazyPut(
+    () => riderRegistration.RegistrationController(
+      registrationRepo: Get.find(tag: 'rider'),
+      generalSettingRepo: Get.find(),
+      profileRepo: Get.find(tag: 'rider'),
+    ),
+    fenix: true,
+    tag: 'rider',
+  );
   // Driver repos with 'driver' tag
   Get.lazyPut(() => driverRide.RideRepo(apiClient: Get.find()), fenix: true, tag: 'driver');
   Get.lazyPut(() => driverReview.ReviewRepo(apiClient: Get.find()), fenix: true, tag: 'driver');

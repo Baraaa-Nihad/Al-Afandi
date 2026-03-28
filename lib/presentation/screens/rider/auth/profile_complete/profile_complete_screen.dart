@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:ovoride/core/route/route.dart';
 import 'package:ovoride/core/utils/dimensions.dart';
 import 'package:ovoride/core/utils/my_color.dart';
@@ -15,8 +18,8 @@ import 'package:ovoride/presentation/components/divider/custom_spacer.dart';
 import 'package:ovoride/presentation/components/image/my_network_image_widget.dart';
 import 'package:ovoride/presentation/components/text-form-field/custom_text_field.dart';
 import 'package:ovoride/presentation/components/will_pop_widget.dart';
-import 'package:ovoride/presentation/screens/shared/auth/auth_background.dart';
 import 'package:ovoride/presentation/screens/rider/auth/registration/widget/country_bottom_sheet.dart';
+import 'package:ovoride/presentation/screens/shared/auth/auth_background.dart';
 
 class ProfileCompleteScreen extends StatefulWidget {
   const ProfileCompleteScreen({super.key});
@@ -26,24 +29,22 @@ class ProfileCompleteScreen extends StatefulWidget {
 }
 
 class _ProfileCompleteScreenState extends State<ProfileCompleteScreen> {
+  final formKey = GlobalKey<FormState>();
+
   @override
   void initState() {
+    super.initState();
+
     Get.put(ProfileRepo(apiClient: Get.find()), tag: 'rider');
     final controller = Get.put(
-      ProfileCompleteController(profileRepo: Get.find(tag: 'rider')), tag: 'rider',
+      ProfileCompleteController(profileRepo: Get.find(tag: 'rider')),
+      tag: 'rider',
     );
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       controller.initialData();
     });
   }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  final formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -53,23 +54,30 @@ class _ProfileCompleteScreenState extends State<ProfileCompleteScreen> {
         child: Scaffold(
           resizeToAvoidBottomInset: true,
           backgroundColor: MyColor.colorWhite,
-          body: GetBuilder<ProfileCompleteController>(tag: 'rider',
+          body: GetBuilder<ProfileCompleteController>(
+            tag: 'rider',
             builder: (controller) => SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   AuthBackgroundWidget(
-                    colors: [MyColor.colorWhite.withValues(alpha: 0.9), MyColor.colorWhite.withValues(alpha: 0.8)],
+                    colors: [
+                      MyColor.colorWhite.withValues(alpha: 0.9),
+                      MyColor.colorWhite.withValues(alpha: 0.8),
+                    ],
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Align(
                           alignment: AlignmentDirectional.centerEnd,
                           child: Padding(
-                            padding: const EdgeInsetsDirectional.only(end: Dimensions.space5),
+                            padding: const EdgeInsetsDirectional.only(
+                              end: Dimensions.space5,
+                            ),
                             child: IconButton(
                               onPressed: () {
-                                Get.offAllNamed(RouteHelper.loginScreen);
+                                Get.offAllNamed(RouteHelper.riderLoginScreen);
                               },
                               icon: Icon(
                                 Icons.close,
@@ -80,13 +88,15 @@ class _ProfileCompleteScreenState extends State<ProfileCompleteScreen> {
                           ),
                         ),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: Dimensions.space20),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: Dimensions.space20,
+                          ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Text(
-                                MyStrings.profileCompleteTitle.tr,
+                                "يلا بينا ؟",
                                 style: boldExtraLarge.copyWith(
                                   fontSize: 32,
                                   color: MyColor.getHeadingTextColor(),
@@ -95,7 +105,7 @@ class _ProfileCompleteScreenState extends State<ProfileCompleteScreen> {
                               ),
                               spaceDown(Dimensions.space5),
                               Text(
-                                MyStrings.profileCompleteSubTitle.tr,
+                                "",
                                 style: regularDefault.copyWith(
                                   color: MyColor.getBodyTextColor(),
                                   fontSize: Dimensions.fontLarge,
@@ -109,24 +119,27 @@ class _ProfileCompleteScreenState extends State<ProfileCompleteScreen> {
                     ),
                   ),
                   Transform.translate(
-                    offset: Offset(0, -Dimensions.space20),
+                    offset: const Offset(0, -Dimensions.space20),
                     child: Container(
                       decoration: BoxDecoration(
                         color: MyColor.colorWhite,
-                        borderRadius: BorderRadius.only(
+                        borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(Dimensions.radius25),
                           topRight: Radius.circular(Dimensions.radius25),
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: MyColor.colorBlack.withValues(alpha: 0.05), // soft top shadow
-                            offset: const Offset(0, -30), // ⬆️ Shadow goes up
+                            color: MyColor.colorBlack.withValues(alpha: 0.05),
+                            offset: const Offset(0, -30),
                             blurRadius: 15,
                             spreadRadius: -3,
                           ),
                         ],
                       ),
-                      padding: EdgeInsets.symmetric(horizontal: Dimensions.space20, vertical: Dimensions.space20),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: Dimensions.space20,
+                        vertical: Dimensions.space20,
+                      ),
                       child: controller.isLoading
                           ? const CustomLoader()
                           : Form(
@@ -146,7 +159,7 @@ class _ProfileCompleteScreenState extends State<ProfileCompleteScreen> {
                                       return;
                                     },
                                     validator: (value) {
-                                      if (value != null && value.isEmpty) {
+                                      if (value == null || value.isEmpty) {
                                         return MyStrings.enterYourUsername.tr;
                                       } else if (value.length < 6) {
                                         return MyStrings.kShortUserNameError;
@@ -155,20 +168,19 @@ class _ProfileCompleteScreenState extends State<ProfileCompleteScreen> {
                                       }
                                     },
                                   ),
-                                  const SizedBox(
-                                    height: Dimensions.space20,
-                                  ),
+                                  const SizedBox(height: Dimensions.space20),
                                   CustomTextField(
                                     labelText: MyStrings.phone.tr,
                                     hintText: "XXX-XXX-XXXX",
                                     textInputType: TextInputType.number,
-                                    inputAction: TextInputAction.next,
-                                    focusNode: controller.countryFocusNode,
+                                    inputAction: TextInputAction.done,
+                                    focusNode: controller.mobileNoFocusNode,
                                     controller: controller.mobileNoController,
-                                    nextFocus: controller.addressFocusNode,
                                     prefixIcon: IntrinsicWidth(
                                       child: Padding(
-                                        padding: EdgeInsetsGeometry.symmetric(horizontal: Dimensions.space10),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: Dimensions.space10,
+                                        ),
                                         child: GestureDetector(
                                           onTap: () {
                                             CountryBottomSheet.profileBottomSheet(
@@ -177,12 +189,9 @@ class _ProfileCompleteScreenState extends State<ProfileCompleteScreen> {
                                             );
                                           },
                                           child: Row(
-                                            crossAxisAlignment: CrossAxisAlignment.center,
                                             mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
-                                              spaceSide(
-                                                Dimensions.space3,
-                                              ),
+                                              spaceSide(Dimensions.space3),
                                               MyImageWidget(
                                                 imageUrl: UrlContainer.countryFlagImageLink.replaceAll(
                                                   "{countryCode}",
@@ -191,9 +200,7 @@ class _ProfileCompleteScreenState extends State<ProfileCompleteScreen> {
                                                 height: Dimensions.space25,
                                                 width: Dimensions.space40,
                                               ),
-                                              spaceSide(
-                                                Dimensions.space5,
-                                              ),
+                                              spaceSide(Dimensions.space5),
                                               Text(
                                                 "+${controller.selectedCountryData.dialCode}",
                                                 style: regularMediumLarge.copyWith(
@@ -219,91 +226,157 @@ class _ProfileCompleteScreenState extends State<ProfileCompleteScreen> {
                                       return;
                                     },
                                     validator: (value) {
-                                      if (value != null && value.isEmpty) {
+                                      if (value == null || value.isEmpty) {
                                         return MyStrings.enterYourPhoneNumber.tr;
-                                      } else {
-                                        return null;
                                       }
+                                      return null;
                                     },
                                   ),
-                                  const SizedBox(
-                                    height: Dimensions.space20,
+                                  const SizedBox(height: Dimensions.space20),
+                                  Text(
+                                    'حدد موقعك',
+                                    style: boldLarge.copyWith(
+                                      color: MyColor.getHeadingTextColor(),
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
-                                  CustomTextField(
-                                    labelText: MyStrings.address.tr,
-                                    hintText: "${MyStrings.enterYour.tr} ${MyStrings.address.toLowerCase().tr}",
-                                    textInputType: TextInputType.text,
-                                    inputAction: TextInputAction.next,
-                                    focusNode: controller.addressFocusNode,
-                                    controller: controller.addressController,
-                                    nextFocus: controller.stateFocusNode,
-                                    onChanged: (value) {
-                                      return;
-                                    },
+                                  const SizedBox(height: Dimensions.space8),
+                                  Text(
+                                    'حرّك الخريطة وضع الدبوس على موقعك الصحيح',
+                                    style: regularDefault.copyWith(
+                                      color: MyColor.getBodyTextColor(),
+                                    ),
                                   ),
-                                  const SizedBox(
-                                    height: Dimensions.space20,
+                                  const SizedBox(height: Dimensions.space15),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(
+                                      Dimensions.radius25,
+                                    ),
+                                    child: SizedBox(
+                                      height: 260,
+                                      width: double.infinity,
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          GoogleMap(
+                                            initialCameraPosition: CameraPosition(
+                                              target: LatLng(
+                                                controller.selectedLatitude,
+                                                controller.selectedLongitude,
+                                              ),
+                                              zoom: 16,
+                                            ),
+                                            myLocationEnabled: true,
+                                            myLocationButtonEnabled: false,
+                                            zoomControlsEnabled: false,
+                                            mapToolbarEnabled: false,
+                                            buildingsEnabled: true,
+                                            compassEnabled: true,
+                                            scrollGesturesEnabled: true,
+                                            zoomGesturesEnabled: true,
+                                            rotateGesturesEnabled: true,
+                                            tiltGesturesEnabled: true,
+                                            gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+                                              Factory<OneSequenceGestureRecognizer>(
+                                                () => EagerGestureRecognizer(),
+                                              ),
+                                            },
+                                            onMapCreated: controller.onMapCreated,
+                                            onCameraMove: controller.onCameraMove,
+                                            onCameraIdle: controller.onCameraIdle,
+                                          ),
+                                          const IgnorePointer(
+                                            child: Icon(
+                                              Icons.location_pin,
+                                              size: 42,
+                                              color: Colors.red,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   ),
-                                  CustomTextField(
-                                    labelText: MyStrings.state,
-                                    hintText: "${MyStrings.enterYour.tr} ${MyStrings.state.toLowerCase().tr}",
-                                    textInputType: TextInputType.text,
-                                    inputAction: TextInputAction.next,
-                                    focusNode: controller.stateFocusNode,
-                                    controller: controller.stateController,
-                                    nextFocus: controller.cityFocusNode,
-                                    onChanged: (value) {
-                                      return;
-                                    },
+                                  const SizedBox(height: Dimensions.space12),
+                                  Align(
+                                    alignment: AlignmentDirectional.centerEnd,
+                                    child: InkWell(
+                                      onTap: controller.moveToCurrentLocation,
+                                      borderRadius: BorderRadius.circular(50),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 14,
+                                          vertical: 10,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: MyColor.colorWhite,
+                                          borderRadius: BorderRadius.circular(50),
+                                          border: Border.all(
+                                            color: MyColor.primaryColor.withValues(alpha: 0.15),
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: MyColor.colorBlack.withValues(alpha: 0.06),
+                                              blurRadius: 10,
+                                              offset: const Offset(0, 4),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              Icons.my_location,
+                                              color: MyColor.primaryColor,
+                                              size: 18,
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              'موقعي الحالي',
+                                              style: regularDefault.copyWith(
+                                                color: MyColor.getHeadingTextColor(),
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                  const SizedBox(
-                                    height: Dimensions.space20,
+                                  const SizedBox(height: Dimensions.space15),
+                                  Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.all(14),
+                                    decoration: BoxDecoration(
+                                      color: MyColor.primaryColor.withValues(alpha: 0.06),
+                                      borderRadius: BorderRadius.circular(
+                                        Dimensions.radius25,
+                                      ),
+                                      border: Border.all(
+                                        color: MyColor.primaryColor.withValues(alpha: 0.15),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Icon(
+                                          Icons.place_outlined,
+                                          color: MyColor.primaryColor,
+                                          size: 20,
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Expanded(
+                                          child: Text(
+                                            controller.selectedAddressText.isEmpty ? 'جارٍ تحديد العنوان...' : controller.selectedAddressText,
+                                            style: regularDefault.copyWith(
+                                              color: MyColor.getHeadingTextColor(),
+                                              height: 1.5,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                  CustomTextField(
-                                    labelText: MyStrings.city.tr,
-                                    hintText: "${MyStrings.enterYour.tr} ${MyStrings.city.toLowerCase().tr}",
-                                    textInputType: TextInputType.text,
-                                    inputAction: TextInputAction.next,
-                                    focusNode: controller.cityFocusNode,
-                                    controller: controller.cityController,
-                                    nextFocus: controller.zipCodeFocusNode,
-                                    onChanged: (value) {
-                                      return;
-                                    },
-                                  ),
-                                  const SizedBox(
-                                    height: Dimensions.space20,
-                                  ),
-                                  CustomTextField(
-                                    labelText: MyStrings.zipCode.tr,
-                                    hintText: "${MyStrings.enterYour.tr} ${MyStrings.zipCode.toLowerCase().tr}",
-                                    textInputType: TextInputType.text,
-                                    inputAction: TextInputAction.done,
-                                    focusNode: controller.zipCodeFocusNode,
-                                    controller: controller.zipCodeController,
-                                    onChanged: (value) {
-                                      return;
-                                    },
-                                  ),
-                                  // if (controller.loginType == "google") ...[
-                                  //   const SizedBox(
-                                  //     height: Dimensions.space20,
-                                  //   ),
-                                  //   CustomTextField(
-                                  //     labelText: MyStrings.referanceName,
-                                  //     hintText: MyStrings.referanceName.tr,
-                                  //     textInputType: TextInputType.text,
-                                  //     inputAction: TextInputAction.next,
-                                  //     controller: controller.referController,
-                                  //     nextFocus: controller.addressFocusNode,
-                                  //     onChanged: (value) {
-                                  //       return;
-                                  //     },
-                                  //   ),
-                                  // ],
-                                  const SizedBox(
-                                    height: Dimensions.space35,
-                                  ),
+                                  const SizedBox(height: Dimensions.space35),
                                   RoundedButton(
                                     isLoading: controller.submitLoading,
                                     text: MyStrings.completeProfile.tr,
@@ -318,9 +391,7 @@ class _ProfileCompleteScreenState extends State<ProfileCompleteScreen> {
                             ),
                     ),
                   ),
-                  const SizedBox(
-                    height: Dimensions.space35,
-                  ),
+                  const SizedBox(height: Dimensions.space35),
                 ],
               ),
             ),
