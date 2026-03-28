@@ -11,14 +11,19 @@ import 'package:ovoride/presentation/components/image/my_network_image_widget.da
 
 class NewRideCardWidget extends StatelessWidget {
   final bool isActive; // تمت إعادتها للعمل مع HomeScreen
+
   final String currency;
+
   final String driverImagePath;
+
   final RideModel ride;
+
   final VoidCallback press;
 
   const NewRideCardWidget({
     super.key,
     required this.isActive, // مطلوبة الآن
+
     required this.press,
     required this.currency,
     required this.ride,
@@ -46,6 +51,7 @@ class NewRideCardWidget extends StatelessWidget {
         child: Column(
           children: [
             // --- الجزء العلوي: معلومات المستخدم والسعر ---
+
             Padding(
               padding: const EdgeInsets.all(15),
               child: Row(
@@ -88,10 +94,14 @@ class NewRideCardWidget extends StatelessWidget {
                     children: [
                       Row(
                         mainAxisSize: MainAxisSize.min, // مهمة جداً ليكون النص والأيقونة متلاصقين
+
                         children: [
                           // إضافة أيقونة مصاري خضراء لتسهيل الفهم بصرياً على المستخدم
+
                           const Icon(Icons.monetization_on, color: Colors.green, size: 20),
+
                           const SizedBox(width: 6), // مسافة بسيطة بين الأيقونة والمبلغ
+
                           Text(
                             "$currency${StringConverter.formatNumber(ride.amount.toString())}",
                             style: boldExtraLarge.copyWith(
@@ -103,6 +113,7 @@ class NewRideCardWidget extends StatelessWidget {
                       ),
                       Text(
                         "العـرض", // تم تعديلها بناءً على طلبك السابق
+
                         style: regularSmall.copyWith(color: MyColor.bodyMutedTextColor),
                       ),
                     ],
@@ -112,6 +123,7 @@ class NewRideCardWidget extends StatelessWidget {
             ),
 
             // --- قسم المسار: من - إلى ---
+
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
               color: MyColor.getPrimaryColor().withOpacity(0.03),
@@ -141,6 +153,7 @@ class NewRideCardWidget extends StatelessWidget {
             ),
 
             // --- الإحصائيات: الوقت، المسافة، الركاب ---
+
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
               child: Row(
@@ -155,6 +168,7 @@ class NewRideCardWidget extends StatelessWidget {
 
             Padding(
               padding: const EdgeInsets.all(15),
+
               child: SizedBox(
                 width: double.infinity,
                 height: 55,
@@ -166,11 +180,12 @@ class NewRideCardWidget extends StatelessWidget {
                     elevation: 0,
                   ),
                   child: Text(
-                    "فاصل ",
+                    "تفاصيل الطلب ",
                     style: boldMediumLarge.copyWith(color: Colors.white, fontSize: 18),
                   ),
                 ),
               ),
+
 // استبدل السطر القديم بهذا
             ).animate(onPlay: (c) => c.repeat()).shimmer(duration: const Duration(seconds: 3), color: Colors.white24),
           ],
