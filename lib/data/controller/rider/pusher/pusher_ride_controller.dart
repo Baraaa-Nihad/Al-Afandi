@@ -39,7 +39,7 @@ class PusherRideController extends GetxController {
   /// دالة الاشتراك في قناة الرحلة لضمان وصول العروض لحظياً
   Future<void> subscribeToRide(String rideId, Function(dynamic) onUpdate) async {
     try {
-      this.rideID = rideId; // تحديث الـ ID الحالي
+      rideID = rideId; // تحديث الـ ID الحالي
       String channelName = "ride.$rideId"; // تنسيق القناة الخاص بالرحلة
 
       // الاشتراك في القناة عبر المدير

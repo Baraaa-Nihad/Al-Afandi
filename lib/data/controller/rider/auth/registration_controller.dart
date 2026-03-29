@@ -296,7 +296,7 @@ class RegistrationController extends GetxController {
         selectedState = place.administrativeArea ?? '';
         selectedZipCode = place.postalCode ?? '';
 
-        selectedAddressText = "${selectedStreetAddress}, ${selectedCity}";
+        selectedAddressText = "$selectedStreetAddress, $selectedCity";
       }
     } catch (_) {}
   }

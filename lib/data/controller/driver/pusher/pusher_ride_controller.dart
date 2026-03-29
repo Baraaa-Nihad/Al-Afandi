@@ -37,7 +37,7 @@ class PusherRideController extends GetxController {
 
   Future<void> subscribeToRide(String rideId, Function(dynamic) onUpdate) async {
     try {
-      this.rideID = rideId;
+      rideID = rideId;
       String channelName = "ride.$rideId";
 
       // نستخدم PusherManager مباشرة لأنه Singleton ومعرف عالمياً

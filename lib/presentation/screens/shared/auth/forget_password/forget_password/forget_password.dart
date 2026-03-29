@@ -31,8 +31,8 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
 
   @override
   void initState() {
-    final _prefs = Get.find<SharedPreferences>();
-    _role = _prefs.getString(SharedPreferenceHelper.userRoleKey) ?? 'driver';
+    final prefs = Get.find<SharedPreferences>();
+    _role = prefs.getString(SharedPreferenceHelper.userRoleKey) ?? 'driver';
     Get.put<LoginRepo>(LoginRepo(apiClient: Get.find()), tag: 'forget_password', permanent: false);
     Get.put<ForgetPasswordController>(ForgetPasswordController(loginRepo: Get.find(tag: 'forget_password')), tag: 'forget_password', permanent: false);
 

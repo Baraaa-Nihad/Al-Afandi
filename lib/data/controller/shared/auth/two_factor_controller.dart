@@ -43,15 +43,15 @@ class TwoFactorController extends GetxController {
           successList: model.message ?? [MyStrings.requestSuccess],
         );
         Get.offAndToNamed(
-          (){
-          final _prefs = Get.find<SharedPreferences>();
-          final _role = _prefs.getString(SharedPreferenceHelper.userRoleKey) ?? 'driver';
-          if (_role == 'rider') {
-            return isProfileCompleteEnable ? RouteHelper.riderProfileCompleteScreen : RouteHelper.riderDashboard;
-          } else {
-            return isProfileCompleteEnable ? RouteHelper.profileCompleteScreen : RouteHelper.dashboard;
-          }
-        }(),
+          () {
+            final prefs = Get.find<SharedPreferences>();
+            final role = prefs.getString(SharedPreferenceHelper.userRoleKey) ?? 'driver';
+            if (role == 'rider') {
+              return isProfileCompleteEnable ? RouteHelper.riderProfileCompleteScreen : RouteHelper.riderDashboard;
+            } else {
+              return isProfileCompleteEnable ? RouteHelper.profileCompleteScreen : RouteHelper.dashboard;
+            }
+          }(),
         );
       } else {
         CustomSnackBar.error(

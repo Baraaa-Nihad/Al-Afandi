@@ -354,7 +354,15 @@ class _RegistrationFormState extends State<RegistrationForm> {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        controller.selectedAddressText.isEmpty ? 'جارٍ تحديد العنوان...' : controller.selectedAddressText,
+                        controller.selectedAddressText.isEmpty
+                            ? 'جارٍ تحديد العنوان...'
+                            : " مكانك الآن : " +
+                                controller.selectedAddressText
+                                    .split(RegExp(r'[,|،]')) // التقسيم سواء كانت الفاصلة عربية (،) أو إنجليزية (,)
+                                    .map((e) => e.trim()) // تنظيف المسافات من الجانبين
+                                    .where((e) => e.isNotEmpty) // استبعاد الفراغات
+                                    .toSet() // حذف الكلمات المكررة
+                                    .join(' - '), // الدمج باستخدام الشرطة (-)
                         style: regularDefault.copyWith(
                           color: MyColor.getHeadingTextColor(),
                           height: 1.5,

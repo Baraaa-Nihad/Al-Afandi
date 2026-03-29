@@ -9,7 +9,6 @@ import 'package:ovoride/core/helper/string_format_helper.dart';
 import 'package:ovoride/core/route/route.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../core/helper/shared_preference_helper.dart';
-import '../../core/utils/method.dart';
 import '../../firebase_options.dart';
 import 'api_client.dart';
 import 'package:get/get.dart' as getx;

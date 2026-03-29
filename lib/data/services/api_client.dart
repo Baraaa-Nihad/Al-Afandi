@@ -51,7 +51,6 @@ class ApiClient extends LocalStorageService {
     bool passHeader = false,
     bool isOnlyAcceptType = false,
   }) async {
-
     try {
       if (passHeader && !isOnlyAcceptType) {
         initToken();
@@ -82,9 +81,11 @@ class ApiClient extends LocalStorageService {
           log("API: $uri Response Code: ${response.statusCode}");
           break;
       }
-      log("request ====> ${uri} , ${response.statusCode}");
+      log("request ====> $uri , ${response.statusCode}");
       printX('url--------------$uri');
-      if (uri.contains('driver-info') || uri.contains('driver/save-device')) { printX('STACK: \${StackTrace.current}'); }
+      if (uri.contains('driver-info') || uri.contains('driver/save-device')) {
+        printX('STACK: \${StackTrace.current}');
+      }
       // printX('params-----------${params.toString()}');
       // printX('status-----------${response.statusCode}');
       printX('body-------------${response.data.toString()}');
@@ -123,9 +124,9 @@ class ApiClient extends LocalStorageService {
             );
             removeToken();
             () {
-            final role = sharedPreferences.getString(SharedPreferenceHelper.userRoleKey) ?? 'driver';
-            Get.offAllNamed(role == 'rider' ? RouteHelper.riderLoginScreen : RouteHelper.loginScreen);
-          }();
+              final role = sharedPreferences.getString(SharedPreferenceHelper.userRoleKey) ?? 'driver';
+              Get.offAllNamed(role == 'rider' ? RouteHelper.riderLoginScreen : RouteHelper.loginScreen);
+            }();
           } else if (model.remark == 'document_unverified' || model.remark == 'document_verification_pending') {
             Get.toNamed(RouteHelper.driverProfileVerificationScreen);
           } else if (model.remark == 'vehicle_unverified') {
@@ -139,9 +140,9 @@ class ApiClient extends LocalStorageService {
       } else if (response.statusCode == 401) {
         setRememberMe(false);
         () {
-            final role = sharedPreferences.getString(SharedPreferenceHelper.userRoleKey) ?? 'driver';
-            Get.offAllNamed(role == 'rider' ? RouteHelper.riderLoginScreen : RouteHelper.loginScreen);
-          }();
+          final role = sharedPreferences.getString(SharedPreferenceHelper.userRoleKey) ?? 'driver';
+          Get.offAllNamed(role == 'rider' ? RouteHelper.riderLoginScreen : RouteHelper.loginScreen);
+        }();
         return ResponseModel(
           false,
           MyStrings.unAuthorized.tr,
@@ -226,7 +227,9 @@ class ApiClient extends LocalStorageService {
       }
 
       printX('url--------------$uri');
-      if (uri.contains('driver-info') || uri.contains('driver/save-device')) { printX('STACK: \${StackTrace.current}'); }
+      if (uri.contains('driver-info') || uri.contains('driver/save-device')) {
+        printX('STACK: \${StackTrace.current}');
+      }
       printX('status-----------${response.statusCode}');
       printX('body-------------${response.data.toString()}');
 
@@ -280,9 +283,9 @@ class ApiClient extends LocalStorageService {
       sharedPreferences.setBool(SharedPreferenceHelper.rememberMeKey, false);
       removeToken();
       () {
-            final role = sharedPreferences.getString(SharedPreferenceHelper.userRoleKey) ?? 'driver';
-            Get.offAllNamed(role == 'rider' ? RouteHelper.riderLoginScreen : RouteHelper.loginScreen);
-          }();
+        final role = sharedPreferences.getString(SharedPreferenceHelper.userRoleKey) ?? 'driver';
+        Get.offAllNamed(role == 'rider' ? RouteHelper.riderLoginScreen : RouteHelper.loginScreen);
+      }();
     }
   }
 }

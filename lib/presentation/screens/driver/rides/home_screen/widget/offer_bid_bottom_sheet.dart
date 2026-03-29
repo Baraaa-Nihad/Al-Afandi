@@ -222,7 +222,7 @@ class _OfferBidBottomSheetState extends State<OfferBidBottomSheet> {
           child: InkWell(
             onTap: onTap,
             customBorder: const CircleBorder(),
-            child: Container(width: 60, height: 60, child: Icon(icon, color: color, size: 32)),
+            child: SizedBox(width: 60, height: 60, child: Icon(icon, color: color, size: 32)),
           ),
         ),
         const SizedBox(height: 8),

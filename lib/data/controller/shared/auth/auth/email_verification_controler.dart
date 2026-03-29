@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:ovoride/core/helper/shared_preference_helper.dart';
 import 'package:ovoride/core/route/route.dart';
 import 'package:ovoride/core/utils/my_strings.dart';
 import 'package:ovoride/data/model/auth/login/login_response_model.dart';

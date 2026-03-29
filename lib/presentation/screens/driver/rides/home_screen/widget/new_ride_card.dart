@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:ovoride/core/helper/string_format_helper.dart';
-import 'package:ovoride/core/utils/dimensions.dart';
 import 'package:ovoride/core/utils/my_color.dart';
 import 'package:ovoride/core/utils/my_strings.dart';
 import 'package:ovoride/core/utils/style.dart';
@@ -22,8 +21,7 @@ class NewRideCardWidget extends StatelessWidget {
 
   const NewRideCardWidget({
     super.key,
-    required this.isActive, // مطلوبة الآن
-
+    required this.isActive,
     required this.press,
     required this.currency,
     required this.ride,
