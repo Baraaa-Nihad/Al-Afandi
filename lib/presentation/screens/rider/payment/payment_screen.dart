@@ -27,6 +27,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:ovoride/presentation/screens/rider/payment/widget/tips_bottom_sheet_body.dart';
+import 'package:ovoride/presentation/screens/rider/ride/widget/ride_info_card.dart';
 
 class PaymentScreen extends StatefulWidget {
   const PaymentScreen({super.key});
@@ -275,7 +276,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         Flexible(
           child: widget ??
               Text(
-                amount.tr,
+                amount.tr.toArabicNumbers(),
                 overflow: TextOverflow.ellipsis,
                 style: boldMediumLarge.copyWith(color: MyColor.colorBlack),
               ),

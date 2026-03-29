@@ -15,6 +15,7 @@ import 'package:ovoride/presentation/components/divider/custom_spacer.dart';
 import 'package:ovoride/presentation/components/image/my_local_image_widget.dart';
 import 'package:ovoride/presentation/components/image/my_network_image_widget.dart';
 import 'package:ovoride/presentation/components/text/header_text.dart';
+import 'package:ovoride/presentation/screens/rider/ride/widget/ride_info_card.dart';
 
 class UserDetailsWidget extends StatelessWidget {
   final RideModel ride;
@@ -93,7 +94,8 @@ class UserDetailsWidget extends StatelessWidget {
                               ),
                               spaceSide(Dimensions.space3),
                               Text(
-                                ride.user?.avgRating == '0.00' ? MyStrings.nA.tr : (ride.user?.avgRating ?? ''),
+                                // نتحقق أولاً من التقييم، وإذا كان موجوداً نقوم بتحويله بالكامل للأرقام العربية
+                                (ride.user?.avgRating == '0.00' || ride.user?.avgRating == '0' ? MyStrings.nA.tr : (ride.user?.avgRating ?? '0.0')).toArabicNumbers(),
                                 style: boldDefault.copyWith(
                                   fontSize: Dimensions.fontSmall,
                                   color: MyColor.getHeadingTextColor(),
@@ -120,16 +122,16 @@ class UserDetailsWidget extends StatelessWidget {
                           fontSize: Dimensions.fontTitleLarge,
                         ),
                       ),
-                      spaceDown(Dimensions.space3),
-                      Text(
-                        "@${ride.user?.username ?? ""}",
-                        style: regularDefault.copyWith(
-                          fontSize: Dimensions.fontDefault,
-                          color: MyColor.informationColor,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                      // spaceDown(Dimensions.space3),
+                      // Text(
+                      //   "@${ride.user?.username ?? ""}",
+                      //   style: regularDefault.copyWith(
+                      //     fontSize: Dimensions.fontDefault,
+                      //     color: MyColor.informationColor,
+                      //   ),
+                      //   maxLines: 1,
+                      //   overflow: TextOverflow.ellipsis,
+                      // ),
                     ],
                   ),
                 ),
@@ -139,7 +141,8 @@ class UserDetailsWidget extends StatelessWidget {
         ),
         Row(
           children: [
-            GetBuilder<RideMessageController>(tag: 'driver', 
+            GetBuilder<RideMessageController>(
+              tag: 'driver',
               builder: (msgController) {
                 return Badge(
                   backgroundColor: MyColor.redCancelTextColor,

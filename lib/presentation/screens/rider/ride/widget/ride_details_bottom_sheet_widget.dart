@@ -11,6 +11,7 @@ import 'package:ovoride/core/utils/url_container.dart';
 import 'package:ovoride/core/utils/util.dart';
 import 'package:ovoride/data/controller/rider/ride/ride_details/ride_details_controller.dart';
 import 'package:ovoride/data/model/global/app/ride_model.dart';
+import 'package:ovoride/data/services/arabic_numbers.dart';
 import 'package:ovoride/data/services/download_service.dart';
 import 'package:ovoride/presentation/components/bottom-sheet/bottom_sheet_bar.dart';
 import 'package:ovoride/presentation/components/bottom-sheet/custom_bottom_sheet.dart';
@@ -137,7 +138,7 @@ class RiderRideDetailsBottomSheetWidget extends StatelessWidget {
   Widget _buildStatusBadge(RideModel ride) {
     bool isCanceled = ride.status == AppStatus.RIDE_CANCELED;
     Color color = isCanceled ? MyColor.redCancelTextColor : MyColor.primaryColor;
-    String text = isCanceled ? MyStrings.rideCanceled.tr : (ride.status == AppStatus.RIDE_COMPLETED ? MyStrings.rideCompleted.tr : "الكابتن في الطريق إليك");
+    String text = isCanceled ? MyStrings.rideCanceled.tr : (ride.status == AppStatus.RIDE_COMPLETED ? MyStrings.rideCompleted.tr : "في السكّـة .. ");
 
     return Container(
       width: double.infinity,
@@ -357,7 +358,14 @@ class RiderRideDetailsBottomSheetWidget extends StatelessWidget {
         children: [
           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             SmallText(text: MyStrings.billToPay.tr),
-            Text("${controller.currencySym}${StringConverter.formatNumber(ride.amount.toString())}", style: boldExtraLarge.copyWith(fontSize: 28, color: MyColor.getHeadingTextColor())),
+            Text(
+              // دمج الرمز والقيمة في نص واحد ثم تحويل الأرقام كلها للعربية
+              "${controller.currencySym}${StringConverter.formatNumber(ride.amount.toString())}".toArabicNumbers(),
+              style: boldExtraLarge.copyWith(
+                fontSize: 28,
+                color: MyColor.getHeadingTextColor(),
+              ),
+            ),
           ]),
           _buildTipButton(controller, context),
         ],

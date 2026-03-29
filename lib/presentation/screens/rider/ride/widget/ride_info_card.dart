@@ -129,39 +129,50 @@ class _RiderRideInfoCardState extends State<RiderRideInfoCard> {
     );
   }
 
-  Widget _buildLocationInfo({required String title, required String address, required String timePrefix, required IconData icon, String? time}) {
-    String originalRawDate = DateConverter.estimatedDate(DateTime.tryParse(time ?? '') ?? DateTime.now());
-    List<String> parts = originalRawDate.split(' ');
+  DateTime _parseToLocalDate(String? rawTime) {
+    final parsed = DateTime.tryParse(rawTime ?? '');
+    if (parsed == null) return DateTime.now();
 
-    String timePart = "";
-    if (parts.length >= 5) {
-      // إزالة الثواني: نأخذ الساعة والدقيقة فقط
-      List<String> timeSplit = parts[3].split(':');
-      String hourAndMinute = "${timeSplit[0]}:${timeSplit[1]}";
+    return parsed.isUtc ? parsed.add(const Duration(hours: 3)) : parsed;
+  }
 
-      timePart = "$hourAndMinute ${parts[4]}";
-      timePart = timePart.replaceAll("AM", "صباحاً").replaceAll("PM", "مساءً");
+  Widget _buildLocationInfo({
+    required String title,
+    required String address,
+    required String timePrefix,
+    required IconData icon,
+    String? time,
+  }) {
+    final DateTime localDate = _parseToLocalDate(time);
 
-      timePart = timePart.toArabicNumbers();
-    }
+    final int hour24 = localDate.hour;
+    final int minute = localDate.minute;
+    final int hour12 = hour24 == 0 ? 12 : (hour24 > 12 ? hour24 - 12 : hour24);
 
-    DateTime parsedDate = DateTime.tryParse(time ?? '') ?? DateTime.now();
+    final String period = hour24 >= 12 ? 'مساءاً' : 'صباحاً';
+    final String timePart = '$hour12:${minute.toString().padLeft(2, '0')} $period'.toArabicNumbers();
 
-    // إضافة حرف "م" بعد السنة وتحويل الكل للأرقام العربية
-    // استخدمنا String interpolation لإضافة حرف الميم بعد الرقم مباشرة
-    String numericDate = "${parsedDate.day}-${parsedDate.month}-${parsedDate.year} م".toArabicNumbers();
+    final String numericDate = '${localDate.day}-${localDate.month}-${localDate.year} م'.toArabicNumbers();
 
     return Padding(
       padding: const EdgeInsets.only(left: 12, bottom: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // العنوان (نقطة الركوب / الوجهة)
-          Text(title, style: regularSmall.copyWith(color: MyColor.getGreyColor(), fontSize: 11)),
+          Text(
+            title,
+            style: regularSmall.copyWith(
+              color: MyColor.getGreyColor(),
+              fontSize: 11,
+            ),
+          ),
           const SizedBox(height: 4),
           Text(
             address,
-            style: boldDefault.copyWith(color: MyColor.getHeadingTextColor(), fontSize: 13),
+            style: boldDefault.copyWith(
+              color: MyColor.getHeadingTextColor(),
+              fontSize: 13,
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -172,7 +183,9 @@ class _RiderRideInfoCardState extends State<RiderRideInfoCard> {
               decoration: BoxDecoration(
                 color: MyColor.getPrimaryColor().withOpacity(0.05),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: MyColor.getPrimaryColor().withOpacity(0.1)),
+                border: Border.all(
+                  color: MyColor.getPrimaryColor().withOpacity(0.1),
+                ),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -182,31 +195,41 @@ class _RiderRideInfoCardState extends State<RiderRideInfoCard> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // عرض وقت الركوب/الوصول بدون ثواني
                       Row(
                         children: [
                           Text(
                             "$timePrefix: ",
-                            style: regularDefault.copyWith(fontSize: 11, color: MyColor.getGreyColor()),
+                            style: regularDefault.copyWith(
+                              fontSize: 11,
+                              color: MyColor.getGreyColor(),
+                            ),
                           ),
                           Text(
                             timePart,
-                            style: boldDefault.copyWith(fontSize: 11, color: MyColor.getPrimaryColor()),
+                            style: boldDefault.copyWith(
+                              fontSize: 11,
+                              color: MyColor.getPrimaryColor(),
+                            ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 2),
-                      // عرض التاريخ مع حرف "م"
                       Row(
                         children: [
                           Text(
                             "بتاريخ: ",
-                            style: regularDefault.copyWith(fontSize: 11, color: MyColor.getGreyColor()),
+                            style: regularDefault.copyWith(
+                              fontSize: 11,
+                              color: MyColor.getGreyColor(),
+                            ),
                           ),
                           const SizedBox(width: 4),
                           Text(
                             numericDate,
-                            style: regularDefault.copyWith(fontSize: 11, color: MyColor.getPrimaryColor()),
+                            style: regularDefault.copyWith(
+                              fontSize: 11,
+                              color: MyColor.getPrimaryColor(),
+                            ),
                           ),
                         ],
                       ),

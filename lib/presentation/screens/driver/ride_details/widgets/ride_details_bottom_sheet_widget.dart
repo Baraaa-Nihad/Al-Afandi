@@ -11,6 +11,7 @@ import 'package:ovoride/core/utils/util.dart';
 import 'package:ovoride/data/controller/driver/ride/ride_details/ride_details_controller.dart';
 import 'package:ovoride/data/model/global/ride/ride_model.dart';
 import 'package:ovoride/data/services/api_client.dart';
+import 'package:ovoride/data/services/arabic_numbers.dart';
 import 'package:ovoride/data/services/download_service.dart';
 import 'package:ovoride/environment.dart';
 import 'package:ovoride/presentation/components/bottom-sheet/custom_bottom_sheet.dart';
@@ -275,12 +276,42 @@ class RideDetailsBottomSheetWidget extends StatelessWidget {
   }
 
   Widget _buildInfoItem(String value, String label, {bool isAmount = false}) {
+    // دالة داخلية سريعة لتحويل الدقائق إلى تنسيق (ساعة ودقيقة)
+    String formattedValue = value;
+
+    // إذا كانت التسمية (label) تحتوي على كلمة "وقت" أو "مدة" أو القيمة تحتوي على "Min"
+    if (label.contains('وقت') || label.contains('مدة') || value.toLowerCase().contains('min')) {
+      double? totalMinutes = double.tryParse(value.replaceAll(RegExp(r'[^0-9.]'), ''));
+      if (totalMinutes != null) {
+        int hours = totalMinutes ~/ 60;
+        int mins = (totalMinutes % 60).toInt();
+
+        if (hours > 0) {
+          formattedValue = "$hours ساعة و $mins دقيقة".toArabicNumbers();
+        } else {
+          formattedValue = "$mins دقيقة".toArabicNumbers();
+        }
+      }
+    } else if (!isAmount) {
+      // لضمان تحويل أي أرقام أخرى (مثل المسافة) للأرقام العربية
+      formattedValue = value.toArabicNumbers();
+    }
+
     return Expanded(
       child: Column(
         children: [
-          FittedBox(child: Text(value, style: boldMediumLarge.copyWith(color: isAmount ? MyColor.getPrimaryColor() : MyColor.titleColor))),
+          FittedBox(
+            child: Text(
+              // تحويل القيمة كاملة (المبلغ + العملة) للأرقام العربية
+              formattedValue.toArabicNumbers(),
+              style: boldMediumLarge.copyWith(color: isAmount ? MyColor.getPrimaryColor() : MyColor.titleColor),
+            ),
+          ),
           const SizedBox(height: 4),
-          Text(label, style: regularSmall.copyWith(color: MyColor.getBodyTextColor())),
+          Text(
+            label.tr,
+            style: regularSmall.copyWith(color: MyColor.getBodyTextColor()),
+          ),
         ],
       ),
     );

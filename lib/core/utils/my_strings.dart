@@ -97,7 +97,7 @@ class MyStrings {
 
   static const String newRide = "المشاوير الجديدة";
 
-  static const String acceptedRide = "مشوار مقبول";
+  static const String acceptedRide = "المشاوير المقبولة";
 
   static const String active = "نشط";
   static const String running = "شغال";
@@ -118,7 +118,7 @@ class MyStrings {
 
   static const String ridePlaced = "تم طلب المشوار";
 
-  static const String rideCompleted = "المشوار خلص";
+  static const String rideCompleted = "المشوار جـاهز ";
   static const String rideCompletedSuccessFully = "المشوار خلص بنجاح";
 
   static const String createdTime = "وقت الطلب";
@@ -289,7 +289,7 @@ class MyStrings {
 
   static const String any = "أي";
 
-  static const String pay = "دفع";
+  static const String pay = "ادفـع ";
 
   static const String register = "تسجيل";
 
@@ -858,7 +858,7 @@ class MyStrings {
   static const String noZoneFound = "للأسف مفيش منطقة موجودة";
 
   static const String endRide = "إنهاء المشوار";
-  static const String waitingForPayment = "مستنيين الدفع";
+  static const String waitingForPayment = "مستنيين الدفع ...";
 
   static const String paymentReceived = "تم استلام الفلوس";
 
@@ -874,7 +874,7 @@ class MyStrings {
 
   static const String firstOrder = "أول أوردر";
 
-  static const String waitForUserPayment = "مستنيين الزبون يدفع";
+  static const String waitForUserPayment = "مستنييـن الأفنـدي يدفع ... ";
 
   static const String yourReferences = "الناس اللي رشحتهم";
 

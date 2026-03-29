@@ -9,6 +9,7 @@ import 'package:ovoride/data/model/global/user/global_driver_model.dart';
 import 'package:ovoride/presentation/components/divider/custom_spacer.dart';
 import 'package:ovoride/presentation/components/image/my_network_image_widget.dart';
 import 'package:ovoride/presentation/components/text/header_text.dart';
+import 'package:ovoride/presentation/screens/rider/ride/widget/ride_info_card.dart';
 
 class DriverProfileWidget extends StatelessWidget {
   GlobalDriverInfo? driver;
@@ -80,7 +81,7 @@ class DriverProfileWidget extends StatelessWidget {
                               ),
                               spaceSide(Dimensions.space3),
                               Text(
-                                driver?.avgRating == '0.00' ? MyStrings.nA.tr : (driver?.avgRating ?? ''),
+                                driver?.avgRating == '0.00' ? MyStrings.nA.tr : (driver?.avgRating ?? '').toArabicNumbers(), // تحويل رقم التقييم هنا
                                 style: boldDefault.copyWith(
                                   fontSize: Dimensions.fontSmall,
                                   color: MyColor.getHeadingTextColor(),
@@ -108,7 +109,7 @@ class DriverProfileWidget extends StatelessWidget {
                       ),
                       spaceDown(Dimensions.space3),
                       Text(
-                        "  $totalCompletedRide طلبية ناجحة",
+                        "$totalCompletedRide ".toArabicNumbers() + " طلبية ناجحة ",
                         style: regularDefault.copyWith(fontSize: Dimensions.fontDefault, color: MyColor.getBodyTextColor()),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,

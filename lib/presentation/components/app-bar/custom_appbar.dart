@@ -96,7 +96,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 : const SizedBox.shrink(),
             backgroundColor: widget.bgColor ?? MyColor.getAppBarColor().withValues(alpha: 0.15),
             title: Text(
-              widget.title.tr,
+              "صفحة " + widget.title.tr,
               style: boldDefault.copyWith(
                 color: MyColor.getHeadingTextColor(),
                 fontSize: Dimensions.fontOverLarge22,

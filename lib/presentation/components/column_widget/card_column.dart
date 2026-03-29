@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:ovoride/core/utils/dimensions.dart';
 import 'package:ovoride/core/utils/my_color.dart';
 import 'package:ovoride/core/utils/style.dart';
+import 'package:ovoride/data/services/arabic_numbers.dart';
 
 class CardColumn extends StatelessWidget {
   final String header;
@@ -38,6 +39,19 @@ class CardColumn extends StatelessWidget {
     this.alignmentCenter = false,
     this.space,
   });
+  String formatDuration(String rawMinutes) {
+    // تنظيف النص من أي كلمات مثل Min وتحويله لرقم
+    double totalMinutes = double.tryParse(rawMinutes.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0;
+
+    int hours = totalMinutes ~/ 60; // القسمة الصحيحة للحصول على الساعات
+    int minutes = (totalMinutes % 60).toInt(); // باقي القسمة للحصول على الدقائق
+
+    if (hours > 0) {
+      return "$hours ساعة و $minutes دقيقة".toArabicNumbers();
+    } else {
+      return "$minutes دقيقة".toArabicNumbers();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,8 +92,10 @@ class CardColumn extends StatelessWidget {
                 maxLines: maxLine,
               ),
               SizedBox(height: space),
+              // داخل الـ Widget الخاص بك:
               Text(
-                body.tr,
+                // نتحقق إذا كان النص يحتوي على دقائق لنقوم بتحويله
+                body.toLowerCase().contains('min') || double.tryParse(body) != null ? formatDuration(body) : body.tr,
                 maxLines: bodyMaxLine,
                 style: isDate
                     ? regularDefault.copyWith(
