@@ -37,7 +37,9 @@ class LocationPickerScreen extends StatefulWidget {
 class _LocationPickerScreenState extends State<LocationPickerScreen> {
   final GlobalKey _secondContainerKey = GlobalKey();
   double? _secondContainerHeight;
-  TextEditingController searchLocationController = TextEditingController(text: '');
+  TextEditingController searchLocationController = TextEditingController(
+    text: '',
+  );
   int index = 0;
   Uint8List? pickUpIcon;
   Uint8List? destinationIcon;
@@ -54,10 +56,14 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
     super.initState();
     Get.put(LocationSearchRepo(apiClient: Get.find()));
     var controller = Get.put(
-      SelectLocationController(locationSearchRepo: Get.find(), selectedLocationIndex: index),
+      SelectLocationController(
+        locationSearchRepo: Get.find(),
+        selectedLocationIndex: index,
+      ),
     );
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final RenderBox box = _secondContainerKey.currentContext?.findRenderObject() as RenderBox;
+      final RenderBox box =
+          _secondContainerKey.currentContext?.findRenderObject() as RenderBox;
       final double height = box.size.height;
       setState(() => _secondContainerHeight = height);
       await loadMarker();
@@ -73,11 +79,12 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
         LatLng destinationLatLng = controller.destinationLatlong;
         if (controller.homeController.selectedLocations.length >= 2) {
           final pickUpBitMap = await CustomMapMarkerBuilder.fromWidget(
-              context: context,
-              marker: _buildInfoWidget(
-                "Pickup",
-                controller.homeController.selectedLocations[0].fullAddress ?? "",
-              ));
+            context: context,
+            marker: _buildInfoWidget(
+              "Pickup",
+              controller.homeController.selectedLocations[0].fullAddress ?? "",
+            ),
+          );
           pickupInfoMarker = Marker(
             markerId: const MarkerId("pickup_location_2"),
             position: pickupLatLng,
@@ -89,11 +96,12 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
           );
 
           final destinationBitMap = await CustomMapMarkerBuilder.fromWidget(
-              context: context,
-              marker: _buildInfoWidget(
-                "Destination",
-                controller.homeController.selectedLocations[1].fullAddress ?? "",
-              ));
+            context: context,
+            marker: _buildInfoWidget(
+              "Destination",
+              controller.homeController.selectedLocations[1].fullAddress ?? "",
+            ),
+          );
           destinationInfoMarker = Marker(
             markerId: const MarkerId("destination_location_2"),
             position: destinationLatLng,
@@ -113,8 +121,14 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
 
   Future<void> loadMarker() async {
     searchLocationController.text = '';
-    pickUpIcon = await Helper.getBytesFromAsset(MyIcons.mapMarkerPickUpIcon, 150);
-    destinationIcon = await Helper.getBytesFromAsset(MyIcons.mapMarkerIcon, 150);
+    pickUpIcon = await Helper.getBytesFromAsset(
+      MyIcons.mapMarkerPickUpIcon,
+      150,
+    );
+    destinationIcon = await Helper.getBytesFromAsset(
+      MyIcons.mapMarkerIcon,
+      150,
+    );
     setState(() {});
   }
 
@@ -151,7 +165,10 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                         liteModeEnabled: false,
                         compassEnabled: false,
                         mapType: MapType.normal,
-                        minMaxZoomPreference: const MinMaxZoomPreference(0, 100),
+                        minMaxZoomPreference: const MinMaxZoomPreference(
+                          0,
+                          100,
+                        ),
                         markers: {
                           Marker(
                             markerId: const MarkerId("pickup_location"),
@@ -159,8 +176,17 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                               controller.pickupLatlong.latitude,
                               controller.pickupLatlong.longitude,
                             ),
-                            icon: pickUpIcon == null ? BitmapDescriptor.defaultMarker : BitmapDescriptor.bytes(pickUpIcon!, height: 45, width: 47),
-                            onTap: () => Get.toNamed(RouteHelper.editLocationPickUpScreen, arguments: 0),
+                            icon: pickUpIcon == null
+                                ? BitmapDescriptor.defaultMarker
+                                : BitmapDescriptor.bytes(
+                                    pickUpIcon!,
+                                    height: 45,
+                                    width: 47,
+                                  ),
+                            onTap: () => Get.toNamed(
+                              RouteHelper.editLocationPickUpScreen,
+                              arguments: 0,
+                            ),
                           ),
                           Marker(
                             markerId: const MarkerId("destination_location"),
@@ -168,14 +194,27 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                               controller.destinationLatlong.latitude,
                               controller.destinationLatlong.longitude,
                             ),
-                            icon: destinationIcon == null ? BitmapDescriptor.defaultMarker : BitmapDescriptor.bytes(destinationIcon!, height: 45, width: 45),
-                            onTap: () => Get.toNamed(RouteHelper.editLocationPickUpScreen, arguments: 1),
+                            icon: destinationIcon == null
+                                ? BitmapDescriptor.defaultMarker
+                                : BitmapDescriptor.bytes(
+                                    destinationIcon!,
+                                    height: 45,
+                                    width: 45,
+                                  ),
+                            onTap: () => Get.toNamed(
+                              RouteHelper.editLocationPickUpScreen,
+                              arguments: 1,
+                            ),
                           ),
                           if (pickupInfoMarker != null) pickupInfoMarker!,
-                          if (destinationInfoMarker != null) destinationInfoMarker!
+                          if (destinationInfoMarker != null)
+                            destinationInfoMarker!,
                         },
                         initialCameraPosition: CameraPosition(
-                          target: controller.getInitialTargetLocationForMap(pickupLocationForIndex: widget.pickupLocationForIndex),
+                          target: controller.getInitialTargetLocationForMap(
+                            pickupLocationForIndex:
+                                widget.pickupLocationForIndex,
+                          ),
                           zoom: Environment.mapDefaultZoom,
                           bearing: 20,
                           tilt: 0,
@@ -185,7 +224,9 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                           _loadWidgetMarker(controller);
                         },
                         onCameraIdle: () => _loadWidgetMarker(controller),
-                        polylines: Set<Polyline>.of(controller.polylines.values),
+                        polylines: Set<Polyline>.of(
+                          controller.polylines.values,
+                        ),
                         style: googleMapLightStyleJson,
                       ),
                     ),
@@ -194,7 +235,11 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
               Positioned.fill(
                 child: Align(
                   alignment: Alignment.center,
-                  child: controller.isLoading ? CircularProgressIndicator(color: MyColor.getPrimaryColor()) : const SizedBox.shrink(),
+                  child: controller.isLoading
+                      ? CircularProgressIndicator(
+                          color: MyColor.getPrimaryColor(),
+                        )
+                      : const SizedBox.shrink(),
                 ),
               ),
               Positioned(
@@ -202,19 +247,25 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                 left: 0,
                 child: SafeArea(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: Dimensions.space12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: Dimensions.space12,
+                    ),
                     child: IconButton(
-                      style: IconButton.styleFrom(backgroundColor: MyColor.colorWhite),
+                      style: IconButton.styleFrom(
+                        backgroundColor: MyColor.colorWhite,
+                      ),
                       color: MyColor.colorBlack,
                       onPressed: () => Get.back(result: true),
                       icon: const Icon(Icons.arrow_back_ios_new_rounded),
                     ),
                   ),
                 ),
-              )
+              ),
             ],
           ),
-          bottomSheet: buildConfirmDestination(pickupLocationForIndex: widget.pickupLocationForIndex),
+          bottomSheet: buildConfirmDestination(
+            pickupLocationForIndex: widget.pickupLocationForIndex,
+          ),
         ),
       ),
     );
@@ -227,10 +278,14 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(Dimensions.defaultRadius),
         border: Border.all(
-          color: title == "Pickup" ? MyColor.greenSuccessColor : MyColor.getPrimaryColor(),
+          color: title == "Pickup"
+              ? MyColor.greenSuccessColor
+              : MyColor.getPrimaryColor(),
           width: 1,
         ),
-        boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(0, 2))],
+        boxShadow: const [
+          BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(0, 2)),
+        ],
       ),
       child: IntrinsicWidth(
         child: Row(
@@ -238,13 +293,19 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
           children: [
             Container(
               padding: const EdgeInsets.all(3),
-              color: title == "Pickup" ? MyColor.greenSuccessColor : MyColor.getPrimaryColor(),
-              child: Icon(title == "Pickup" ? Icons.my_location : Icons.location_on, size: 15, color: Colors.white),
+              color: title == "Pickup"
+                  ? MyColor.greenSuccessColor
+                  : MyColor.getPrimaryColor(),
+              child: Icon(
+                title == "Pickup" ? Icons.my_location : Icons.location_on,
+                size: 15,
+                color: Colors.white,
+              ),
             ),
             const SizedBox(width: 4),
             Expanded(
               child: Text(
-                address.isEmpty ? "No address available" : address,
+                address.isEmpty ? 'مفيش عنوان متاح' : address,
                 style: const TextStyle(fontSize: 5),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -293,7 +354,9 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                 spaceDown(Dimensions.space10),
                 Container(
                   width: MediaQuery.of(context).size.width,
-                  padding: const EdgeInsetsDirectional.symmetric(vertical: Dimensions.space3),
+                  padding: const EdgeInsetsDirectional.symmetric(
+                    vertical: Dimensions.space3,
+                  ),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(
                       Dimensions.mediumRadius,
@@ -309,15 +372,22 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                             LabelText(text: MyStrings.pickUpLocation),
                             spaceDown(Dimensions.space5),
                             LocationPickTextField(
-                              fillColor: controller.selectedLocationIndex == 0 ? MyColor.colorWhite : MyColor.textFieldBgColor,
-                              shadowColor: controller.selectedLocationIndex == 0 ? MyColor.primaryColor.withValues(alpha: 0.2) : MyColor.colorGrey.withValues(alpha: 0.1),
+                              fillColor: controller.selectedLocationIndex == 0
+                                  ? MyColor.colorWhite
+                                  : MyColor.textFieldBgColor,
+                              shadowColor: controller.selectedLocationIndex == 0
+                                  ? MyColor.primaryColor.withValues(alpha: 0.2)
+                                  : MyColor.colorGrey.withValues(alpha: 0.1),
                               labelText: MyStrings.pickUpLocation,
                               controller: controller.pickUpController,
                               onTap: () {
                                 controller.changeIndex(0);
                               },
                               prefixIcon: Padding(
-                                padding: EdgeInsetsDirectional.only(start: Dimensions.space12, end: Dimensions.space2),
+                                padding: EdgeInsetsDirectional.only(
+                                  start: Dimensions.space12,
+                                  end: Dimensions.space2,
+                                ),
                                 child: CustomSvgPicture(
                                   image: MyIcons.currentLocation,
                                   color: MyColor.primaryColor,
@@ -340,7 +410,9 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                               radius: Dimensions.moreRadius,
                               inputAction: TextInputAction.done,
                               suffixIcon: Padding(
-                                padding: EdgeInsetsDirectional.only(end: Dimensions.space5),
+                                padding: EdgeInsetsDirectional.only(
+                                  end: Dimensions.space5,
+                                ),
                                 child: IconButton(
                                   onPressed: () async {
                                     controller.clearTextFiled(0);
@@ -357,8 +429,12 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                             LabelText(text: MyStrings.destination),
                             spaceDown(Dimensions.space5),
                             LocationPickTextField(
-                              fillColor: controller.selectedLocationIndex == 1 ? MyColor.colorWhite : MyColor.textFieldBgColor,
-                              shadowColor: controller.selectedLocationIndex == 1 ? MyColor.primaryColor.withValues(alpha: 0.2) : MyColor.colorGrey.withValues(alpha: 0.1),
+                              fillColor: controller.selectedLocationIndex == 1
+                                  ? MyColor.colorWhite
+                                  : MyColor.textFieldBgColor,
+                              shadowColor: controller.selectedLocationIndex == 1
+                                  ? MyColor.primaryColor.withValues(alpha: 0.2)
+                                  : MyColor.colorGrey.withValues(alpha: 0.1),
                               inputAction: TextInputAction.done,
                               labelText: MyStrings.whereToGo,
                               controller: controller.destinationController,
@@ -379,7 +455,10 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                               hintText: MyStrings.pickUpDestination.tr,
                               radius: Dimensions.mediumRadius,
                               prefixIcon: Padding(
-                                padding: EdgeInsetsDirectional.only(start: Dimensions.space12, end: Dimensions.space2),
+                                padding: EdgeInsetsDirectional.only(
+                                  start: Dimensions.space12,
+                                  end: Dimensions.space2,
+                                ),
                                 child: CustomSvgPicture(
                                   image: MyIcons.location,
                                   color: MyColor.primaryColor,
@@ -387,7 +466,9 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                                 ),
                               ),
                               suffixIcon: Padding(
-                                padding: EdgeInsetsDirectional.only(end: Dimensions.space5),
+                                padding: EdgeInsetsDirectional.only(
+                                  end: Dimensions.space5,
+                                ),
                                 child: IconButton(
                                   onPressed: () async {
                                     controller.clearTextFiled(1);
@@ -412,9 +493,13 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                     : GestureDetector(
                         onTap: () {},
                         child: SizedBox(
-                          height: controller.allPredictions.isNotEmpty ? context.height * .3 : 0,
+                          height: controller.allPredictions.isNotEmpty
+                              ? context.height * .3
+                              : 0,
                           child: ListView.builder(
-                            padding: EdgeInsets.symmetric(vertical: Dimensions.space20),
+                            padding: EdgeInsets.symmetric(
+                              vertical: Dimensions.space20,
+                            ),
                             itemCount: controller.allPredictions.length,
                             shrinkWrap: true,
                             itemBuilder: (context, index) {
@@ -422,29 +507,34 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                               return InkWell(
                                 radius: Dimensions.defaultRadius,
                                 onTap: () async {
-                                  await controller.getLangAndLatFromMap(item).whenComplete(() {
-                                    controller.pickLocation();
-                                    controller.updateSelectedAddressFromSearch(
-                                      item.description ?? '',
-                                    );
-                                    controller.animateMapCameraPosition();
-                                  });
+                                  await controller
+                                      .getLangAndLatFromMap(item)
+                                      .whenComplete(() {
+                                        controller.pickLocation();
+                                        controller
+                                            .updateSelectedAddressFromSearch(
+                                              item.description ?? '',
+                                            );
+                                        controller.animateMapCameraPosition();
+                                      });
 
                                   MyUtils.closeKeyboard();
                                 },
                                 child: Container(
                                   width: MediaQuery.of(context).size.width,
-                                  padding: const EdgeInsetsDirectional.symmetric(
-                                    vertical: Dimensions.space15,
-                                    horizontal: Dimensions.space8,
-                                  ),
+                                  padding:
+                                      const EdgeInsetsDirectional.symmetric(
+                                        vertical: Dimensions.space15,
+                                        horizontal: Dimensions.space8,
+                                      ),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(
                                       Dimensions.mediumRadius,
                                     ),
                                   ),
                                   child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       const Icon(
@@ -477,7 +567,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                     Get.back(result: 'true');
                   },
                   isOutlined: false,
-                )
+                ),
               ],
             ),
           ),

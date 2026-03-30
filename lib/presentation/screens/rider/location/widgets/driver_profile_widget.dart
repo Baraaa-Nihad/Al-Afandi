@@ -9,7 +9,6 @@ import 'package:ovoride/data/model/global/user/global_driver_model.dart';
 import 'package:ovoride/presentation/components/divider/custom_spacer.dart';
 import 'package:ovoride/presentation/components/image/my_network_image_widget.dart';
 import 'package:ovoride/presentation/components/text/header_text.dart';
-import 'package:ovoride/presentation/screens/rider/ride/widget/ride_info_card.dart';
 
 class DriverProfileWidget extends StatelessWidget {
   GlobalDriverInfo? driver;
@@ -54,19 +53,28 @@ class DriverProfileWidget extends StatelessWidget {
                       right: 0,
                       left: 0,
                       child: Container(
-                        decoration: BoxDecoration(color: MyColor.colorWhite, borderRadius: BorderRadius.circular(Dimensions.space20), boxShadow: [
-                          BoxShadow(
-                            color: MyColor.colorBlack.withValues(alpha: 0.02),
-                            blurRadius: 6,
-                            offset: Offset(0, 0),
+                        decoration: BoxDecoration(
+                          color: MyColor.colorWhite,
+                          borderRadius: BorderRadius.circular(
+                            Dimensions.space20,
                           ),
-                          BoxShadow(
-                            color: MyColor.colorBlack.withValues(alpha: 0.08),
-                            blurRadius: 4,
-                            offset: Offset(0, 2),
-                          ),
-                        ]),
-                        padding: const EdgeInsets.symmetric(horizontal: Dimensions.space3, vertical: Dimensions.space3),
+                          boxShadow: [
+                            BoxShadow(
+                              color: MyColor.colorBlack.withValues(alpha: 0.02),
+                              blurRadius: 6,
+                              offset: Offset(0, 0),
+                            ),
+                            BoxShadow(
+                              color: MyColor.colorBlack.withValues(alpha: 0.08),
+                              blurRadius: 4,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: Dimensions.space3,
+                          vertical: Dimensions.space3,
+                        ),
                         child: FittedBox(
                           fit: BoxFit.scaleDown,
                           child: Row(
@@ -81,7 +89,9 @@ class DriverProfileWidget extends StatelessWidget {
                               ),
                               spaceSide(Dimensions.space3),
                               Text(
-                                driver?.avgRating == '0.00' ? MyStrings.nA.tr : (driver?.avgRating ?? '').toArabicNumbers(), // تحويل رقم التقييم هنا
+                                driver?.avgRating == '0.00'
+                                    ? MyStrings.nA.tr
+                                    : (driver?.avgRating ?? ''),
                                 style: boldDefault.copyWith(
                                   fontSize: Dimensions.fontSmall,
                                   color: MyColor.getHeadingTextColor(),
@@ -109,8 +119,11 @@ class DriverProfileWidget extends StatelessWidget {
                       ),
                       spaceDown(Dimensions.space3),
                       Text(
-                        "${"$totalCompletedRide ".toArabicNumbers()} طلبية ناجحة ",
-                        style: regularDefault.copyWith(fontSize: Dimensions.fontDefault, color: MyColor.getBodyTextColor()),
+                        "  $totalCompletedRide طلبية ناجحة",
+                        style: regularDefault.copyWith(
+                          fontSize: Dimensions.fontDefault,
+                          color: MyColor.getBodyTextColor(),
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -141,7 +154,11 @@ class DriverProfileWidget extends StatelessWidget {
                   ),
                 ),
               Text(
-                [driver?.vehicleData?.color?.name, driver?.vehicleData?.model?.name, driver?.vehicleData?.year?.name].where((e) => (e != null && e.trim().isNotEmpty)).join(' | '),
+                [
+                  driver?.vehicleData?.color?.name,
+                  driver?.vehicleData?.model?.name,
+                  driver?.vehicleData?.year?.name,
+                ].where((e) => (e != null && e.trim().isNotEmpty)).join(' | '),
                 textAlign: TextAlign.end,
                 style: lightDefault.copyWith(color: MyColor.bodyTextColor),
                 maxLines: 3,

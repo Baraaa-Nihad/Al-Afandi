@@ -5,6 +5,7 @@ import 'package:ovoride/core/utils/url_container.dart';
 import 'package:ovoride/data/model/auth/sign_up_model/sign_up_model.dart';
 import 'package:ovoride/data/model/global/response_model/response_model.dart';
 import 'package:ovoride/data/services/api_client.dart';
+import 'package:ovoride/data/services/push_notification_service.dart';
 
 class RegistrationRepo {
   ApiClient apiClient;
@@ -41,7 +42,8 @@ class RegistrationRepo {
     if (apiClient.sharedPreferences.containsKey(
       SharedPreferenceHelper.fcmDeviceKey,
     )) {
-      deviceToken = apiClient.sharedPreferences.getString(
+      deviceToken =
+          apiClient.sharedPreferences.getString(
             SharedPreferenceHelper.fcmDeviceKey,
           ) ??
           '';
@@ -52,22 +54,40 @@ class RegistrationRepo {
     FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
     bool success = false;
     if (deviceToken.isEmpty) {
-      firebaseMessaging.getToken().then((fcmDeviceToken) async {
-        success = await sendUpdatedToken(fcmDeviceToken ?? '');
-      });
+      final fcmDeviceToken = await firebaseMessaging.getToken();
+      if (fcmDeviceToken == null || fcmDeviceToken.isEmpty) {
+        return false;
+      }
+
+      await apiClient.sharedPreferences.setString(
+        SharedPreferenceHelper.fcmDeviceKey,
+        fcmDeviceToken,
+      );
+      success = await sendUpdatedToken(fcmDeviceToken);
     } else {
-      firebaseMessaging.onTokenRefresh.listen((fcmDeviceToken) async {
-        if (deviceToken == fcmDeviceToken) {
-          success = true;
-        } else {
-          apiClient.sharedPreferences.setString(
-            SharedPreferenceHelper.fcmDeviceKey,
-            fcmDeviceToken,
-          );
-          success = await sendUpdatedToken(fcmDeviceToken);
-        }
-      });
+      success = true;
     }
+
+    await PushNotificationService.registerTokenRefreshListener(
+      firebaseMessaging: firebaseMessaging,
+      onTokenRefresh: (fcmDeviceToken) async {
+        final currentToken =
+            apiClient.sharedPreferences.getString(
+              SharedPreferenceHelper.fcmDeviceKey,
+            ) ??
+            '';
+        if (currentToken == fcmDeviceToken) {
+          return;
+        }
+
+        await apiClient.sharedPreferences.setString(
+          SharedPreferenceHelper.fcmDeviceKey,
+          fcmDeviceToken,
+        );
+        await sendUpdatedToken(fcmDeviceToken);
+      },
+    );
+
     return success;
   }
 
@@ -75,8 +95,13 @@ class RegistrationRepo {
     String url = '${UrlContainer.baseUrl}${UrlContainer.deviceTokenEndPoint}';
     Map<String, String> map = deviceTokenMap(deviceToken);
 
-    await apiClient.request(url, Method.postMethod, map, passHeader: true);
-    return true;
+    final response = await apiClient.request(
+      url,
+      Method.postMethod,
+      map,
+      passHeader: true,
+    );
+    return response.statusCode == 200;
   }
 
   Map<String, String> deviceTokenMap(String deviceToken) {

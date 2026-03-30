@@ -32,9 +32,12 @@ Future<void> main() async {
   AudioUtils();
 
   try {
-    await PushNotificationService(apiClient: Get.find()).setupInteractedMessage();
-  } catch (e) {
-    printX(e);
+    await PushNotificationService(
+      apiClient: Get.find(),
+    ).setupInteractedMessage();
+  } catch (e, st) {
+    printX('Push notification setup failed: $e');
+    printX(st);
   }
 
   HttpOverrides.global = MyHttpOverrides();
@@ -62,7 +65,9 @@ void startForgroundTask() {
 class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context)..badCertificateCallback = (X509Certificate cert, String host, int port) => false;
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => false;
   }
 }
 
@@ -78,10 +83,10 @@ class _OvoAppState extends State<OvoApp> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    MyUtils.precacheImagesFromPathList(
-      context,
-      [MyImages.backgroundImage, MyImages.logoWhite, MyImages.noDataImage],
-    );
+    MyUtils.precacheImagesFromPathList(context, [
+      MyImages.backgroundImage,
+      MyImages.logoWhite,
+    ]);
   }
 
   @override

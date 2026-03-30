@@ -1,7 +1,9 @@
 class SharedPreferenceHelper {
   static const String pusherConfigSettingKey = 'pusherConfig-setting-key';
   static const String notificationAudioKey = 'notification-audio-key';
-  static const String notificationAudioEnableKey = 'driver-notification-audio-enable-key';
+  static const String notificationAudioEnableKey =
+      'driver-notification-audio-enable-key';
+  static const String notificationListKey = 'notification_list_key';
 
   static const String accessTokenKey = 'access_token';
   static const String accessTokenType = 'access_type';
@@ -33,6 +35,4 @@ class SharedPreferenceHelper {
 
   static const String currentTabKey = "current_tab";
   static const String userRoleKey = 'user_role'; // "rider" or "driver"
-
-
 }

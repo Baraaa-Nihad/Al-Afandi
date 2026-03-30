@@ -39,7 +39,8 @@ class InnerShadowContainer extends StatelessWidget {
     this.shadowColor = const Color(0x12000000),
     this.child,
     this.alignment = Alignment.center,
-    this.padding = EdgeInsets.zero, // تغيير القيمة الافتراضية إلى صفر لمنع الـ Overflow
+    this.padding =
+        EdgeInsets.zero, // تغيير القيمة الافتراضية إلى صفر لمنع الـ Overflow
     this.margin = EdgeInsets.zero,
     this.outerShadows,
     this.border,
@@ -48,7 +49,11 @@ class InnerShadowContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hasShadow = isShadowTopLeft || isShadowTopRight || isShadowBottomRight || isShadowBottomLeft;
+    final hasShadow =
+        isShadowTopLeft ||
+        isShadowTopRight ||
+        isShadowBottomRight ||
+        isShadowBottomLeft;
 
     return Container(
       height: height,
@@ -56,10 +61,11 @@ class InnerShadowContainer extends StatelessWidget {
       margin: margin,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(borderRadius),
-        boxShadow: outerShadows ??
+        boxShadow:
+            outerShadows ??
             [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 2),
               ),
@@ -78,16 +84,14 @@ class InnerShadowContainer extends StatelessWidget {
                 color: gradient == null ? backgroundColor : null,
                 gradient: gradient,
                 borderRadius: BorderRadius.circular(borderRadius),
-                border: border ??
+                border:
+                    border ??
                     Border.all(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       width: 1,
                     ),
               ),
-              child: Padding(
-                padding: padding,
-                child: child,
-              ),
+              child: Padding(padding: padding, child: child),
             ),
 
             if (hasShadow)

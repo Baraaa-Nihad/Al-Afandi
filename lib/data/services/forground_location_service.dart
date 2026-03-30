@@ -16,36 +16,39 @@ class ForgroundLocationService extends TaskHandler {
   @override
   Future<void> onStart(DateTime timestamp, TaskStarter starter) async {
     try {
-      SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+      SharedPreferences sharedPreferences =
+          await SharedPreferences.getInstance();
       ApiClient apiClient = ApiClient(sharedPreferences: sharedPreferences);
       dashBoardRepo = DashBoardRepo(apiClient: apiClient);
-      _positionStream = Geolocator.getPositionStream(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.best,
-          // timeLimit: Duration(seconds: 30),
-          distanceFilter: Environment.driverLocationUpdateAfterNmetersOrMovements, // Only update every 10 meters of movement
-        ),
-      ).listen((Position? location) async {
-        if (location != null) {
-          final double lat = location.latitude;
-          final double lon = location.longitude;
-          final isOnline = dashBoardRepo.apiClient.getUserOnlineStatus();
-          final isLoggedIn = dashBoardRepo.apiClient.isLoggedIn();
-          printX("Is online -> $isOnline | isLoggedIn -> $isLoggedIn");
-          if (isOnline && isLoggedIn) {
-            FlutterForegroundTask.updateService(
-              notificationText: "Current Location: $lat , $lat",
-            );
-            await sendLocationToServer(lat: lat, long: lon);
-            // FlutterForegroundTask.updateService(notificationText: "Refreshing location....");
-          } else {
-            printE("Stoped Foreground Task");
-            FlutterForegroundTask.stopService();
-            _positionStream?.cancel();
-            _positionStream = null;
-          }
-        }
-      });
+      _positionStream =
+          Geolocator.getPositionStream(
+            locationSettings: const LocationSettings(
+              accuracy: LocationAccuracy.best,
+              // timeLimit: Duration(seconds: 30),
+              distanceFilter: Environment
+                  .driverLocationUpdateAfterNmetersOrMovements, // Only update every 10 meters of movement
+            ),
+          ).listen((Position? location) async {
+            if (location != null) {
+              final double lat = location.latitude;
+              final double lon = location.longitude;
+              final isOnline = dashBoardRepo.apiClient.getUserOnlineStatus();
+              final isLoggedIn = dashBoardRepo.apiClient.isLoggedIn();
+              printX("Is online -> $isOnline | isLoggedIn -> $isLoggedIn");
+              if (isOnline && isLoggedIn) {
+                FlutterForegroundTask.updateService(
+                  notificationText: 'الموقع الحالي: $lat , $lon',
+                );
+                await sendLocationToServer(lat: lat, long: lon);
+                // FlutterForegroundTask.updateService(notificationText: "Refreshing location....");
+              } else {
+                printE("Stoped Foreground Task");
+                FlutterForegroundTask.stopService();
+                _positionStream?.cancel();
+                _positionStream = null;
+              }
+            }
+          });
     } catch (e) {
       printE(e);
       // FlutterForegroundTask.stopService();
@@ -63,7 +66,7 @@ class ForgroundLocationService extends TaskHandler {
       );
       if (response.statusCode == 200) {
         FlutterForegroundTask.updateService(
-          notificationText: "Data synced successfully",
+          notificationText: 'تمت مزامنة البيانات بنجاح',
         );
       }
     } catch (e) {

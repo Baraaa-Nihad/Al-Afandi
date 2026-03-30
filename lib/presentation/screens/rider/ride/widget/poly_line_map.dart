@@ -17,7 +17,7 @@ class _RiderPolyLineMapScreenState extends State<RiderPolyLineMapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: GetBuilder<RideMapController>(
-      tag: 'rider',
+        tag: 'rider',
         builder: (controller) {
           return GoogleMap(
             trafficEnabled: false,
@@ -40,7 +40,8 @@ class _RiderPolyLineMapScreenState extends State<RiderPolyLineMapScreen> {
               double northEastLat;
               double northEastLong;
 
-              if (controller.pickupLatLng.latitude <= controller.destinationLatLng.latitude) {
+              if (controller.pickupLatLng.latitude <=
+                  controller.destinationLatLng.latitude) {
                 southWestLat = controller.pickupLatLng.latitude;
                 northEastLat = controller.destinationLatLng.latitude;
               } else {
@@ -48,7 +49,8 @@ class _RiderPolyLineMapScreenState extends State<RiderPolyLineMapScreen> {
                 southWestLat = controller.destinationLatLng.latitude;
               }
 
-              if (controller.pickupLatLng.longitude <= controller.destinationLatLng.longitude) {
+              if (controller.pickupLatLng.longitude <=
+                  controller.destinationLatLng.longitude) {
                 southWestLong = controller.pickupLatLng.longitude;
                 northEastLong = controller.destinationLatLng.longitude;
               } else {
@@ -60,7 +62,9 @@ class _RiderPolyLineMapScreenState extends State<RiderPolyLineMapScreen> {
                 southwest: LatLng(southWestLat, southWestLong),
               );
 
-              controller.mapController?.animateCamera(CameraUpdate.newLatLngBounds(bounds, 100));
+              controller.mapController?.animateCamera(
+                CameraUpdate.newLatLngBounds(bounds, 100),
+              );
             },
             markers: controller.getMarkers(
               pickup: controller.pickupLatLng,

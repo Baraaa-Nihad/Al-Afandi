@@ -34,10 +34,10 @@ class BidInfoCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 15,
                 offset: const Offset(0, 5),
-              )
+              ),
             ],
           ),
           child: Column(
@@ -57,10 +57,16 @@ class BidInfoCard extends StatelessWidget {
                         Container(
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            border: Border.all(color: MyColor.primaryColor.withOpacity(0.2), width: 2),
+                            border: Border.all(
+                              color: MyColor.primaryColor.withValues(
+                                alpha: 0.2,
+                              ),
+                              width: 2,
+                            ),
                           ),
                           child: MyImageWidget(
-                            imageUrl: '${controller.driverImagePath}${bid.driver?.avatar}',
+                            imageUrl:
+                                '${controller.driverImagePath}${bid.driver?.avatar}',
                             isProfile: true,
                             height: 55,
                             width: 55,
@@ -71,24 +77,37 @@ class BidInfoCard extends StatelessWidget {
                           bottom: 0,
                           right: 0,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               color: MyColor.colorYellow,
                               borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: Colors.white, width: 1.5),
+                              border: Border.all(
+                                color: Colors.white,
+                                width: 1.5,
+                              ),
                             ),
                             child: Row(
                               children: [
-                                const Icon(Icons.star, size: 10, color: Colors.white),
+                                const Icon(
+                                  Icons.star,
+                                  size: 10,
+                                  color: Colors.white,
+                                ),
                                 const SizedBox(width: 2),
                                 Text(
                                   "${bid.driver?.avgRating}",
-                                  style: boldDefault.copyWith(fontSize: 10, color: Colors.white),
+                                  style: boldDefault.copyWith(
+                                    fontSize: 10,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ],
                             ),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -99,12 +118,18 @@ class BidInfoCard extends StatelessWidget {
                       children: [
                         Text(
                           "${bid.driver?.getFullName()}",
-                          style: boldDefault.copyWith(fontSize: 18, color: MyColor.rideTitle),
+                          style: boldDefault.copyWith(
+                            fontSize: 18,
+                            color: MyColor.rideTitle,
+                          ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           "الكابتن قريب منك • ${ride.duration}",
-                          style: regularDefault.copyWith(color: MyColor.bodyTextColor.withOpacity(0.6), fontSize: 13),
+                          style: regularDefault.copyWith(
+                            color: MyColor.bodyTextColor.withValues(alpha: 0.6),
+                            fontSize: 13,
+                          ),
                         ),
                       ],
                     ),
@@ -114,11 +139,17 @@ class BidInfoCard extends StatelessWidget {
                     children: [
                       Text(
                         "$currency${StringConverter.formatNumber(bid.bidAmount.toString())}",
-                        style: boldDefault.copyWith(fontSize: 20, color: MyColor.primaryColor),
+                        style: boldDefault.copyWith(
+                          fontSize: 20,
+                          color: MyColor.primaryColor,
+                        ),
                       ),
                       Text(
                         "عرض السائق",
-                        style: regularDefault.copyWith(fontSize: 11, color: MyColor.bodyTextColor.withOpacity(0.5)),
+                        style: regularDefault.copyWith(
+                          fontSize: 11,
+                          color: MyColor.bodyTextColor.withValues(alpha: 0.5),
+                        ),
                       ),
                     ],
                   ),
@@ -132,7 +163,10 @@ class BidInfoCard extends StatelessWidget {
 
               // Ride Rules (Chips Style)
               if (bid.driver?.rules?.isNotEmpty ?? false) ...[
-                Text(MyStrings.rideRulse.tr, style: boldDefault.copyWith(fontSize: 14)),
+                Text(
+                  MyStrings.rideRulse.tr,
+                  style: boldDefault.copyWith(fontSize: 14),
+                ),
                 const SizedBox(height: 10),
                 Wrap(
                   spacing: 8,
@@ -140,14 +174,20 @@ class BidInfoCard extends StatelessWidget {
                   children: List.generate(
                     bid.driver?.rules?.length ?? 0,
                     (index) => Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
-                        color: MyColor.primaryColor.withOpacity(0.05),
+                        color: MyColor.primaryColor.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
                         bid.driver?.rules?[index] ?? "",
-                        style: regularDefault.copyWith(fontSize: 12, color: MyColor.primaryColor),
+                        style: regularDefault.copyWith(
+                          fontSize: 12,
+                          color: MyColor.primaryColor,
+                        ),
                       ),
                     ),
                   ),
@@ -166,10 +206,24 @@ class BidInfoCard extends StatelessWidget {
                         height: 50,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.1),
+                          color: Colors.red.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(15),
                         ),
-                        child: controller.isRejectLoading && controller.selectedId == bid.id.toString() ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.red)) : Text(MyStrings.reject.tr, style: boldDefault.copyWith(color: Colors.red)),
+                        child:
+                            controller.isRejectLoading &&
+                                controller.selectedId == bid.id.toString()
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.red,
+                                ),
+                              )
+                            : Text(
+                                MyStrings.reject.tr,
+                                style: boldDefault.copyWith(color: Colors.red),
+                              ),
                       ),
                     ),
                   ),
@@ -177,7 +231,10 @@ class BidInfoCard extends StatelessWidget {
                   Expanded(
                     flex: 3,
                     child: InkWell(
-                      onTap: () => controller.acceptBid(bid.id.toString(), ride.id.toString()),
+                      onTap: () => controller.acceptBid(
+                        bid.id.toString(),
+                        ride.id.toString(),
+                      ),
                       child: Container(
                         height: 50,
                         alignment: Alignment.center,
@@ -186,13 +243,31 @@ class BidInfoCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(15),
                           boxShadow: [
                             BoxShadow(
-                              color: MyColor.primaryColor.withOpacity(0.3),
+                              color: MyColor.primaryColor.withValues(
+                                alpha: 0.3,
+                              ),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
-                            )
+                            ),
                           ],
                         ),
-                        child: controller.isAcceptLoading && controller.selectedId == bid.id.toString() ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : Text(MyStrings.confirm.tr, style: boldDefault.copyWith(color: Colors.white)),
+                        child:
+                            controller.isAcceptLoading &&
+                                controller.selectedId == bid.id.toString()
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Text(
+                                MyStrings.confirm.tr,
+                                style: boldDefault.copyWith(
+                                  color: Colors.white,
+                                ),
+                              ),
                       ),
                     ),
                   ),

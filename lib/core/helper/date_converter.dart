@@ -23,16 +23,13 @@ class DateConverter {
     }
   }
 
-  String getMonthName(int monthNumber) {
-    List<String> months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
-    return months[monthNumber - 1];
-  }
-
   /// Get user timezone location, fallback to UTC
   static tz.Location _getUserTimeZone() {
     try {
       final apiClient = ApiClient(sharedPreferences: Get.find());
-      final timeZone = apiClient.getGeneralSettings().data?.generalSetting?.timezone ?? 'UTC';
+      final timeZone =
+          apiClient.getGeneralSettings().data?.generalSetting?.timezone ??
+          'UTC';
       return tz.getLocation(timeZone);
     } catch (_) {
       return tz.getLocation('UTC');
@@ -48,10 +45,14 @@ class DateConverter {
     try {
       final location = _getUserTimeZone();
       final zonedTime = tz.TZDateTime.from(dateTime, location);
-      final format = customFormat ?? _getFormatFromType(formatType ?? DateFormatType.dateTime12hr);
+      final format =
+          customFormat ??
+          _getFormatFromType(formatType ?? DateFormatType.dateTime12hr);
       return DateFormat(format).format(zonedTime);
     } catch (_) {
-      final format = customFormat ?? _getFormatFromType(formatType ?? DateFormatType.dateTime12hr);
+      final format =
+          customFormat ??
+          _getFormatFromType(formatType ?? DateFormatType.dateTime12hr);
       return DateFormat(format).format(dateTime.toLocal());
     }
   }

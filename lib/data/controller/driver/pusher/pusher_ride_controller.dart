@@ -33,7 +33,10 @@ class PusherRideController extends GetxController {
     PusherManager().addListener(onEvent);
   }
 
-  Future<void> subscribeToRide(String rideId, Function(dynamic) onUpdate) async {
+  Future<void> subscribeToRide(
+    String rideId,
+    Function(dynamic) onUpdate,
+  ) async {
     try {
       rideID = rideId;
       String channelName = "ride.$rideId";
@@ -87,7 +90,8 @@ class PusherRideController extends GetxController {
 
   void _handleMessageEvent(PusherResponseModel eventResponse) {
     if (eventResponse.data?.message != null) {
-      if (eventResponse.data!.ride != null && eventResponse.data!.ride!.id != rideID) {
+      if (eventResponse.data!.ride != null &&
+          eventResponse.data!.ride!.id != rideID) {
         printX(
           'Message for different ride: ${eventResponse.data!.ride!.id}, current ride: $rideID',
         );
@@ -113,7 +117,8 @@ class PusherRideController extends GetxController {
   void _handleOnlinePayment(PusherResponseModel eventResponse) {
     MyUtils.vibrate();
     if (isRideDetailsPage()) {
-      if (eventResponse.data!.ride != null && eventResponse.data!.ride!.id != rideID) {
+      if (eventResponse.data!.ride != null &&
+          eventResponse.data!.ride!.id != rideID) {
         printX(
           'Message for different ride: ${eventResponse.data!.ride!.id}, current ride: $rideID',
         );
@@ -126,11 +131,16 @@ class PusherRideController extends GetxController {
 
   void updateEvent(PusherResponseModel eventResponse) {
     printX('event.eventName ${eventResponse.eventName}');
-    if (eventResponse.eventName == "pick_up" || eventResponse.eventName == "ride_end" || eventResponse.eventName == "online-payment-received" || eventResponse.eventName == "bid_accept" || eventResponse.eventName == "cancel_ride") {
+    if (eventResponse.eventName == "pick_up" ||
+        eventResponse.eventName == "ride_end" ||
+        eventResponse.eventName == "online-payment-received" ||
+        eventResponse.eventName == "bid_accept" ||
+        eventResponse.eventName == "cancel_ride") {
       if (eventResponse.eventName == "online-payment-received") {
-        CustomSnackBar.success(successList: ["Payment Received"]);
+        CustomSnackBar.success(successList: ['تم استلام الدفع']);
       }
-      if (eventResponse.data!.ride != null && eventResponse.data!.ride!.id != rideID) {
+      if (eventResponse.data!.ride != null &&
+          eventResponse.data!.ride!.id != rideID) {
         printX(
           'Message for different ride: ${eventResponse.data!.ride!.id}, current ride: $rideID',
         );
@@ -152,7 +162,8 @@ class PusherRideController extends GetxController {
 
   Future<void> ensureConnection({String? channelName}) async {
     try {
-      var userId = apiClient.sharedPreferences.getString(
+      var userId =
+          apiClient.sharedPreferences.getString(
             SharedPreferenceHelper.userIdKey,
           ) ??
           '';

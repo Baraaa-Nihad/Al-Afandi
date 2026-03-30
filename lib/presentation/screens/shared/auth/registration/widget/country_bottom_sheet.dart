@@ -13,7 +13,7 @@ import 'package:ovoride/presentation/components/image/my_network_image_widget.da
 class CountryBottomSheet {
   static void bottomSheet(
     BuildContext context,
-    DriverProfileCompleteController controller,
+    ProfileCompleteController controller,
   ) {
     CustomBottomSheet(
       child: StatefulBuilder(
@@ -30,8 +30,8 @@ class CountryBottomSheet {
                 controller.filteredCountries = controller.countryList
                     .where(
                       (country) => country.country!.toLowerCase().contains(
-                            query.toLowerCase(),
-                          ),
+                        query.toLowerCase(),
+                      ),
                     )
                     .toList();
               });
@@ -103,10 +103,13 @@ class CountryBottomSheet {
                                   end: Dimensions.space10,
                                 ),
                                 child: MyImageWidget(
-                                  imageUrl: UrlContainer.countryFlagImageLink.replaceAll(
-                                    "{countryCode}",
-                                    countryItem.countryCode.toString().toLowerCase(),
-                                  ),
+                                  imageUrl: UrlContainer.countryFlagImageLink
+                                      .replaceAll(
+                                        "{countryCode}",
+                                        countryItem.countryCode
+                                            .toString()
+                                            .toLowerCase(),
+                                      ),
                                   height: Dimensions.space25,
                                   width: Dimensions.space40 + 2,
                                 ),
@@ -147,7 +150,7 @@ class CountryBottomSheet {
 
   static void profileBottomSheet(
     BuildContext context,
-    DriverProfileCompleteController controller,
+    ProfileCompleteController controller,
   ) {
     CustomBottomSheet(
       child: StatefulBuilder(
@@ -166,8 +169,8 @@ class CountryBottomSheet {
                 controller.filteredCountries = controller.countryList
                     .where(
                       (country) => country.country!.toLowerCase().contains(
-                            query.toLowerCase(),
-                          ),
+                        query.toLowerCase(),
+                      ),
                     )
                     .toList();
               });
@@ -201,7 +204,9 @@ class CountryBottomSheet {
                       color: Colors.grey,
                       size: 20, // smaller icon
                     ),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 12), // ✅ centers text & icon
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 12,
+                    ), // ✅ centers text & icon
                     hintText: MyStrings.searchCountry.tr,
 
                     border: const UnderlineInputBorder(
@@ -244,7 +249,11 @@ class CountryBottomSheet {
                             border: Border(
                               bottom: BorderSide(
                                 color: MyColor.colorGrey.withValues(alpha: 0.3),
-                                width: index == controller.filteredCountries.length - 1 ? 0 : 0.5,
+                                width:
+                                    index ==
+                                        controller.filteredCountries.length - 1
+                                    ? 0
+                                    : 0.5,
                               ),
                             ),
                           ),
@@ -255,10 +264,13 @@ class CountryBottomSheet {
                                   end: Dimensions.space10,
                                 ),
                                 child: MyImageWidget(
-                                  imageUrl: UrlContainer.countryFlagImageLink.replaceAll(
-                                    "{countryCode}",
-                                    countryItem.countryCode.toString().toLowerCase(),
-                                  ),
+                                  imageUrl: UrlContainer.countryFlagImageLink
+                                      .replaceAll(
+                                        "{countryCode}",
+                                        countryItem.countryCode
+                                            .toString()
+                                            .toLowerCase(),
+                                      ),
                                   height: Dimensions.space25,
                                   width: Dimensions.space40 + 2,
                                 ),

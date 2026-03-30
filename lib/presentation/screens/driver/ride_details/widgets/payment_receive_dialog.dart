@@ -16,7 +16,8 @@ class PaymentReceiveDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<RideDetailsController>(tag: 'driver', 
+    return GetBuilder<RideDetailsController>(
+      tag: 'driver',
       builder: (controller) => Dialog(
         backgroundColor: MyColor.transparentColor,
         insetPadding: const EdgeInsets.symmetric(

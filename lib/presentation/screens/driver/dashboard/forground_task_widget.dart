@@ -27,7 +27,8 @@ class ForGroundTaskWidget extends StatefulWidget {
   State<ForGroundTaskWidget> createState() => ForGroundTaskWidgetState();
 }
 
-class ForGroundTaskWidgetState extends State<ForGroundTaskWidget> with WidgetsBindingObserver {
+class ForGroundTaskWidgetState extends State<ForGroundTaskWidget>
+    with WidgetsBindingObserver {
   late ApiClient apiClient;
   bool _isInitialized = false;
   static bool _hasCheckedBatteryOptimization = false;
@@ -48,8 +49,9 @@ class ForGroundTaskWidgetState extends State<ForGroundTaskWidget> with WidgetsBi
     FlutterForegroundTask.init(
       androidNotificationOptions: AndroidNotificationOptions(
         channelId: 'foreground_service',
-        channelName: 'Foreground Service Notification',
-        channelDescription: 'This notification appears when the foreground service is running.',
+        channelName: 'إشعار خدمة التشغيل المستمر',
+        channelDescription:
+            'الإشعار ده بيظهر لما خدمة التشغيل المستمر تكون شغالة.',
         channelImportance: NotificationChannelImportance.LOW,
         priority: NotificationPriority.DEFAULT,
         visibility: NotificationVisibility.VISIBILITY_PUBLIC,
@@ -78,7 +80,8 @@ class ForGroundTaskWidgetState extends State<ForGroundTaskWidget> with WidgetsBi
   /// Check and request necessary permissions
   Future<bool> _checkPermissions() async {
     final permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
       printE("Location permission denied");
       return false;
     }
@@ -119,8 +122,7 @@ class ForGroundTaskWidgetState extends State<ForGroundTaskWidget> with WidgetsBi
     final isServiceRunning = await FlutterForegroundTask.isRunningService;
 
     if (isServiceRunning) {
-      printX("Service already running, restarting...");
-      FlutterForegroundTask.restartService();
+      printX("Service already running, skipping restart");
       return;
     }
 
@@ -132,8 +134,8 @@ class ForGroundTaskWidgetState extends State<ForGroundTaskWidget> with WidgetsBi
       await FlutterForegroundTask.startService(
         serviceTypes: [ForegroundServiceTypes.dataSync],
         serviceId: 256,
-        notificationTitle: "${Environment.appName} is running",
-        notificationText: "Do not close the app",
+        notificationTitle: '${Environment.appName} شغال دلوقتي',
+        notificationText: 'من فضلك ما تقفلش التطبيق',
         callback: widget.callback!,
         notificationIcon: const NotificationIcon(
           metaDataName: 'service.NOTIFICATION_ICON',
@@ -164,7 +166,8 @@ class ForGroundTaskWidgetState extends State<ForGroundTaskWidget> with WidgetsBi
       return;
     }
 
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
       await startForegroundTask();
     }
   }

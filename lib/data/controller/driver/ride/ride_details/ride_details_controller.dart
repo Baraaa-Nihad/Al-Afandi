@@ -57,7 +57,7 @@ class RideDetailsController extends GetxController {
           userImageUrl = model.data?.userImagePath ?? '';
           if (tRide != null) {
             ride = tRide;
-            isRunning = tRide.isRunning == '1' ? true : false;
+            isRunning = tRide.isRunning;
             pickupLatLng = LatLng(
               StringConverter.formatDouble(
                 tRide.pickupLatitude.toString(),
@@ -84,7 +84,7 @@ class RideDetailsController extends GetxController {
             pickup: pickupLatLng,
             destination: destinationLatLng,
           );
-          if (ride.isRunning == "1" || ride.status == "1") {
+          if (ride.isRunning || ride.status == "1") {
             await mapController.setCustomMarkerIcon(isRunning: true);
           }
           if (ride.paymentStatus == "3" && shouldLoading == true) {
@@ -257,6 +257,16 @@ class RideDetailsController extends GetxController {
 
   bool isReviewLoading = false;
   Future<void> reviewRide(String rideId) async {
+    final String review = reviewMsgController.text.trim();
+    if (review.isEmpty) {
+      CustomSnackBar.error(errorList: [MyStrings.reviewRequired]);
+      return;
+    }
+    if (rating <= 0) {
+      CustomSnackBar.error(errorList: [MyStrings.ratingRequired]);
+      return;
+    }
+
     isReviewLoading = true;
     update();
 
@@ -264,7 +274,7 @@ class RideDetailsController extends GetxController {
       ResponseModel responseModel = await repo.reviewRide(
         id: rideId,
         rating: rating.toString(),
-        review: reviewMsgController.text,
+        review: review,
       );
       if (responseModel.statusCode == 200) {
         AuthorizationResponseModel model = AuthorizationResponseModel.fromJson(
@@ -273,7 +283,7 @@ class RideDetailsController extends GetxController {
         if (model.status == MyStrings.success) {
           ride.userReview = UserReview(
             rating: rating.toString(),
-            review: reviewMsgController.text,
+            review: review,
           );
           reviewMsgController.text = '';
           rating = 0.0;
@@ -328,10 +338,12 @@ class RideDetailsController extends GetxController {
       final String driverLng = position.longitude.toString();
 
       // Navigate from driver current → destination
-      url = "https://www.google.com/maps/dir/?api=1&origin=$driverLat,$driverLng&destination=$destLat,$destLng&travelmode=driving";
+      url =
+          "https://www.google.com/maps/dir/?api=1&origin=$driverLat,$driverLng&destination=$destLat,$destLng&travelmode=driving";
     } else {
       // Navigate from pickup → destination
-      url = "https://www.google.com/maps/dir/?api=1&origin=$pickupLat,$pickupLng&destination=$destLat,$destLng&travelmode=driving";
+      url =
+          "https://www.google.com/maps/dir/?api=1&origin=$pickupLat,$pickupLng&destination=$destLat,$destLng&travelmode=driving";
     }
 
     final Uri uri = Uri.parse(url);

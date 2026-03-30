@@ -1,3 +1,4 @@
+import 'package:ovoride/core/helper/date_converter.dart';
 import 'package:ovoride/core/helper/string_format_helper.dart';
 import 'package:ovoride/core/route/route.dart';
 import 'package:ovoride/core/utils/app_status.dart';
@@ -14,10 +15,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ovoride/data/services/download_service.dart';
 import 'package:ovoride/presentation/components/buttons/rounded_button.dart';
+import 'package:ovoride/presentation/components/card/custom_app_card.dart';
 import 'package:ovoride/presentation/components/image/my_local_image_widget.dart';
 import 'package:ovoride/presentation/components/timeline/custom_time_line.dart';
 
-// دالة مساعدة لتحويل الأرقام إلى العربية (بقية كما هي لضمان التوافق)
+// دالة مساعدة لتحويل الأرقام إلى العربية
 extension ArabicNumbers on String {
   String toArabicNumbers() {
     const english = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
@@ -33,223 +35,119 @@ extension ArabicNumbers on String {
 class RiderRideInfoCard extends StatefulWidget {
   final AllRideController controller;
   final RideModel ride;
-  const RiderRideInfoCard({super.key, required this.controller, required this.ride});
+  const RiderRideInfoCard({
+    super.key,
+    required this.controller,
+    required this.ride,
+  });
 
   @override
   State<RiderRideInfoCard> createState() => _RiderRideInfoCardState();
 }
 
-class _RiderRideInfoCardState extends State<RiderRideInfoCard> with SingleTickerProviderStateMixin {
+class _RiderRideInfoCardState extends State<RiderRideInfoCard> {
   bool isDownLoadLoading = false;
-  bool isExpanded = false; // متغير للتحكم في توسيع البطاقة
 
   @override
   Widget build(BuildContext context) {
-    Color statusColor = MyUtils.getRideStatusColor(widget.ride.status ?? '9');
-
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      margin: const EdgeInsets.symmetric(vertical: Dimensions.space10),
-      decoration: BoxDecoration(
-        color: MyColor.getCardBgColor(),
-        borderRadius: BorderRadius.circular(Dimensions.mediumRadius),
-        boxShadow: [
-          BoxShadow(
-            color: statusColor.withOpacity(0.08),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-        border: Border.all(
-          color: isExpanded ? statusColor.withOpacity(0.3) : MyColor.borderColor,
-          width: 1,
-        ),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(Dimensions.mediumRadius),
-          onTap: () => setState(() => isExpanded = !isExpanded), // التوسيع عند الضغط
-          child: Padding(
-            padding: const EdgeInsets.all(Dimensions.space15),
-            child: Column(
-              children: [
-                // --- الحالة المختصرة (دائماً ظاهرة) ---
-                _buildCollapsedHeader(statusColor),
-
-                // --- الحالة المتوسعة (تظهر بأنيميشن) ---
-                AnimatedCrossFade(
-                  firstChild: const SizedBox.shrink(),
-                  secondChild: _buildExpandedDetails(),
-                  crossFadeState: isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
-                  duration: const Duration(milliseconds: 300),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // الجزء العلوي الذي يحتوي على السعر والحالة والوجهة
-  Widget _buildCollapsedHeader(Color statusColor) {
-    return Row(
-      children: [
-        // أيقونة الحالة الدائرية
-        Container(
-          height: 45,
-          width: 45,
-          decoration: BoxDecoration(
-            color: statusColor.withOpacity(0.1),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            isExpanded ? Icons.keyboard_arrow_up_rounded : Icons.directions_car_filled_rounded,
-            color: statusColor,
-          ),
-        ),
-        const SizedBox(width: Dimensions.space15),
-
-        // معلومات الرحلة المختصرة
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return CustomAppCard(
+      padding: const EdgeInsets.all(Dimensions.space15),
+      onPressed: () {
+        Get.toNamed(
+          RouteHelper.riderRideDetailsScreen,
+          arguments: widget.ride.id.toString(),
+        )?.then((value) {
+          widget.controller.initialData(
+            shouldLoading: false,
+            tabID: widget.controller.selectedTab,
+          );
+        });
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header: Status and Price
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                widget.ride.destination ?? MyStrings.destination.tr,
-                style: boldDefault.copyWith(fontSize: 15),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: MyUtils.getRideStatusColor(
+                    widget.ride.status ?? '9',
+                  ).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: MyUtils.getRideStatusColor(
+                      widget.ride.status ?? '9',
+                    ).withValues(alpha: 0.3),
+                  ),
+                ),
+                child: Text(
+                  MyUtils.getRideStatus(widget.ride.status ?? '9').tr,
+                  style: boldDefault.copyWith(
+                    fontSize: 12,
+                    color: MyUtils.getRideStatusColor(
+                      widget.ride.status ?? '9',
+                    ),
+                  ),
+                ),
               ),
-              const SizedBox(height: 4),
-              Row(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: statusColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Text(
-                      MyUtils.getRideStatus(widget.ride.status ?? '9').tr,
-                      style: regularSmall.copyWith(color: statusColor, fontSize: 10),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
                   Text(
-                    () {
-                      final date = _parseToLocalDate(widget.ride.startTime);
-
-                      // تنسيق التاريخ: 2026/2/13
-                      String formattedDate = "${date.year}/${date.month}/${date.day}";
-
-                      // تنسيق الوقت: 11:30
-                      int hour12 = date.hour == 0 ? 12 : (date.hour > 12 ? date.hour - 12 : date.hour);
-                      String minute = date.minute.toString().padLeft(2, '0');
-                      String period = date.hour >= 12 ? 'مساءاً' : 'صباحاً';
-
-                      // الدمج النهائي
-                      return "$formattedDate - $hour12:$minute $period".toArabicNumbers();
-                    }(),
-                    style: regularSmall.copyWith(
-                      color: MyColor.getGreyColor(),
-                      fontSize: 10, // تصغير بسيط ليناسب المساحة الجديدة
+                    // تحويل رقم السعر للعربي
+                    "${widget.controller.defaultCurrencySymbol}${StringConverter.formatNumber(widget.ride.offerAmount.toString())}"
+                        .toArabicNumbers(),
+                    style: boldExtraLarge.copyWith(
+                      color: MyColor.getPrimaryColor(),
+                      fontSize: 18,
                     ),
                   ),
+                  if (widget.ride.service?.name != null)
+                    Text(
+                      widget.ride.service?.name ?? '',
+                      style: regularSmall.copyWith(
+                        color: MyColor.getGreyColor(),
+                      ),
+                    ),
                 ],
               ),
             ],
           ),
-        ),
 
-        // السعر
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(
-              "${widget.controller.defaultCurrencySymbol}${StringConverter.formatNumber(widget.ride.offerAmount.toString())}".toArabicNumbers(),
-              style: boldDefault.copyWith(color: MyColor.getPrimaryColor(), fontSize: 17),
+          const SizedBox(height: Dimensions.space20),
+
+          // Timeline Section
+          CustomTimeLine(
+            indicatorPosition: 0.1,
+            dashColor: MyColor.neutral300,
+            firstWidget: _buildLocationInfo(
+              title: MyStrings.pickUpLocation.tr,
+              address: widget.ride.pickupLocation ?? '',
+              timePrefix: "وقت الركوب",
+              time: widget.ride.startTime,
+              icon: Icons.access_time_filled_rounded,
             ),
-            Icon(
-              isExpanded ? Icons.visibility : Icons.visibility_outlined,
-              size: 16,
-              color: MyColor.getGreyColor().withOpacity(0.5),
+            secondWidget: _buildLocationInfo(
+              title: MyStrings.destination.tr,
+              address: widget.ride.destination ?? '',
+              timePrefix: "وقت الوصول",
+              time: widget.ride.endTime,
+              icon: Icons.flag_circle_rounded,
             ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  // تفاصيل الرحلة الكاملة (Timeline + Buttons)
-  Widget _buildExpandedDetails() {
-    return Column(
-      children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(vertical: Dimensions.space10),
-          child: Divider(height: 1, thickness: 0.5),
-        ),
-
-        // التايم لاين بتصميم أنحف
-        CustomTimeLine(
-          indicatorPosition: 0.1,
-          dashColor: MyColor.neutral300,
-          firstWidget: _buildLocationInfo(
-            title: MyStrings.pickUpLocation.tr,
-            address: widget.ride.pickupLocation ?? '',
-            timePrefix: "وقت الركوب",
-            time: widget.ride.startTime,
-            icon: Icons.access_time_filled_rounded,
           ),
-          secondWidget: _buildLocationInfo(
-            title: MyStrings.destination.tr,
-            address: widget.ride.destination ?? '',
-            timePrefix: "وقت الوصول",
-            time: widget.ride.endTime,
-            icon: Icons.flag_circle_rounded,
-          ),
-        ),
 
-        const SizedBox(height: Dimensions.space15),
+          const SizedBox(height: Dimensions.space15),
 
-        // الأزرار وتفاصيل الخدمة
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            if (widget.ride.service?.name != null)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("نوع الخدمة", style: regularSmall.copyWith(fontSize: 10, color: MyColor.getGreyColor())),
-                  Text(widget.ride.service?.name ?? '', style: boldDefault.copyWith(fontSize: 12)),
-                ],
-              ),
-
-            // زر عرض التفاصيل الكاملة (الذي كان في CustomAppCard الأصلي)
-            TextButton(
-              onPressed: () {
-                Get.toNamed(RouteHelper.riderRideDetailsScreen, arguments: widget.ride.id.toString())?.then((value) {
-                  widget.controller.initialData(shouldLoading: false, tabID: widget.controller.selectedTab);
-                });
-              },
-              child: Text("كل التفاصيل >", style: boldDefault.copyWith(color: MyColor.getPrimaryColor(), fontSize: 12)),
-            ),
-          ],
-        ),
-
-        const SizedBox(height: Dimensions.space10),
-        _buildActionButtons(),
-      ],
+          _buildActionButtons(),
+        ],
+      ),
     );
-  }
-
-  // --- بقية الدوال المساعدة (بدون تغيير في المنطق لضمان عدم حدوث أخطاء) ---
-
-  DateTime _parseToLocalDate(String? rawTime) {
-    final parsed = DateTime.tryParse(rawTime ?? '');
-    if (parsed == null) return DateTime.now();
-    return parsed.isUtc ? parsed.add(const Duration(hours: 3)) : parsed;
   }
 
   Widget _buildLocationInfo({
@@ -259,31 +157,118 @@ class _RiderRideInfoCardState extends State<RiderRideInfoCard> with SingleTicker
     required IconData icon,
     String? time,
   }) {
-    final DateTime localDate = _parseToLocalDate(time);
-    final int hour24 = localDate.hour;
-    final int minute = localDate.minute;
-    final int hour12 = hour24 == 0 ? 12 : (hour24 > 12 ? hour24 - 12 : hour24);
-    final String period = hour24 >= 12 ? 'مساءاً' : 'صباحاً';
-    final String timePart = '$hour12:${minute.toString().padLeft(2, '0')} $period'.toArabicNumbers();
-    final String numericDate = '${localDate.day}-${localDate.month}-${localDate.year} م'.toArabicNumbers();
+    String originalRawDate = DateConverter.estimatedDate(
+      DateTime.tryParse(time ?? '') ?? DateTime.now(),
+    );
+    List<String> parts = originalRawDate.split(' ');
+
+    String timePart = "";
+    if (parts.length >= 5) {
+      // إزالة الثواني: نأخذ الساعة والدقيقة فقط
+      List<String> timeSplit = parts[3].split(':');
+      String hourAndMinute = "${timeSplit[0]}:${timeSplit[1]}";
+
+      timePart = "$hourAndMinute ${parts[4]}";
+      timePart = timePart.replaceAll("AM", "صباحاً").replaceAll("PM", "مساءً");
+
+      timePart = timePart.toArabicNumbers();
+    }
+
+    DateTime parsedDate = DateTime.tryParse(time ?? '') ?? DateTime.now();
+
+    // إضافة حرف "م" بعد السنة وتحويل الكل للأرقام العربية
+    // استخدمنا String interpolation لإضافة حرف الميم بعد الرقم مباشرة
+    String numericDate =
+        "${parsedDate.day}-${parsedDate.month}-${parsedDate.year} م"
+            .toArabicNumbers();
 
     return Padding(
-      padding: const EdgeInsets.only(left: 12, bottom: 15),
+      padding: const EdgeInsets.only(left: 12, bottom: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: regularSmall.copyWith(color: MyColor.getGreyColor(), fontSize: 10)),
-          Text(address, style: boldDefault.copyWith(fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
-          if (time != null) ...[
-            const SizedBox(height: 5),
-            Row(
-              children: [
-                Icon(icon, size: 12, color: MyColor.getPrimaryColor()),
-                const SizedBox(width: 5),
-                Text("$timePart | $numericDate", style: regularSmall.copyWith(fontSize: 10, color: MyColor.getPrimaryColor())),
-              ],
+          // العنوان (نقطة الركوب / الوجهة)
+          Text(
+            title,
+            style: regularSmall.copyWith(
+              color: MyColor.getGreyColor(),
+              fontSize: 11,
             ),
-          ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            address,
+            style: boldDefault.copyWith(
+              color: MyColor.getHeadingTextColor(),
+              fontSize: 13,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 8),
+          if (time != null)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: MyColor.getPrimaryColor().withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: MyColor.getPrimaryColor().withValues(alpha: 0.1),
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(icon, size: 16, color: MyColor.getPrimaryColor()),
+                  const SizedBox(width: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // عرض وقت الركوب/الوصول بدون ثواني
+                      Row(
+                        children: [
+                          Text(
+                            "$timePrefix: ",
+                            style: regularDefault.copyWith(
+                              fontSize: 11,
+                              color: MyColor.getGreyColor(),
+                            ),
+                          ),
+                          Text(
+                            timePart,
+                            style: boldDefault.copyWith(
+                              fontSize: 11,
+                              color: MyColor.getPrimaryColor(),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      // عرض التاريخ مع حرف "م"
+                      Row(
+                        children: [
+                          Text(
+                            "بتاريخ: ",
+                            style: regularDefault.copyWith(
+                              fontSize: 11,
+                              color: MyColor.getGreyColor(),
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            numericDate,
+                            style: regularDefault.copyWith(
+                              fontSize: 11,
+                              color: MyColor.getPrimaryColor(),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
         ],
       ),
     );
@@ -295,12 +280,20 @@ class _RiderRideInfoCardState extends State<RiderRideInfoCard> with SingleTicker
     } else if (widget.ride.status == AppStatus.RIDE_PAYMENT_REQUESTED) {
       return RoundedButton(
         text: MyStrings.payNow.tr,
-        press: () => Get.toNamed(RouteHelper.paymentScreen, arguments: [widget.ride, ""]),
+        press: () => Get.toNamed(
+          RouteHelper.paymentScreen,
+          arguments: [widget.ride, ""],
+        ),
       );
     } else if (widget.ride.status == AppStatus.RIDE_PENDING) {
       return RoundedButton(
-        text: "${MyStrings.viewBids.tr} (${widget.ride.bidsCount ?? 0})".toArabicNumbers(),
-        press: () => Get.toNamed(RouteHelper.rideBidScreen, arguments: widget.ride.id.toString()),
+        // تحويل عدد المزايدات للعربي
+        text: "${MyStrings.viewBids.tr} (${widget.ride.bidsCount ?? 0})"
+            .toArabicNumbers(),
+        press: () => Get.toNamed(
+          RouteHelper.rideBidScreen,
+          arguments: widget.ride.id.toString(),
+        ),
       );
     } else if (widget.ride.status == AppStatus.RIDE_COMPLETED) {
       return RoundedButton(
@@ -327,7 +320,14 @@ class _RiderRideInfoCardState extends State<RiderRideInfoCard> with SingleTicker
     return Row(
       children: [
         _smallActionCard(MyIcons.message, MyStrings.message, () {
-          Get.toNamed(RouteHelper.rideMessageScreen, arguments: [widget.ride.id.toString(), widget.ride.driver?.getFullName(), widget.ride.status.toString()]);
+          Get.toNamed(
+            RouteHelper.rideMessageScreen,
+            arguments: [
+              widget.ride.id.toString(),
+              widget.ride.driver?.getFullName(),
+              widget.ride.status.toString(),
+            ],
+          );
         }),
         const SizedBox(width: 10),
         _smallActionCard(MyIcons.callIcon, MyStrings.call, () {
@@ -344,16 +344,29 @@ class _RiderRideInfoCardState extends State<RiderRideInfoCard> with SingleTicker
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
-            color: MyColor.getPrimaryColor().withOpacity(0.05),
+            color: MyColor.getPrimaryColor().withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(Dimensions.mediumRadius),
-            border: Border.all(color: MyColor.getPrimaryColor().withOpacity(0.1)),
+            border: Border.all(
+              color: MyColor.getPrimaryColor().withValues(alpha: 0.1),
+            ),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              MyLocalImageWidget(imagePath: icon, width: 18, height: 18, imageOverlayColor: MyColor.getPrimaryColor()),
+              MyLocalImageWidget(
+                imagePath: icon,
+                width: 18,
+                height: 18,
+                imageOverlayColor: MyColor.getPrimaryColor(),
+              ),
               const SizedBox(width: 8),
-              Text(label.tr, style: boldDefault.copyWith(color: MyColor.getPrimaryColor(), fontSize: 14)),
+              Text(
+                label.tr,
+                style: boldDefault.copyWith(
+                  color: MyColor.getPrimaryColor(),
+                  fontSize: 14,
+                ),
+              ),
             ],
           ),
         ),

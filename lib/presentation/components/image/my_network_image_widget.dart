@@ -40,7 +40,9 @@ class MyImageWidget extends StatelessWidget {
           image: DecorationImage(
             image: imageProvider,
             fit: boxFit,
-            colorFilter: color != null ? ColorFilter.mode(color!, BlendMode.srcIn) : null,
+            colorFilter: color != null
+                ? ColorFilter.mode(color!, BlendMode.srcIn)
+                : null,
           ),
         ),
       ),
@@ -57,21 +59,23 @@ class MyImageWidget extends StatelessWidget {
           ),
         ),
       ),
-      errorWidget: (context, url, error) => SizedBox(
-        height: height,
-        width: width,
-        child: isProfile
-            ? ProfileWidget(imagePath: '', onClicked: () {})
-            : ClipRRect(
-                borderRadius: BorderRadius.circular(radius),
-                child: Center(
-                  child: Icon(
-                    Icons.image,
-                    color: MyColor.colorGrey.withValues(alpha: 0.5),
+      errorWidget: (context, url, error) =>
+          errorWidget ??
+          SizedBox(
+            height: height,
+            width: width,
+            child: isProfile
+                ? ProfileWidget(imagePath: '', onClicked: () {})
+                : ClipRRect(
+                    borderRadius: BorderRadius.circular(radius),
+                    child: Center(
+                      child: Icon(
+                        Icons.image,
+                        color: MyColor.colorGrey.withValues(alpha: 0.5),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-      ),
+          ),
     );
   }
 }

@@ -28,7 +28,10 @@ class _OfferBidBottomSheetState extends State<OfferBidBottomSheet> {
       final controller = Get.find<DashBoardController>();
 
       // الأولوية لسعر الراكب (amount)، ثم سعر النظام (recommendAmount) كخيار بديل
-      double initialPrice = double.tryParse(widget.ride.amount.toString()) ?? double.tryParse(widget.ride.recommendAmount.toString()) ?? 0;
+      double initialPrice =
+          double.tryParse(widget.ride.amount.toString()) ??
+          double.tryParse(widget.ride.recommendAmount.toString()) ??
+          0;
 
       controller.bidAmountController.text = initialPrice.round().toString();
       controller.update();
@@ -86,7 +89,9 @@ class _OfferBidBottomSheetState extends State<OfferBidBottomSheet> {
           ),
           child: SafeArea(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: Dimensions.space20),
+              padding: const EdgeInsets.symmetric(
+                horizontal: Dimensions.space20,
+              ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -130,24 +135,46 @@ class _OfferBidBottomSheetState extends State<OfferBidBottomSheet> {
 
   // مكوّن: تعليمات الراكب (مع معالجة الـ null)
   Widget _buildInstructionCard() {
-    bool hasNote = widget.ride.note != null && widget.ride.note!.toLowerCase() != "null" && widget.ride.note!.isNotEmpty;
+    bool hasNote =
+        widget.ride.note != null &&
+        widget.ride.note!.toLowerCase() != "null" &&
+        widget.ride.note!.isNotEmpty;
 
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(Dimensions.space15),
-      decoration: BoxDecoration(color: MyColor.colorWhite, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.grey.shade100)),
+      decoration: BoxDecoration(
+        color: MyColor.colorWhite,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade100),
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(hasNote ? Icons.info_outline_rounded : Icons.notes_rounded, size: 20, color: hasNote ? MyColor.primaryColor : Colors.grey),
+          Icon(
+            hasNote ? Icons.info_outline_rounded : Icons.notes_rounded,
+            size: 20,
+            color: hasNote ? MyColor.primaryColor : Colors.grey,
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("${MyStrings.riderInstruction.tr}:", style: boldDefault.copyWith(color: MyColor.getBodyTextColor().withOpacity(0.7), fontSize: 12)),
+                Text(
+                  "${MyStrings.riderInstruction.tr}:",
+                  style: boldDefault.copyWith(
+                    color: MyColor.getBodyTextColor().withValues(alpha: 0.7),
+                    fontSize: 12,
+                  ),
+                ),
                 const SizedBox(height: 4),
-                Text(hasNote ? widget.ride.note! : "لا توجد تعليمات إضافية", style: regularDefault.copyWith(color: hasNote ? MyColor.getBodyTextColor() : Colors.grey)),
+                Text(
+                  hasNote ? widget.ride.note! : "لا توجد تعليمات إضافية",
+                  style: regularDefault.copyWith(
+                    color: hasNote ? MyColor.getBodyTextColor() : Colors.grey,
+                  ),
+                ),
               ],
             ),
           ),
@@ -161,16 +188,27 @@ class _OfferBidBottomSheetState extends State<OfferBidBottomSheet> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(Dimensions.space12),
-      decoration: BoxDecoration(color: Colors.blue.withOpacity(0.08), borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.blue.withOpacity(0.2))),
+      decoration: BoxDecoration(
+        color: Colors.blue.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.blue.withValues(alpha: 0.2)),
+      ),
       child: RichText(
         textAlign: TextAlign.center,
         text: TextSpan(
-          style: regularDefault.copyWith(color: MyColor.getBodyTextColor(), fontSize: 14),
+          style: regularDefault.copyWith(
+            color: MyColor.getBodyTextColor(),
+            fontSize: 14,
+          ),
           children: [
             const TextSpan(text: "عرض الراكب : "),
             TextSpan(
-              text: "${controller.currencySym}${widget.ride.amount.toString().split('.').first}",
-              style: boldDefault.copyWith(color: Colors.blue.shade800, fontSize: 16),
+              text:
+                  "${controller.currencySym}${widget.ride.amount.toString().split('.').first}",
+              style: boldDefault.copyWith(
+                color: Colors.blue.shade800,
+                fontSize: 16,
+              ),
             ),
           ],
         ),
@@ -182,43 +220,83 @@ class _OfferBidBottomSheetState extends State<OfferBidBottomSheet> {
   Widget _buildPriceStepper(DashBoardController controller) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-      decoration: BoxDecoration(color: MyColor.colorWhite, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20, offset: const Offset(0, 10))]),
+      decoration: BoxDecoration(
+        color: MyColor.colorWhite,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _stepperButton("-5", Icons.remove_rounded, () => _decrementAmount(controller), Colors.red),
+          _stepperButton(
+            "-5",
+            Icons.remove_rounded,
+            () => _decrementAmount(controller),
+            Colors.red,
+          ),
           Column(
             children: [
-              Text(controller.currencySym, style: boldDefault.copyWith(color: MyColor.primaryColor.withOpacity(0.5))),
+              Text(
+                controller.currencySym,
+                style: boldDefault.copyWith(
+                  color: MyColor.primaryColor.withValues(alpha: 0.5),
+                ),
+              ),
               IntrinsicWidth(
                 child: TextFormField(
                   controller: controller.bidAmountController,
                   textAlign: TextAlign.center,
                   keyboardType: TextInputType.number,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  style: boldExtraLarge.copyWith(fontSize: 55, color: MyColor.primaryColor),
-                  decoration: const InputDecoration(border: InputBorder.none, contentPadding: EdgeInsets.zero),
+                  style: boldExtraLarge.copyWith(
+                    fontSize: 55,
+                    color: MyColor.primaryColor,
+                  ),
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.zero,
+                  ),
                 ),
               ),
             ],
           ),
-          _stepperButton("+5", Icons.add_rounded, () => _incrementAmount(controller), MyColor.primaryColor),
+          _stepperButton(
+            "+5",
+            Icons.add_rounded,
+            () => _incrementAmount(controller),
+            MyColor.primaryColor,
+          ),
         ],
       ),
     );
   }
 
   // مكوّن: زر الـ Stepper مع التسمية النصية
-  Widget _stepperButton(String label, IconData icon, VoidCallback onTap, Color color) {
+  Widget _stepperButton(
+    String label,
+    IconData icon,
+    VoidCallback onTap,
+    Color color,
+  ) {
     return Column(
       children: [
         Material(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           shape: const CircleBorder(),
           child: InkWell(
             onTap: onTap,
             customBorder: const CircleBorder(),
-            child: SizedBox(width: 60, height: 60, child: Icon(icon, color: color, size: 32)),
+            child: SizedBox(
+              width: 60,
+              height: 60,
+              child: Icon(icon, color: color, size: 32),
+            ),
           ),
         ),
         const SizedBox(height: 8),
@@ -234,22 +312,38 @@ class _OfferBidBottomSheetState extends State<OfferBidBottomSheet> {
       height: 55,
       child: ElevatedButton(
         onPressed: () async {
-          int enterValue = int.tryParse(controller.bidAmountController.text) ?? 0;
+          int enterValue =
+              int.tryParse(controller.bidAmountController.text) ?? 0;
           int min = formatInt(widget.ride.minAmount ?? '0');
           int max = formatInt(widget.ride.maxAmount ?? '0');
 
           if (enterValue >= min && enterValue <= max) {
-            await controller.sendBid(widget.ride.id ?? '-1', amount: enterValue.toString(), onActon: () => Get.back());
+            await controller.sendBid(
+              widget.ride.id ?? '-1',
+              amount: enterValue.toString(),
+              onActon: () => Get.back(),
+            );
           } else {
-            CustomSnackBar.error(errorList: ['يجب أن يكون العرض بين ${controller.currencySym}$min و ${controller.currencySym}$max']);
+            CustomSnackBar.error(
+              errorList: [
+                'يجب أن يكون العرض بين ${controller.currencySym}$min و ${controller.currencySym}$max',
+              ],
+            );
           }
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: MyColor.primaryColor,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           elevation: 2,
         ),
-        child: controller.isSendBidLoading ? const CircularProgressIndicator(color: Colors.white) : Text("قدّم عرضك انت ", style: boldLarge.copyWith(color: Colors.white)),
+        child: controller.isSendBidLoading
+            ? const CircularProgressIndicator(color: Colors.white)
+            : Text(
+                "قدّم عرضك انت ",
+                style: boldLarge.copyWith(color: Colors.white),
+              ),
       ),
     );
   }

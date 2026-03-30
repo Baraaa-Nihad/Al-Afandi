@@ -4,6 +4,8 @@ import 'package:ovoride/core/helper/string_format_helper.dart';
 import 'package:ovoride/core/route/route.dart';
 import 'package:ovoride/core/utils/my_strings.dart';
 import 'package:ovoride/core/utils/url_container.dart';
+import 'package:ovoride/data/controller/rider/ride/ride_details/ride_details_controller.dart'
+    as rider_ride_details;
 import 'package:ovoride/data/model/authorization/authorization_response_model.dart';
 import 'package:ovoride/data/model/rider/bid/bid_list_response_model.dart';
 import 'package:ovoride/data/model/global/bid/bid_model.dart';
@@ -42,9 +44,13 @@ class RideBidListController extends GetxController {
     try {
       ResponseModel responseModel = await repo.getRideBidList(id: id);
       if (responseModel.statusCode == 200) {
-        BidListResponseModel model = BidListResponseModel.fromJson((responseModel.responseJson));
-        userImagePath = '${UrlContainer.domainUrl}/${model.data?.userImagePath}/';
-        driverImagePath = '${UrlContainer.domainUrl}/${model.data?.driverImagePath}/';
+        BidListResponseModel model = BidListResponseModel.fromJson(
+          (responseModel.responseJson),
+        );
+        userImagePath =
+            '${UrlContainer.domainUrl}/${model.data?.userImagePath}/';
+        driverImagePath =
+            '${UrlContainer.domainUrl}/${model.data?.driverImagePath}/';
         if (model.status == "success") {
           bids = model.data?.bids ?? [];
           ride = model.data?.ride ?? RideModel(id: "-1");
@@ -73,12 +79,29 @@ class RideBidListController extends GetxController {
     try {
       ResponseModel responseModel = await repo.acceptBid(bidId: id);
       if (responseModel.statusCode == 200) {
-        AuthorizationResponseModel model = AuthorizationResponseModel.fromJson((responseModel.responseJson));
+        AuthorizationResponseModel model = AuthorizationResponseModel.fromJson(
+          (responseModel.responseJson),
+        );
         if (model.status == "success") {
-          if (Get.previousRoute == RouteHelper.riderRideDetailsScreen) {
+          if (Get.previousRoute == RouteHelper.riderRideDetailsScreen &&
+              Get.isRegistered<rider_ride_details.RideDetailsController>(
+                tag: 'rider',
+              )) {
+            final riderDetailsController =
+                Get.find<rider_ride_details.RideDetailsController>(
+                  tag: 'rider',
+                );
+            await riderDetailsController.getRideDetails(
+              rideId,
+              shouldLoading: false,
+            );
+            await riderDetailsController.getRideBidList(rideId);
             Get.back(result: true);
           } else {
-            Get.offAndToNamed(RouteHelper.riderRideDetailsScreen, arguments: rideId);
+            Get.offAndToNamed(
+              RouteHelper.riderRideDetailsScreen,
+              arguments: rideId,
+            );
           }
         } else {
           CustomSnackBar.error(
@@ -105,12 +128,16 @@ class RideBidListController extends GetxController {
     try {
       ResponseModel responseModel = await repo.rejectBid(id: id);
       if (responseModel.statusCode == 200) {
-        AuthorizationResponseModel model = AuthorizationResponseModel.fromJson((responseModel.responseJson));
+        AuthorizationResponseModel model = AuthorizationResponseModel.fromJson(
+          (responseModel.responseJson),
+        );
         if (model.status == "success") {
           bids = [];
           update();
           getRideBidList(rideId);
-          CustomSnackBar.success(successList: model.message ?? ["Success"]);
+          CustomSnackBar.success(
+            successList: model.message ?? [MyStrings.requestSuccess],
+          );
         } else {
           CustomSnackBar.error(
             errorList: model.message ?? [MyStrings.somethingWentWrong],
@@ -137,12 +164,16 @@ class RideBidListController extends GetxController {
         reason: cancelReasonController.text,
       );
       if (responseModel.statusCode == 200) {
-        AuthorizationResponseModel model = AuthorizationResponseModel.fromJson((responseModel.responseJson));
+        AuthorizationResponseModel model = AuthorizationResponseModel.fromJson(
+          (responseModel.responseJson),
+        );
         if (model.status == "success") {
           Get.offAllNamed(RouteHelper.dashboard);
-          CustomSnackBar.success(successList: model.message ?? ["Success"]);
+          CustomSnackBar.success(
+            successList: model.message ?? [MyStrings.requestSuccess],
+          );
         } else {
-          CustomSnackBar.error(errorList: model.message ?? ["Error"]);
+          CustomSnackBar.error(errorList: model.message ?? [MyStrings.error]);
         }
       } else {
         CustomSnackBar.error(errorList: [responseModel.message]);

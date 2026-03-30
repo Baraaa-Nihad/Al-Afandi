@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ovoride/core/utils/my_icons.dart';
 import 'package:ovoride/data/controller/rider/home/home_controller.dart';
-import 'package:ovoride/presentation/components/card/inner_shadow_container.dart';
 import 'package:ovoride/presentation/components/image/custom_svg_picture.dart';
 
 import 'package:ovoride/core/utils/dimensions.dart';
@@ -12,13 +11,16 @@ import 'package:ovoride/core/utils/style.dart';
 import 'package:ovoride/core/utils/util.dart';
 import 'package:ovoride/presentation/components/divider/custom_spacer.dart';
 import 'package:ovoride/presentation/components/text/header_text.dart';
+import 'package:ovoride/core/route/route.dart';
+import 'package:ovoride/presentation/components/text-form-field/location_pick_text_field.dart';
 
 class LocationPickUpHomeWidget extends StatefulWidget {
   final HomeController controller;
   const LocationPickUpHomeWidget({super.key, required this.controller});
 
   @override
-  State<LocationPickUpHomeWidget> createState() => _LocationPickUpHomeWidgetState();
+  State<LocationPickUpHomeWidget> createState() =>
+      _LocationPickUpHomeWidgetState();
 }
 
 class _LocationPickUpHomeWidgetState extends State<LocationPickUpHomeWidget> {
@@ -41,7 +43,10 @@ class _LocationPickUpHomeWidgetState extends State<LocationPickUpHomeWidget> {
         borderRadius: BorderRadius.circular(Dimensions.moreRadius),
       ),
       width: double.infinity,
-      padding: const EdgeInsetsDirectional.symmetric(horizontal: Dimensions.space16, vertical: Dimensions.space16),
+      padding: const EdgeInsetsDirectional.symmetric(
+        horizontal: Dimensions.space16,
+        vertical: Dimensions.space16,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -51,121 +56,92 @@ class _LocationPickUpHomeWidgetState extends State<LocationPickUpHomeWidget> {
             style: boldLarge.copyWith(fontSize: 17),
           ),
           spaceDown(Dimensions.space15),
-          InkWell(
+          LocationPickTextField(
+            hintText: MyStrings.pickUpLocation,
+            controller: TextEditingController(
+              text:
+                  widget.controller
+                      .getSelectedLocationInfoAtIndex(0)
+                      ?.getFullAddress(showFull: true) ??
+                  (widget.controller.currentAddress.contains(MyStrings.loading)
+                      ? ''
+                      : widget.controller.currentAddress),
+            ),
             onTap: () {
-              // widget.controller.updateIsServiceShake(false);
-              // Get.toNamed(RouteHelper.locationPickUpScreen, arguments: [1])?.then((v) {
-              //   if (widget.controller.selectedLocations.length > 1) {
-              //     widget.controller.getRideFare();
-              //   }
-              // });
-
               widget.controller.updateIsServiceShake(false);
-
-              // استدعاء البيانات الوهمية بدلاً من فتح الخريطة
-              widget.controller.fillMockLocationData();
-
-              // إذا كنت تريد محاكاة الانتقال والرجوع، اتركها هكذا أو أضف Loading بسيط
+              Get.toNamed(
+                RouteHelper.locationPickUpScreen,
+                arguments: [0],
+              )?.then((v) {
+                if (widget.controller.selectedLocations.length > 1 &&
+                    widget.controller.selectedService.id != '-99') {
+                  widget.controller.getRideFare();
+                }
+              });
             },
-            child: InnerShadowContainer(
-              width: double.infinity,
-              backgroundColor: MyColor.neutral50,
-              borderRadius: Dimensions.largeRadius,
-              blur: 6,
-              offset: Offset(3, 3),
-              shadowColor: MyColor.colorBlack.withValues(alpha: 0.04),
-              isShadowTopLeft: true,
-              isShadowBottomRight: true,
-              padding: EdgeInsetsGeometry.symmetric(vertical: Dimensions.space16, horizontal: Dimensions.space16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  CustomSvgPicture(
-                    image: MyIcons.location,
-                    color: MyColor.primaryColor,
-                  ),
-                  spaceSide(Dimensions.space10),
-                  Expanded(
-                    child: Text(
-                      (widget.controller.getSelectedLocationInfoAtIndex(1)?.getFullAddress(showFull: true) ?? MyStrings.whereToGo.tr),
-                      style: regularDefault.copyWith(),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
+            onChanged: (val) {},
+            radius: Dimensions.mediumRadius,
+            readOnly: true,
+            prefixIcon: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: CustomSvgPicture(
+                image: MyIcons.currentLocation,
+                color: MyColor.primaryColor,
               ),
             ),
           ),
-          // LocationPickTextField(
-          //   hintText: MyStrings.pickUpLocation,
-          //   controller: TextEditingController(
-          //     text: widget.controller.getSelectedLocationInfoAtIndex(0)?.getFullAddress(showFull: true) ?? (widget.controller.currentAddress.contains(MyStrings.loading) ? '' : widget.controller.currentAddress),
-          //   ),
-          //   onTap: () {
-          //     widget.controller.updateIsServiceShake(false);
-          //     Get.toNamed(RouteHelper.locationPickUpScreen, arguments: [0])?.then((v) {
-          //       if (widget.controller.selectedLocations.length > 1 && widget.controller.selectedService.id != '-99') {
-          //         widget.controller.getRideFare();
-          //       }
-          //     });
-          //   },
-          //   onChanged: (val) {},
-          //   radius: Dimensions.mediumRadius,
-          //   readOnly: true,
-          //   prefixIcon: Padding(
-          //     padding: const EdgeInsets.symmetric(horizontal: 10.0),
-          //     child: CustomSvgPicture(
-          //       image: MyIcons.currentLocation,
-          //       color: MyColor.primaryColor,
-          //     ),
-          //   ),
-          // ),
-          // SizedBox(
-          //   child: Padding(
-          //     padding: EdgeInsetsDirectional.only(start: 20),
-          //     child: Column(
-          //       children: List.generate(
-          //         6,
-          //         (index) => Container(
-          //           decoration: BoxDecoration(color: MyColor.primaryColor),
-          //           width: 1,
-          //           height: 3,
-          //           margin: EdgeInsets.only(bottom: 1),
-          //         ),
-          //       ),
-          //     ),
-          //   ),
-          // ),
+          SizedBox(
+            child: Padding(
+              padding: EdgeInsetsDirectional.only(start: 20),
+              child: Column(
+                children: List.generate(
+                  6,
+                  (index) => Container(
+                    decoration: BoxDecoration(color: MyColor.primaryColor),
+                    width: 1,
+                    height: 3,
+                    margin: EdgeInsets.only(bottom: 1),
+                  ),
+                ),
+              ),
+            ),
+          ),
 
-          // LocationPickTextField(
-          //   controller: TextEditingController(
-          //     text: widget.controller.getSelectedLocationInfoAtIndex(1)?.getFullAddress(showFull: true) ?? '',
-          //   ),
-          //   onTap: () {
-          //     widget.controller.updateIsServiceShake(false);
-          //     Get.toNamed(RouteHelper.locationPickUpScreen, arguments: [1])?.then((v) {
-          //       if (widget.controller.selectedLocations.length > 1 && widget.controller.selectedService.id != '-99') {
-          //         widget.controller.getRideFare();
-          //       }
-          //     });
-          //   },
-          //   fillColor: MyColor.secondaryScreenBgColor,
-          //   borderColor: MyColor.naturalTextColor,
-          //   textColor: MyColor.bodyMutedTextColor,
-          //   onChanged: (val) {},
-          //   hintText: MyStrings.whereToGo.tr,
-          //   radius: Dimensions.largeRadius,
-          //   readOnly: true,
-          //   prefixIcon: Padding(
-          //     padding: const EdgeInsets.symmetric(horizontal: 10.0),
-          //     child: CustomSvgPicture(
-          //       image: MyIcons.location,
-          //       color: MyColor.primaryColor,
-          //     ),
-          //   ),
-          // ),
+          LocationPickTextField(
+            controller: TextEditingController(
+              text:
+                  widget.controller
+                      .getSelectedLocationInfoAtIndex(1)
+                      ?.getFullAddress(showFull: true) ??
+                  '',
+            ),
+            onTap: () {
+              widget.controller.updateIsServiceShake(false);
+              Get.toNamed(
+                RouteHelper.locationPickUpScreen,
+                arguments: [1],
+              )?.then((v) {
+                if (widget.controller.selectedLocations.length > 1 &&
+                    widget.controller.selectedService.id != '-99') {
+                  widget.controller.getRideFare();
+                }
+              });
+            },
+            fillColor: MyColor.secondaryScreenBgColor,
+            borderColor: MyColor.naturalTextColor,
+            textColor: MyColor.bodyMutedTextColor,
+            onChanged: (val) {},
+            hintText: MyStrings.whereToGo.tr,
+            radius: Dimensions.largeRadius,
+            readOnly: true,
+            prefixIcon: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: CustomSvgPicture(
+                image: MyIcons.location,
+                color: MyColor.primaryColor,
+              ),
+            ),
+          ),
         ],
       ),
     );

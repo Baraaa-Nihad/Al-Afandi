@@ -13,7 +13,8 @@ class RideDetailsPaymentSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<RideDetailsController>(tag: 'driver', 
+    return GetBuilder<RideDetailsController>(
+      tag: 'driver',
       builder: (controller) {
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,

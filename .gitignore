@@ -42,3 +42,20 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Downloaded archives kept outside source control
+/*.zip
+
+# Local Android/Gradle artifacts generated during troubleshooting
+/.cache-downloads/
+/_artifact_cache/
+/_flutter_abi_jars/
+/android/local-maven-repo/
+/lib/arm64-v8a/
+/lib/x86_64/
+/kotlin-gradle-plugin-*.jar
+/pubget_sample.err
+/repository*.xml
+
+
+AGENTS.md

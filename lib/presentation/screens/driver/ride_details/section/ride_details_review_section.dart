@@ -18,7 +18,6 @@ import 'package:ovoride/presentation/components/divider/custom_divider.dart';
 import 'package:ovoride/presentation/components/image/custom_svg_picture.dart';
 import 'package:ovoride/presentation/components/image/my_local_image_widget.dart';
 import 'package:ovoride/presentation/components/image/my_network_image_widget.dart';
-import 'package:ovoride/presentation/components/snack_bar/show_custom_snackbar.dart';
 import 'package:ovoride/presentation/components/text-form-field/custom_text_field.dart';
 
 class RideDetailsReviewSection extends StatelessWidget {
@@ -26,7 +25,8 @@ class RideDetailsReviewSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<RideDetailsController>(tag: 'driver', 
+    return GetBuilder<RideDetailsController>(
+      tag: 'driver',
       builder: (controller) {
         return AnnotatedRegionWidget(
           child: Column(
@@ -52,7 +52,8 @@ class RideDetailsReviewSection extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: MyImageWidget(
-                  imageUrl: '${UrlContainer.domainUrl}/${controller.userImageUrl}/${controller.ride.user?.avatar}',
+                  imageUrl:
+                      '${UrlContainer.domainUrl}/${controller.userImageUrl}/${controller.ride.user?.avatar}',
                   height: 85,
                   width: 85,
                   radius: 50,
@@ -102,7 +103,8 @@ class RideDetailsReviewSection extends StatelessWidget {
                     ),
                   ),
                   GestureDetector(
-                    onTap: () => MyUtils.launchPhone(controller.ride.user?.mobile ?? ""),
+                    onTap: () =>
+                        MyUtils.launchPhone(controller.ride.user?.mobile ?? ""),
                     child: Row(
                       children: [
                         CustomSvgPicture(
@@ -144,7 +146,8 @@ class RideDetailsReviewSection extends StatelessWidget {
                 allowHalfRating: false,
                 itemCount: 5,
                 itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
-                itemBuilder: (context, _) => const Icon(Icons.star, color: Colors.amber),
+                itemBuilder: (context, _) =>
+                    const Icon(Icons.star, color: Colors.amber),
                 onRatingUpdate: (rating) {
                   controller.updateRating(rating);
                 },
@@ -172,13 +175,8 @@ class RideDetailsReviewSection extends StatelessWidget {
               RoundedButton(
                 text: MyStrings.submit,
                 textColor: MyColor.colorWhite,
-                press: () {
-                  if (controller.rating > 0 && controller.reviewMsgController.text.isNotEmpty) {
-                    controller.reviewRide(controller.ride.id.toString());
-                  } else {
-                    CustomSnackBar.error(errorList: [MyStrings.reviewRequired]);
-                  }
-                },
+                press: () =>
+                    controller.reviewRide(controller.ride.id.toString()),
                 isLoading: controller.isReviewLoading,
               ),
             ],

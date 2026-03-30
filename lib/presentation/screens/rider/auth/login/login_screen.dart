@@ -37,7 +37,10 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     Get.put(LoginRepo(apiClient: Get.find()), tag: 'rider');
-    Get.put(LoginController(loginRepo: Get.find(tag: 'rider')), tag: 'rider');
+    Get.put(
+      LoginController(loginRepo: Get.find(tag: 'rider')),
+      tag: 'rider',
+    );
     Get.put(SocialAuthRepo(apiClient: Get.find()));
     Get.put(SocialAuthController(authRepo: Get.find()));
 
@@ -61,14 +64,18 @@ class _LoginScreenState extends State<LoginScreen> {
         statusBarColor: Colors.transparent,
         child: Scaffold(
           backgroundColor: MyColor.colorWhite,
-          body: GetBuilder<LoginController>(tag: 'rider',
+          body: GetBuilder<LoginController>(
+            tag: 'rider',
             builder: (controller) => SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   AuthBackgroundWidget(
                     child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: Dimensions.space20, vertical: Dimensions.space10),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: Dimensions.space20,
+                        vertical: Dimensions.space10,
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -83,7 +90,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           spaceDown(Dimensions.space15),
                           // تعديل العنوان بناءً على براند الأفنـدي الجديد
                           Text(
-                            userRole == 'driver' ? "أهلاً بك يا كابتن" : "جاهز لمشوارك؟",
+                            userRole == 'driver'
+                                ? "أهلاً بك يا كابتن"
+                                : "جاهز لمشوارك؟",
                             style: boldExtraLarge.copyWith(
                               fontSize: 32,
                               color: MyColor.colorWhite,
@@ -92,7 +101,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           spaceDown(Dimensions.space5),
                           Text(
-                            userRole == 'driver' ? "سجل دخولك وابدأ في تحقيق الأرباح" : "سجل دخولك واستمتع برحلة آمنة مع الأفنـدي",
+                            userRole == 'driver'
+                                ? "سجل دخولك وابدأ في تحقيق الأرباح"
+                                : "سجل دخولك واستمتع برحلة آمنة مع الأفنـدي",
                             style: regularDefault.copyWith(
                               color: MyColor.colorWhite,
                               fontSize: Dimensions.fontLarge,
@@ -121,7 +132,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ],
                       ),
-                      padding: EdgeInsets.symmetric(horizontal: Dimensions.space15, vertical: Dimensions.space15),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: Dimensions.space15,
+                        vertical: Dimensions.space15,
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -142,7 +156,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                   textInputType: TextInputType.emailAddress,
                                   inputAction: TextInputAction.next,
                                   prefixIcon: Padding(
-                                    padding: EdgeInsetsDirectional.only(start: Dimensions.space12, end: Dimensions.space8),
+                                    padding: EdgeInsetsDirectional.only(
+                                      start: Dimensions.space12,
+                                      end: Dimensions.space8,
+                                    ),
                                     child: CustomSvgPicture(
                                       image: MyIcons.user,
                                       color: MyColor.primaryColor,
@@ -168,7 +185,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                   textInputType: TextInputType.text,
                                   inputAction: TextInputAction.done,
                                   prefixIcon: Padding(
-                                    padding: EdgeInsetsDirectional.only(start: Dimensions.space12, end: Dimensions.space8),
+                                    padding: EdgeInsetsDirectional.only(
+                                      start: Dimensions.space12,
+                                      end: Dimensions.space8,
+                                    ),
                                     child: CustomSvgPicture(
                                       image: MyIcons.password,
                                       color: MyColor.primaryColor,
@@ -185,7 +205,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                                 spaceDown(Dimensions.space15),
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Row(
                                       children: [
@@ -194,7 +215,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                           height: 28,
                                           child: Checkbox(
                                             shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(Dimensions.space5),
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                    Dimensions.space5,
+                                                  ),
                                             ),
                                             activeColor: MyColor.primaryColor,
                                             checkColor: MyColor.colorWhite,
@@ -206,10 +230,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                         ),
                                         spaceSide(Dimensions.space8),
                                         InkWell(
-                                          onTap: () => controller.changeRememberMe(),
+                                          onTap: () =>
+                                              controller.changeRememberMe(),
                                           child: DefaultText(
                                             text: MyStrings.rememberMe.tr,
-                                            textColor: MyColor.getBodyTextColor(),
+                                            textColor:
+                                                MyColor.getBodyTextColor(),
                                             fontSize: 14,
                                           ),
                                         ),
@@ -218,12 +244,16 @@ class _LoginScreenState extends State<LoginScreen> {
                                     InkWell(
                                       onTap: () {
                                         controller.clearTextField();
-                                        Get.toNamed(RouteHelper.riderForgetPasswordScreen);
+                                        Get.toNamed(
+                                          RouteHelper.riderForgetPasswordScreen,
+                                        );
                                       },
                                       child: DefaultText(
                                         text: MyStrings.forgotPassword.tr,
                                         textColor: MyColor.redCancelTextColor,
-                                        textStyle: boldDefault.copyWith(fontSize: Dimensions.fontLarge),
+                                        textStyle: boldDefault.copyWith(
+                                          fontSize: Dimensions.fontLarge,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -255,11 +285,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                     const SizedBox(width: Dimensions.space5),
                                     TextButton(
                                       onPressed: () {
-                                        Get.offAndToNamed(RouteHelper.riderRegistartionScreen);
+                                        Get.offAndToNamed(
+                                          RouteHelper.riderRegistartionScreen,
+                                        );
                                       },
                                       child: Text(
                                         MyStrings.register.tr,
-                                        style: boldLarge.copyWith(color: MyColor.getPrimaryColor()),
+                                        style: boldLarge.copyWith(
+                                          color: MyColor.getPrimaryColor(),
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -268,20 +302,34 @@ class _LoginScreenState extends State<LoginScreen> {
 
                                 // --- النقطة 2: Role Reminder & Switcher ---
                                 Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 10,
+                                    horizontal: 15,
+                                  ),
                                   decoration: BoxDecoration(
-                                    color: MyColor.primaryColor.withValues(alpha: 0.05),
-                                    borderRadius: BorderRadius.circular(Dimensions.radius25),
+                                    color: MyColor.primaryColor.withValues(
+                                      alpha: 0.05,
+                                    ),
+                                    borderRadius: BorderRadius.circular(
+                                      Dimensions.radius25,
+                                    ),
                                   ),
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        userRole == 'driver' ? "ترجع تسجل كراكب ؟" : "ترجع تسجل ككابتن ؟",
-                                        style: boldDefault.copyWith(color: MyColor.primaryColor),
+                                        userRole == 'driver'
+                                            ? "ترجع تسجل كراكب ؟"
+                                            : "ترجع تسجل ككابتن ؟",
+                                        style: boldDefault.copyWith(
+                                          color: MyColor.primaryColor,
+                                        ),
                                       ),
                                       InkWell(
-                                        onTap: () => Get.offAllNamed(RouteHelper.userRoleScreen),
+                                        onTap: () => Get.offAllNamed(
+                                          RouteHelper.userRoleScreen,
+                                        ),
                                         child: Text(
                                           "تغيير الدور؟",
                                           style: regularDefault.copyWith(

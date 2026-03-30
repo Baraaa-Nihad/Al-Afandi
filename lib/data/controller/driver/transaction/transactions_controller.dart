@@ -16,8 +16,8 @@ class TransactionsController extends GetxController {
   bool isLoading = true;
   final formKey = GlobalKey<FormState>();
 
-  List<String> transactionTypeList = ["All", "Plus", "Minus"];
-  List<Remarks> remarksList = [(Remarks(remark: "All"))];
+  List<String> transactionTypeList = ['الكل', 'إضافة', 'خصم'];
+  List<Remarks> remarksList = [(Remarks(remark: 'الكل'))];
 
   List<TransactionData> transactionList = [];
 
@@ -31,14 +31,14 @@ class TransactionsController extends GetxController {
 
   TextEditingController trxController = TextEditingController();
 
-  String selectedRemark = "All";
-  String selectedTrxType = "All";
+  String selectedRemark = 'الكل';
+  String selectedTrxType = 'الكل';
   GlobalDriverInfoModel driver = GlobalDriverInfoModel();
 
   void initialSelectedValue() async {
     page = 0;
-    selectedRemark = "All";
-    selectedTrxType = "All";
+    selectedRemark = 'الكل';
+    selectedTrxType = 'الكل';
     trxController.text = '';
     trxSearchText = '';
     transactionList.clear();
@@ -57,14 +57,14 @@ class TransactionsController extends GetxController {
       currency = transactionRepo.apiClient.getCurrency();
       currencySym = transactionRepo.apiClient.getCurrency(isSymbol: true);
       remarksList.clear();
-      remarksList.insert(0, Remarks(remark: "All"));
+      remarksList.insert(0, Remarks(remark: 'الكل'));
       transactionList.clear();
     }
 
     ResponseModel responseModel = await transactionRepo.getTransactionList(
       page,
-      type: selectedTrxType.toLowerCase(),
-      remark: selectedRemark.toLowerCase(),
+      type: _transactionTypeApiValue(selectedTrxType),
+      remark: _remarkApiValue(selectedRemark),
       searchText: trxSearchText,
     );
 
@@ -75,14 +75,17 @@ class TransactionsController extends GetxController {
 
       nextPageUrl = model.data?.transactions?.nextPageUrl;
 
-      if (model.status.toString().toLowerCase() == MyStrings.success.toLowerCase()) {
+      if (model.status.toString().toLowerCase() ==
+          MyStrings.success.toLowerCase()) {
         List<TransactionData>? tempDataList = model.data?.transactions?.data;
         if (page == 1) {
           List<Remarks>? tempRemarksList = model.data?.remarks;
 
           if (tempRemarksList != null && tempRemarksList.isNotEmpty) {
             for (var element in tempRemarksList) {
-              if (element.remark != null && element.remark?.toLowerCase() != 'null' && element.remark!.isNotEmpty) {
+              if (element.remark != null &&
+                  element.remark?.toLowerCase() != 'null' &&
+                  element.remark!.isNotEmpty) {
                 remarksList.add(element);
               }
             }
@@ -113,6 +116,28 @@ class TransactionsController extends GetxController {
     update();
   }
 
+  String _transactionTypeApiValue(String value) {
+    switch (value.toLowerCase()) {
+      case 'الكل':
+      case 'all':
+        return 'all';
+      case 'إضافة':
+      case 'plus':
+        return 'plus';
+      case 'خصم':
+      case 'minus':
+        return 'minus';
+      default:
+        return value.toLowerCase();
+    }
+  }
+
+  String _remarkApiValue(String value) {
+    return value.toLowerCase() == 'all' || value == 'الكل'
+        ? 'all'
+        : value.toLowerCase();
+  }
+
   bool filterLoading = false;
 
   Future<void> filterData() async {
@@ -129,7 +154,11 @@ class TransactionsController extends GetxController {
   }
 
   bool hasNext() {
-    return nextPageUrl != null && nextPageUrl!.isNotEmpty && nextPageUrl != 'null' ? true : false;
+    return nextPageUrl != null &&
+            nextPageUrl!.isNotEmpty &&
+            nextPageUrl != 'null'
+        ? true
+        : false;
   }
 
   bool isSearch = false;

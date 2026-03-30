@@ -49,12 +49,18 @@ class CustomBidDialog {
     required ToastificationItem holder,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: Dimensions.space10, vertical: Dimensions.space10),
+      padding: const EdgeInsets.symmetric(
+        horizontal: Dimensions.space10,
+        vertical: Dimensions.space10,
+      ),
       child: Material(
         color: MyColor.colorWhite,
         borderRadius: BorderRadius.circular(Dimensions.largeRadius),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: Dimensions.space15, horizontal: Dimensions.space20),
+          padding: const EdgeInsets.symmetric(
+            vertical: Dimensions.space15,
+            horizontal: Dimensions.space20,
+          ),
           child: Column(
             children: [
               Row(
@@ -80,7 +86,10 @@ class CustomBidDialog {
                                   Expanded(
                                     flex: 2,
                                     child: HeaderText(
-                                      text: bid.driver?.getFullName() ?? bid.driver?.username ?? "",
+                                      text:
+                                          bid.driver?.getFullName() ??
+                                          bid.driver?.username ??
+                                          "",
                                       style: boldLarge.copyWith(
                                         color: MyColor.getTextColor(),
                                         fontSize: Dimensions.fontTitleLarge,
@@ -90,10 +99,14 @@ class CustomBidDialog {
                                   if (bid.bidAmount != null) ...[
                                     spaceSide(Dimensions.space10),
                                     Text(
-                                      bid.bidAmount == null ? "" : "$currency${bid.bidAmount}",
-                                      style: boldExtraLarge.copyWith(color: MyColor.primaryColor),
+                                      bid.bidAmount == null
+                                          ? ""
+                                          : "$currency${bid.bidAmount}",
+                                      style: boldExtraLarge.copyWith(
+                                        color: MyColor.primaryColor,
+                                      ),
                                     ),
-                                  ]
+                                  ],
                                 ],
                               ),
                               spaceDown(Dimensions.space3),
@@ -109,14 +122,17 @@ class CustomBidDialog {
                                   ),
                                   spaceSide(Dimensions.space3),
                                   Text(
-                                    bid.driver?.avgRating == '0.00' ? MyStrings.nA.tr : (bid.driver?.avgRating ?? ''),
+                                    bid.driver?.avgRating == '0.00'
+                                        ? MyStrings.nA.tr
+                                        : (bid.driver?.avgRating ?? ''),
                                     style: boldDefault.copyWith(
                                       fontSize: Dimensions.fontSmall,
                                       color: MyColor.getHeadingTextColor(),
                                     ),
                                   ),
                                   spaceSide(Dimensions.space5),
-                                  if (bid.driver?.vehicleData?.model?.name != null) ...[
+                                  if (bid.driver?.vehicleData?.model?.name !=
+                                      null) ...[
                                     Text(
                                       "•",
                                       style: boldDefault.copyWith(
@@ -127,14 +143,18 @@ class CustomBidDialog {
                                     spaceSide(Dimensions.space5),
                                     Expanded(
                                       child: Text(
-                                        bid.driver?.vehicleData?.model?.name ?? "",
-                                        style: regularDefault.copyWith(fontSize: Dimensions.fontDefault, color: MyColor.getBodyTextColor()),
+                                        bid.driver?.vehicleData?.model?.name ??
+                                            "",
+                                        style: regularDefault.copyWith(
+                                          fontSize: Dimensions.fontDefault,
+                                          color: MyColor.getBodyTextColor(),
+                                        ),
                                         maxLines: 2,
                                         textAlign: TextAlign.start,
                                         overflow: TextOverflow.visible,
                                       ),
                                     ),
-                                  ]
+                                  ],
                                 ],
                               ),
                             ],
@@ -149,48 +169,60 @@ class CustomBidDialog {
               Row(
                 children: [
                   Expanded(
-                    child: GetBuilder<RideDetailsController>(builder: (controller) {
-                      return RoundedButton(
-                        isOutlined: true,
-                        text: MyStrings.cancel,
-                        isLoading: controller.isRejectLoading && controller.selectedId == bid.id.toString(),
-                        press: () async {
-                          controller.rejectBid(
-                            bid.id.toString(),
-                            onSuccess: () {
-                              toastification.dismissById(holder.id);
-                            },
-                          );
-                        },
-                        bgColor: MyColor.getPrimaryColor().withValues(alpha: 0.1),
-                        textColor: MyColor.getPrimaryColor(),
-                        textStyle: regularDefault.copyWith(
-                          color: MyColor.getPrimaryColor(),
-                          fontSize: Dimensions.fontLarge,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        isColorChange: true,
-                      );
-                    }),
+                    child: GetBuilder<RideDetailsController>(
+                      tag: 'rider',
+                      builder: (controller) {
+                        return RoundedButton(
+                          isOutlined: true,
+                          text: MyStrings.cancel,
+                          isLoading:
+                              controller.isRejectLoading &&
+                              controller.selectedId == bid.id.toString(),
+                          press: () async {
+                            controller.rejectBid(
+                              bid.id.toString(),
+                              onSuccess: () {
+                                toastification.dismissById(holder.id);
+                              },
+                            );
+                          },
+                          bgColor: MyColor.getPrimaryColor().withValues(
+                            alpha: 0.1,
+                          ),
+                          textColor: MyColor.getPrimaryColor(),
+                          textStyle: regularDefault.copyWith(
+                            color: MyColor.getPrimaryColor(),
+                            fontSize: Dimensions.fontLarge,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          isColorChange: true,
+                        );
+                      },
+                    ),
                   ),
                   const SizedBox(width: Dimensions.space20),
                   Expanded(
-                    child: GetBuilder<RideDetailsController>(builder: (controller) {
-                      return RoundedButton(
-                        text: MyStrings.confirm,
-                        isLoading: controller.isAcceptLoading && controller.selectedId == bid.id.toString(),
-                        press: () async {
-                          controller.acceptBid(
-                            bid.id.toString(),
-                            onSuccess: () {
-                              toastification.dismissById(holder.id);
-                            },
-                          );
-                        },
-                        bgColor: MyColor.primaryColor,
-                        isColorChange: true,
-                      );
-                    }),
+                    child: GetBuilder<RideDetailsController>(
+                      tag: 'rider',
+                      builder: (controller) {
+                        return RoundedButton(
+                          text: MyStrings.confirm,
+                          isLoading:
+                              controller.isAcceptLoading &&
+                              controller.selectedId == bid.id.toString(),
+                          press: () async {
+                            controller.acceptBid(
+                              bid.id.toString(),
+                              onSuccess: () {
+                                toastification.dismissById(holder.id);
+                              },
+                            );
+                          },
+                          bgColor: MyColor.primaryColor,
+                          isColorChange: true,
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),

@@ -15,7 +15,6 @@ import 'package:ovoride/presentation/components/divider/custom_spacer.dart';
 import 'package:ovoride/presentation/components/image/my_local_image_widget.dart';
 import 'package:ovoride/presentation/components/image/my_network_image_widget.dart';
 import 'package:ovoride/presentation/components/text/header_text.dart';
-import 'package:ovoride/presentation/screens/rider/ride/widget/ride_info_card.dart';
 
 class UserDetailsWidget extends StatelessWidget {
   final RideModel ride;
@@ -46,7 +45,8 @@ class UserDetailsWidget extends StatelessWidget {
                   clipBehavior: Clip.none,
                   children: [
                     MyImageWidget(
-                      imageUrl: '${UrlContainer.domainUrl}/$imageUrl/${ride.user?.avatar}',
+                      imageUrl:
+                          '${UrlContainer.domainUrl}/$imageUrl/${ride.user?.avatar}',
                       height: 50,
                       width: 50,
                       radius: Dimensions.radiusHuge,
@@ -94,8 +94,9 @@ class UserDetailsWidget extends StatelessWidget {
                               ),
                               spaceSide(Dimensions.space3),
                               Text(
-                                // نتحقق أولاً من التقييم، وإذا كان موجوداً نقوم بتحويله بالكامل للأرقام العربية
-                                (ride.user?.avgRating == '0.00' || ride.user?.avgRating == '0' ? MyStrings.nA.tr : (ride.user?.avgRating ?? '0.0')).toArabicNumbers(),
+                                ride.user?.avgRating == '0.00'
+                                    ? MyStrings.nA.tr
+                                    : (ride.user?.avgRating ?? ''),
                                 style: boldDefault.copyWith(
                                   fontSize: Dimensions.fontSmall,
                                   color: MyColor.getHeadingTextColor(),
@@ -116,22 +117,25 @@ class UserDetailsWidget extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       HeaderText(
-                        text: ride.user?.getFullName() ?? ride.user?.username ?? "",
+                        text:
+                            ride.user?.getFullName() ??
+                            ride.user?.username ??
+                            "",
                         style: boldLarge.copyWith(
                           color: MyColor.getTextColor(),
                           fontSize: Dimensions.fontTitleLarge,
                         ),
                       ),
-                      // spaceDown(Dimensions.space3),
-                      // Text(
-                      //   "@${ride.user?.username ?? ""}",
-                      //   style: regularDefault.copyWith(
-                      //     fontSize: Dimensions.fontDefault,
-                      //     color: MyColor.informationColor,
-                      //   ),
-                      //   maxLines: 1,
-                      //   overflow: TextOverflow.ellipsis,
-                      // ),
+                      spaceDown(Dimensions.space3),
+                      Text(
+                        "@${ride.user?.username ?? ""}",
+                        style: regularDefault.copyWith(
+                          fontSize: Dimensions.fontDefault,
+                          color: MyColor.informationColor,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ],
                   ),
                 ),

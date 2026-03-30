@@ -117,14 +117,24 @@ class DashBoardController extends GetxController {
     try {
       final GeolocatorPlatform geolocator = GeolocatorPlatform.instance;
       currentPosition = await geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(accuracy: LocationAccuracy.best),
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.best,
+        ),
       );
 
       if (currentPosition != null) {
         if (Environment.addressPickerFromGoogleMapApi) {
-          currentAddress = await repo.getActualAddress(currentPosition!.latitude, currentPosition!.longitude) ?? 'Unknown location..';
+          currentAddress =
+              await repo.getActualAddress(
+                currentPosition!.latitude,
+                currentPosition!.longitude,
+              ) ??
+              'موقع غير معروف';
         } else {
-          final placemarks = await placemarkFromCoordinates(currentPosition!.latitude, currentPosition!.longitude);
+          final placemarks = await placemarkFromCoordinates(
+            currentPosition!.latitude,
+            currentPosition!.longitude,
+          );
           if (placemarks.isNotEmpty) {
             currentAddress = _formatAddress(placemarks.first);
           }
@@ -158,13 +168,18 @@ class DashBoardController extends GetxController {
         page = 1;
       }
 
-      ResponseModel responseModel = await repo.getDashboardData(page: page.toString());
+      ResponseModel responseModel = await repo.getDashboardData(
+        page: page.toString(),
+      );
 
       if (responseModel.statusCode == 200) {
-        DashBoardRideResponseModel model = DashBoardRideResponseModel.fromJson(responseModel.responseJson);
+        DashBoardRideResponseModel model = DashBoardRideResponseModel.fromJson(
+          responseModel.responseJson,
+        );
         if (model.status == MyStrings.success) {
           nextPageUrl = model.data?.ride?.nextPageUrl;
-          userImagePath = '${UrlContainer.domainUrl}/${model.data?.userImagePath}';
+          userImagePath =
+              '${UrlContainer.domainUrl}/${model.data?.userImagePath}';
 
           if (page == 1) {
             rideList.clear();
@@ -185,7 +200,8 @@ class DashBoardController extends GetxController {
           driver = model.data?.driverInfo ?? GlobalDriverInfoModel(id: '-1');
           runningRide = model.data?.runningRide;
 
-          profileImageUrl = "${UrlContainer.domainUrl}/${model.data?.driverImagePath}/${model.data?.driverInfo?.image}";
+          profileImageUrl =
+              "${UrlContainer.domainUrl}/${model.data?.driverImagePath}/${model.data?.driverInfo?.image}";
 
           update();
         }
@@ -199,23 +215,41 @@ class DashBoardController extends GetxController {
   }
 
   bool hasNext() {
-    return nextPageUrl != null && nextPageUrl!.isNotEmpty && nextPageUrl != 'null';
+    return nextPageUrl != null &&
+        nextPageUrl!.isNotEmpty &&
+        nextPageUrl != 'null';
   }
 
   bool isSendBidLoading = false;
-  Future<void> sendBid(String rideId, {String? amount, VoidCallback? onActon}) async {
+  Future<void> sendBid(
+    String rideId, {
+    String? amount,
+    VoidCallback? onActon,
+  }) async {
     isSendBidLoading = true;
     update();
     try {
-      ResponseModel responseModel = await repo.createBid(amount: amount ?? "", id: rideId);
+      ResponseModel responseModel = await repo.createBid(
+        amount: amount ?? "",
+        id: rideId,
+      );
       if (responseModel.statusCode == 200) {
-        AuthorizationResponseModel model = AuthorizationResponseModel.fromJson(responseModel.responseJson);
+        AuthorizationResponseModel model = AuthorizationResponseModel.fromJson(
+          responseModel.responseJson,
+        );
         if (model.status == "success") {
           if (onActon != null) onActon();
-          Get.toNamed(RouteHelper.driverRideDetailsScreen, arguments: rideId)?.then((v) => initialData(shouldLoad: false));
+          Get.toNamed(
+            RouteHelper.driverRideDetailsScreen,
+            arguments: rideId,
+          )?.then((v) => initialData(shouldLoad: false));
         } else {
-          CustomSnackBar.error(errorList: model.message ?? [MyStrings.somethingWentWrong]);
+          CustomSnackBar.error(
+            errorList: model.message ?? [MyStrings.somethingWentWrong],
+          );
         }
+      } else {
+        CustomSnackBar.error(errorList: [responseModel.message]);
       }
     } catch (e) {
       printX(e);
@@ -238,7 +272,9 @@ class DashBoardController extends GetxController {
         long: currentPosition?.longitude.toString() ?? "",
       );
       if (responseModel.statusCode == 200) {
-        AuthorizationResponseModel model = AuthorizationResponseModel.fromJson(responseModel.responseJson);
+        AuthorizationResponseModel model = AuthorizationResponseModel.fromJson(
+          responseModel.responseJson,
+        );
         if (model.status == MyStrings.success) {
           userOnline = model.data?.online.toString() == 'true';
           repo.apiClient.setOnlineStatus(userOnline);

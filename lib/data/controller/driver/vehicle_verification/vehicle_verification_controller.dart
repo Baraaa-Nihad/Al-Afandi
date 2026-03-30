@@ -100,14 +100,17 @@ class VehicleVerificationController extends GetxController {
 
     try {
       model = await repo.getVahicleVerificationKycData();
-      if (model.data != null && model.status?.toLowerCase() == MyStrings.success.toLowerCase()) {
+      if (model.data != null &&
+          model.status?.toLowerCase() == MyStrings.success.toLowerCase()) {
         if (model.remark?.toLowerCase() == 'under_review') {
           isAlreadyPending = true;
         }
 
         path = '${UrlContainer.domainUrl}/${model.data?.path ?? ''}';
-        serviceImagePath = '${UrlContainer.domainUrl}/${model.data?.serviceImagePath ?? ''}';
-        brandImagePath = '${UrlContainer.domainUrl}/${model.data?.brandImagePath ?? ''}';
+        serviceImagePath =
+            '${UrlContainer.domainUrl}/${model.data?.serviceImagePath ?? ''}';
+        brandImagePath =
+            '${UrlContainer.domainUrl}/${model.data?.brandImagePath ?? ''}';
 
         riderRules.addAll(model.data?.riderRules ?? []);
 
@@ -211,36 +214,45 @@ class VehicleVerificationController extends GetxController {
       return;
     }
     if (modelValue.id == '-1') {
-      CustomSnackBar.error(errorList: ["Vehicle model is required".tr]);
+      CustomSnackBar.error(
+        errorList: ['${MyStrings.vehicleModel.tr} ${MyStrings.isRequired.tr}'],
+      );
       return;
     }
     if (colorValue.id == '-1') {
-      CustomSnackBar.error(errorList: ["Vehicle color is required".tr]);
+      CustomSnackBar.error(
+        errorList: ['${MyStrings.vehicleColor.tr} ${MyStrings.isRequired.tr}'],
+      );
       return;
     }
     if (yearValue.id == '-1') {
-      CustomSnackBar.error(errorList: ["Vehicle year is required".tr]);
+      CustomSnackBar.error(
+        errorList: ['${MyStrings.vehicleYear.tr} ${MyStrings.isRequired.tr}'],
+      );
       return;
     }
     if (imageFile == null) {
-      CustomSnackBar.error(errorList: ["Vehicle Image is required".tr]);
+      CustomSnackBar.error(
+        errorList: ['${MyStrings.vehicleImage.tr} ${MyStrings.isRequired.tr}'],
+      );
       return;
     }
 
     submitLoading = true;
     update();
     try {
-      AuthorizationResponseModel response = await repo.submitVehicleVerificationKycData(
-        formList: formList,
-        rideRuleList: selectedRiderRules,
-        service: selectedService,
-        brand: selectedBrand,
-        vmodel: modelValue.name ?? '',
-        color: colorValue.name ?? '',
-        year: yearValue.name ?? '',
-        image: imageFile!,
-        vehicleNumber: vehicleNumberController.text,
-      );
+      AuthorizationResponseModel response = await repo
+          .submitVehicleVerificationKycData(
+            formList: formList,
+            rideRuleList: selectedRiderRules,
+            service: selectedService,
+            brand: selectedBrand,
+            vmodel: modelValue.name ?? '',
+            color: colorValue.name ?? '',
+            year: yearValue.name ?? '',
+            image: imageFile!,
+            vehicleNumber: vehicleNumberController.text,
+          );
 
       if (response.status?.toLowerCase() == MyStrings.success.toLowerCase()) {
         isAlreadyPending = true;
@@ -275,7 +287,8 @@ class VehicleVerificationController extends GetxController {
             errorList.add('${element.name} ${MyStrings.isRequired}');
           }
         } else {
-          if (element.selectedValue == '' || element.selectedValue == selectOne) {
+          if (element.selectedValue == '' ||
+              element.selectedValue == selectOne) {
             errorList.add('${element.name} ${MyStrings.isRequired}');
           }
         }
@@ -290,7 +303,8 @@ class VehicleVerificationController extends GetxController {
   }
 
   void changeSelectedRadioBtnValue(int listIndex, int selectedIndex) {
-    formList[listIndex].selectedValue = formList[listIndex].options?[selectedIndex];
+    formList[listIndex].selectedValue =
+        formList[listIndex].options?[selectedIndex];
     update();
   }
 
@@ -361,7 +375,8 @@ class VehicleVerificationController extends GetxController {
         formList[index].selectedValue = DateConverter.estimatedDateTime(
           selectedDateTime,
         );
-        formList[index].textEditingController?.text = DateConverter.estimatedDateTime(selectedDateTime);
+        formList[index].textEditingController?.text =
+            DateConverter.estimatedDateTime(selectedDateTime);
 
         update();
       }

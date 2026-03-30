@@ -6,6 +6,8 @@ import 'package:ovoride/data/controller/shared/splash/splash_controller.dart';
 import 'package:ovoride/data/repo/shared/auth/general_setting_repo.dart';
 import 'package:ovoride/data/repo/shared/splash/splash_repo.dart';
 import 'package:ovoride/data/services/api_client.dart';
+import 'package:ovoride/data/services/local_storage_service.dart';
+import 'package:ovoride/data/services/notification_controller.dart';
 // Rider repos
 import 'package:ovoride/data/repo/rider/home/home_repo.dart';
 import 'package:ovoride/data/repo/rider/refer/reference_repo.dart';
@@ -17,8 +19,10 @@ import 'package:ovoride/data/repo/rider/message/message_repo.dart';
 import 'package:ovoride/data/repo/rider/coupon/coupon_repo.dart';
 import 'package:ovoride/data/repo/rider/menu_repo/menu_repo.dart';
 import 'package:ovoride/data/repo/rider/review/review_repo.dart';
-import 'package:ovoride/data/repo/rider/account/profile_repo.dart' as riderProfile;
-import 'package:ovoride/data/controller/rider/account/profile_controller.dart' as riderProfileCtrl;
+import 'package:ovoride/data/repo/rider/account/profile_repo.dart'
+    as rider_profile;
+import 'package:ovoride/data/controller/rider/account/profile_controller.dart'
+    as rider_profile_ctrl;
 // Rider controllers
 import 'package:ovoride/data/controller/rider/home/home_controller.dart';
 import 'package:ovoride/data/controller/rider/location/app_location_controller.dart';
@@ -27,13 +31,17 @@ import 'package:ovoride/data/controller/rider/ride/all_ride_controller.dart';
 import 'package:ovoride/data/controller/rider/map/ride_map_controller.dart';
 import 'package:ovoride/data/controller/rider/review/review_controller.dart';
 import 'package:ovoride/data/controller/rider/menu/my_menu_controller.dart';
-import 'package:ovoride/data/repo/rider/auth/signup_repo.dart' as riderSignUp;
-import 'package:ovoride/data/controller/rider/auth/registration_controller.dart' as riderRegistration;
+import 'package:ovoride/data/repo/rider/auth/signup_repo.dart' as rider_sign_up;
+import 'package:ovoride/data/controller/rider/auth/registration_controller.dart'
+    as rider_registration;
 // Driver repos (aliased to avoid name conflicts)
-import 'package:ovoride/data/repo/driver/ride/ride_repo.dart' as driverRide;
-import 'package:ovoride/data/repo/driver/review/review_repo.dart' as driverReview;
-import 'package:ovoride/data/repo/driver/payment_history/payment_history_repo.dart' as driverPaymentHistory;
-import 'package:ovoride/data/repo/driver/meassage/meassage_repo.dart' as driverMessage;
+import 'package:ovoride/data/repo/driver/ride/ride_repo.dart' as driver_ride;
+import 'package:ovoride/data/repo/driver/review/review_repo.dart'
+    as driver_review;
+import 'package:ovoride/data/repo/driver/payment_history/payment_history_repo.dart'
+    as driver_payment_history;
+import 'package:ovoride/data/repo/driver/meassage/meassage_repo.dart'
+    as driver_message;
 
 Future<Map<String, Map<String, String>>> init() async {
   final sharedPreferences = await SharedPreferences.getInstance();
@@ -42,9 +50,26 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.lazyPut(() => ApiClient(sharedPreferences: Get.find()), fenix: true);
   Get.lazyPut(() => GeneralSettingRepo(apiClient: Get.find()), fenix: true);
   Get.lazyPut(() => SplashRepo(apiClient: Get.find()), fenix: true);
-  Get.lazyPut(() => LocalizationController(sharedPreferences: Get.find()), fenix: true);
-  Get.lazyPut(() => SplashController(repo: Get.find(), localizationController: Get.find()), fenix: true);
-  Get.lazyPut(() => ThemeController(sharedPreferences: Get.find()), fenix: true);
+  Get.lazyPut(
+    () => LocalizationController(sharedPreferences: Get.find()),
+    fenix: true,
+  );
+  Get.lazyPut(
+    () =>
+        SplashController(repo: Get.find(), localizationController: Get.find()),
+    fenix: true,
+  );
+  Get.lazyPut(
+    () => ThemeController(sharedPreferences: Get.find()),
+    fenix: true,
+  );
+  Get.lazyPut(
+    () => NotificationController(
+      localStorageService: Get.find<LocalStorageService>(),
+      apiClient: Get.find(),
+    ),
+    fenix: true,
+  );
 
   // Rider repos (no tag = rider by default)
   Get.lazyPut(() => HomeRepo(apiClient: Get.find()), fenix: true);
@@ -58,31 +83,71 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.lazyPut(() => MenuRepo(apiClient: Get.find()), fenix: true);
   Get.lazyPut(() => ReviewRepo(apiClient: Get.find()), fenix: true);
 
-// Rider controllers (no tag = rider by default)
+  // Rider controllers (no tag = rider by default)
   Get.lazyPut(() => AppLocationController(), fenix: true);
-  Get.lazyPut(() => HomeController(homeRepo: Get.find(), appLocationController: Get.find()), fenix: true);
-  Get.lazyPut(() => PaymentHistoryController(paymentRepo: Get.find()), fenix: true);
+  Get.lazyPut(
+    () =>
+        HomeController(homeRepo: Get.find(), appLocationController: Get.find()),
+    fenix: true,
+  );
+  Get.lazyPut(
+    () => PaymentHistoryController(paymentRepo: Get.find()),
+    fenix: true,
+  );
   Get.lazyPut(() => AllRideController(repo: Get.find()), fenix: true);
   Get.lazyPut(() => RideMapController(), fenix: true);
   Get.lazyPut(() => ReviewController(repo: Get.find()), fenix: true);
-  Get.lazyPut(() => riderProfile.ProfileRepo(apiClient: Get.find()), fenix: true, tag: 'rider');
-  Get.lazyPut(() => riderProfileCtrl.ProfileController(profileRepo: Get.find(tag: 'rider')), fenix: true, tag: 'rider');
-  Get.lazyPut(() => MyMenuController(menuRepo: Get.find(), repo: Get.find()), fenix: true);
-  Get.lazyPut(() => riderSignUp.RegistrationRepo(apiClient: Get.find()), fenix: true, tag: 'rider');
   Get.lazyPut(
-    () => riderRegistration.RegistrationController(
-      registrationRepo: Get.find(tag: 'rider'),
-      generalSettingRepo: Get.find(),
+    () => rider_profile.ProfileRepo(apiClient: Get.find()),
+    fenix: true,
+    tag: 'rider',
+  );
+  Get.lazyPut(
+    () => rider_profile_ctrl.ProfileController(
       profileRepo: Get.find(tag: 'rider'),
     ),
     fenix: true,
     tag: 'rider',
   );
+  Get.lazyPut(
+    () => MyMenuController(menuRepo: Get.find(), repo: Get.find()),
+    fenix: true,
+  );
+  Get.lazyPut(
+    () => rider_sign_up.RegistrationRepo(apiClient: Get.find()),
+    fenix: true,
+    tag: 'rider',
+  );
+  Get.lazyPut(
+    () => rider_registration.RegistrationController(
+      registrationRepo: Get.find(tag: 'rider'),
+      generalSettingRepo: Get.find(),
+    ),
+    fenix: true,
+    tag: 'rider',
+  );
+
   // Driver repos with 'driver' tag
-  Get.lazyPut(() => driverRide.RideRepo(apiClient: Get.find()), fenix: true, tag: 'driver');
-  Get.lazyPut(() => driverReview.ReviewRepo(apiClient: Get.find()), fenix: true, tag: 'driver');
-  Get.lazyPut(() => driverPaymentHistory.PaymentHistoryRepo(apiClient: Get.find()), fenix: true, tag: 'driver');
-  Get.lazyPut(() => driverMessage.MessageRepo(apiClient: Get.find()), fenix: true, tag: 'driver');
+  Get.lazyPut(
+    () => driver_ride.RideRepo(apiClient: Get.find()),
+    fenix: true,
+    tag: 'driver',
+  );
+  Get.lazyPut(
+    () => driver_review.ReviewRepo(apiClient: Get.find()),
+    fenix: true,
+    tag: 'driver',
+  );
+  Get.lazyPut(
+    () => driver_payment_history.PaymentHistoryRepo(apiClient: Get.find()),
+    fenix: true,
+    tag: 'driver',
+  );
+  Get.lazyPut(
+    () => driver_message.MessageRepo(apiClient: Get.find()),
+    fenix: true,
+    tag: 'driver',
+  );
 
   Map<String, Map<String, String>> language = {};
   language['en_US'] = {'': ''};

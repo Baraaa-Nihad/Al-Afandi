@@ -19,8 +19,8 @@ class PaymentHistoryController extends GetxController {
   bool isLoading = true;
   final formKey = GlobalKey<FormState>();
 
-  List<String> transactionTypeList = ["All", "Plus", "Minus"];
-  List<String> remarksList = ["All"];
+  List<String> transactionTypeList = ['الكل', 'إضافة', 'خصم'];
+  List<String> remarksList = ['الكل'];
 
   List<PaymentHistoryData> transactionList = [];
   GlobalUser user = GlobalUser();
@@ -35,13 +35,13 @@ class PaymentHistoryController extends GetxController {
 
   TextEditingController trxController = TextEditingController();
 
-  String selectedRemark = "All";
-  String selectedTrxType = "All";
+  String selectedRemark = 'الكل';
+  String selectedTrxType = 'الكل';
 
   void initData({bool shouldLoad = true}) async {
     page = 0;
-    selectedRemark = "All";
-    selectedTrxType = "All";
+    selectedRemark = 'الكل';
+    selectedTrxType = 'الكل';
     trxController.text = '';
     trxSearchText = '';
     isLoading = shouldLoad;
@@ -62,18 +62,21 @@ class PaymentHistoryController extends GetxController {
 
       ResponseModel responseModel = await paymentRepo.getTransactionList(
         page,
-        type: selectedTrxType.toLowerCase(),
-        remark: selectedRemark.toLowerCase(),
+        type: _transactionTypeApiValue(selectedTrxType),
+        remark: _remarkApiValue(selectedRemark),
         searchText: trxSearchText,
       );
 
       if (responseModel.statusCode == 200) {
-        PaymentHistoryResponseModel model = PaymentHistoryResponseModel.fromJson((responseModel.responseJson));
+        PaymentHistoryResponseModel model =
+            PaymentHistoryResponseModel.fromJson((responseModel.responseJson));
 
         nextPageUrl = model.data?.payments?.nextPageUrl;
 
-        if (model.status.toString().toLowerCase() == MyStrings.success.toLowerCase()) {
-          List<PaymentHistoryData>? tempDataList = model.data?.payments?.data ?? [];
+        if (model.status.toString().toLowerCase() ==
+            MyStrings.success.toLowerCase()) {
+          List<PaymentHistoryData>? tempDataList =
+              model.data?.payments?.data ?? [];
           if (page == 1) {
             transactionList.clear();
           }
@@ -111,6 +114,28 @@ class PaymentHistoryController extends GetxController {
     update();
   }
 
+  String _transactionTypeApiValue(String value) {
+    switch (value.toLowerCase()) {
+      case 'الكل':
+      case 'all':
+        return 'all';
+      case 'إضافة':
+      case 'plus':
+        return 'plus';
+      case 'خصم':
+      case 'minus':
+        return 'minus';
+      default:
+        return value.toLowerCase();
+    }
+  }
+
+  String _remarkApiValue(String value) {
+    return value.toLowerCase() == 'all' || value == 'الكل'
+        ? 'all'
+        : value.toLowerCase();
+  }
+
   bool filterLoading = false;
 
   Future<void> filterData() async {
@@ -127,7 +152,11 @@ class PaymentHistoryController extends GetxController {
   }
 
   bool hasNext() {
-    return nextPageUrl != null && nextPageUrl!.isNotEmpty && nextPageUrl != 'null' ? true : false;
+    return nextPageUrl != null &&
+            nextPageUrl!.isNotEmpty &&
+            nextPageUrl != 'null'
+        ? true
+        : false;
   }
 
   bool isSearch = false;
@@ -148,6 +177,4 @@ class PaymentHistoryController extends GetxController {
     expandIndex = expandIndex == index ? -1 : index;
     update();
   }
-
-
 }

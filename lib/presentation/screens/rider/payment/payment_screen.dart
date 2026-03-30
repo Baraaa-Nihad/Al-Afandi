@@ -27,7 +27,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:ovoride/presentation/screens/rider/payment/widget/tips_bottom_sheet_body.dart';
-import 'package:ovoride/presentation/screens/rider/ride/widget/ride_info_card.dart';
 
 class PaymentScreen extends StatefulWidget {
   const PaymentScreen({super.key});
@@ -42,9 +41,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
     RideModel ride = Get.arguments[0] as RideModel;
 
     Get.put(CouponRepo(apiClient: Get.find()));
-    Get.put(CouponController(couponRepo: Get.find(), rideId: ride.id.toString()));
+    Get.put(
+      CouponController(couponRepo: Get.find(), rideId: ride.id.toString()),
+    );
     Get.put(PaymentRepo(apiClient: Get.find()));
-    final controller = Get.put(RidePaymentController(repo: Get.find(), couponController: Get.find()));
+    final controller = Get.put(
+      RidePaymentController(repo: Get.find(), couponController: Get.find()),
+    );
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((time) {
       controller.initialData(ride);
@@ -68,7 +71,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 PaymentRideDetailsCard(
                   currency: controller.defaultCurrencySymbol,
                   ride: controller.ride,
-                  driverImageUrl: '${controller.driverImagePath}/${controller.ride.driver?.avatar}',
+                  driverImageUrl:
+                      '${controller.driverImagePath}/${controller.ride.driver?.avatar}',
                 ),
                 spaceDown(Dimensions.space15),
                 CustomAppCard(
@@ -125,7 +129,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                   apply: () {},
                                   isApplied: true,
                                   remove: () {
-                                    if (couponController.isRemoveLoading) return;
+                                    if (couponController.isRemoveLoading)
+                                      return;
                                     couponController.removeCoupon(
                                       couponController.selectedCoupon,
                                     );
@@ -151,7 +156,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           spaceDown(Dimensions.space15),
                           summaryRow(
                             title: MyStrings.rideAmount,
-                            amount: "${controller.defaultCurrencySymbol}${StringConverter.formatNumber(controller.ride.amount ?? '0')}",
+                            amount:
+                                "${controller.defaultCurrencySymbol}${StringConverter.formatNumber(controller.ride.amount ?? '0')}",
                             isTitleBold: true,
                           ),
                           const CustomDivider(
@@ -160,7 +166,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           ),
                           summaryRow(
                             title: MyStrings.discount,
-                            amount: "${couponController.selectedCoupon.discountType == AppStatus.DISCOUNT_FIXED ? controller.defaultCurrencySymbol : ''}"
+                            amount:
+                                "${couponController.selectedCoupon.discountType == AppStatus.DISCOUNT_FIXED ? controller.defaultCurrencySymbol : ''}"
                                 "${StringConverter.formatNumber(couponController.selectedCoupon.amount ?? '0', precision: couponController.selectedCoupon.discountType == AppStatus.DISCOUNT_PERCENT ? 0 : 2)}"
                                 "${couponController.selectedCoupon.discountType == AppStatus.DISCOUNT_PERCENT ? '%' : ''}",
                             isTitleBold: true,
@@ -171,22 +178,33 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           ),
                           summaryRow(
                             title: MyStrings.paymentMethod,
-                            amount: controller.selectedMethod.method?.name ?? '',
+                            amount:
+                                controller.selectedMethod.method?.name ?? '',
                             widget: GestureDetector(
                               onTap: () {
                                 CustomBottomSheet(
-                                  child: const RiderPaymentMethodListBottomSheet(),
+                                  child:
+                                      const RiderPaymentMethodListBottomSheet(),
                                 ).customBottomSheet(context);
                               },
-                              child: controller.selectedMethod.id == "-9" || controller.selectedMethod.id == "-1"
+                              child:
+                                  controller.selectedMethod.id == "-9" ||
+                                      controller.selectedMethod.id == "-1"
                                   ? Image.asset(
-                                      controller.selectedMethod.id == "-1" ? MyImages.payable : controller.selectedMethod.method?.image ?? '',
+                                      controller.selectedMethod.id == "-1"
+                                          ? MyImages.payable
+                                          : controller
+                                                    .selectedMethod
+                                                    .method
+                                                    ?.image ??
+                                                '',
                                       width: Dimensions.space50 + 8,
                                       height: Dimensions.fontExtraLarge + 15,
                                       color: MyColor.primaryColor,
                                     )
                                   : MyImageWidget(
-                                      imageUrl: '${controller.imagePath}/${controller.selectedMethod.method?.image}',
+                                      imageUrl:
+                                          '${controller.imagePath}/${controller.selectedMethod.method?.image}',
                                       width: 50,
                                       height: 50,
                                       radius: 25,
@@ -200,7 +218,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           ),
                           summaryRow(
                             title: MyStrings.tips,
-                            amount: controller.selectedMethod.method?.name ?? '',
+                            amount:
+                                controller.selectedMethod.method?.name ?? '',
                             widget: GestureDetector(
                               onTap: () {
                                 CustomBottomSheet(
@@ -224,7 +243,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           ),
                           summaryRow(
                             title: MyStrings.payableAmount,
-                            amount: "${controller.defaultCurrencySymbol}${StringConverter.sum(StringConverter.calculateDiscount(controller.ride.amount ?? '0', couponController.selectedCoupon.amount ?? '0', isPercentageCalculation: couponController.selectedCoupon.discountType == AppStatus.DISCOUNT_PERCENT), controller.tipsController.text)}",
+                            amount:
+                                "${controller.defaultCurrencySymbol}${StringConverter.sum(StringConverter.calculateDiscount(controller.ride.amount ?? '0', couponController.selectedCoupon.amount ?? '0', isPercentageCalculation: couponController.selectedCoupon.discountType == AppStatus.DISCOUNT_PERCENT), controller.tipsController.text)}",
                             isTitleBold: true,
                           ),
                           const SizedBox(height: Dimensions.space25 - 1),
@@ -241,9 +261,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           ),
                         ],
                       ).animate().shimmer(
-                            duration: const Duration(milliseconds: 500),
-                            curve: Curves.easeInOut,
-                          );
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeInOut,
+                      );
                     },
                   ),
                 ),
@@ -269,14 +289,17 @@ class _PaymentScreenState extends State<PaymentScreen> {
           child: Text(
             title.tr,
             overflow: TextOverflow.ellipsis,
-            style: isTitleBold! ? regularMediumLarge.copyWith(color: MyColor.colorBlack) : regularMediumLarge.copyWith(color: MyColor.rideSub),
+            style: isTitleBold!
+                ? regularMediumLarge.copyWith(color: MyColor.colorBlack)
+                : regularMediumLarge.copyWith(color: MyColor.rideSub),
           ),
         ),
         // spaceSide(width: Dimensions.space15),
         Flexible(
-          child: widget ??
+          child:
+              widget ??
               Text(
-                amount.tr.toArabicNumbers(),
+                amount.tr,
                 overflow: TextOverflow.ellipsis,
                 style: boldMediumLarge.copyWith(color: MyColor.colorBlack),
               ),

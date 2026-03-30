@@ -4,15 +4,18 @@ class MyStrings {
 
   static const String onboardTitle1 = "خليك جزء من عالم الأفنـدي"; //Title 1
 
-  static const String onboardDescription1 = "سواء كنت بتدور على مشوار مريح أو عايز تزود دخلك بذكاء، الأفنـدي بيجمعنا في شبكة واحدة بتكبر بيك.";
+  static const String onboardDescription1 =
+      "سواء كنت بتدور على مشوار مريح أو عايز تزود دخلك بذكاء، الأفنـدي بيجمعنا في شبكة واحدة بتكبر بيك.";
 
   static const String onboardTitle2 = "سُوق، اكسَب، وعيش"; //Title 2
 
-  static const String onboardDescription2 = "من مشاوير يومية لرحلات سفر، أنت اللي بتختار تكسب إزاي. طريقك للاستقلال المادي بيبدأ من هنا";
+  static const String onboardDescription2 =
+      "من مشاوير يومية لرحلات سفر، أنت اللي بتختار تكسب إزاي. طريقك للاستقلال المادي بيبدأ من هنا";
 
   static const String onboardTitle3 = "رحلات آمنة ومضمونة"; //Title 3
 
-  static const String onboardDescription3 = "كل رحلة متأمنة بميزات أمان وفحص لبيانات السواق، عشان تكون مطمن من أول ما تركب لحد ما توصل."; //Des 3
+  static const String onboardDescription3 =
+      "كل رحلة متأمنة بميزات أمان وفحص لبيانات السواق، عشان تكون مطمن من أول ما تركب لحد ما توصل."; //Des 3
   //Onboard End
   static const String referenceName = "اسم المرجع";
   static const String imagePreview = "معاينة الصورة";
@@ -39,15 +42,18 @@ class MyStrings {
 
   static const String loginScreenTitle = "جاهز تبدأ تكسب؟";
 
-  static const String loginScreenSubTitle = "سجل دخولك الآن وابدأ باستقبال الرحلات بأفضل عمولة في مصر";
+  static const String loginScreenSubTitle =
+      "سجل دخولك الآن وابدأ باستقبال الرحلات بأفضل عمولة في مصر";
 
   static const String regScreenTitle = "انضم ككابتن";
 
-  static const String regScreenSubTitle = "سجل عشان تبدأ تقدم مشاوير مريحة وتكسب في الوقت اللي يناسبك";
+  static const String regScreenSubTitle =
+      "سجل عشان تبدأ تقدم مشاوير مريحة وتكسب في الوقت اللي يناسبك";
 
   static const String regRiderScreenTitle = "انضم لينا";
 
-  static const String regRiderScreenSubTitle = "سجل حساب جديد وابدأ استمتع بمشاوير مريحة في أي وقت تحتاجه";
+  static const String regRiderScreenSubTitle =
+      "سجل حساب جديد وابدأ استمتع بمشاوير مريحة في أي وقت تحتاجه";
 
   static const String selectService = "اختار الخدمة";
 
@@ -68,7 +74,8 @@ class MyStrings {
 
   static const String pickUpLocation = "نقطة الركوب";
 
-  static const String recommendedPrice = "السعر المقترح {priceKey} لمسافة {distanceKey} تقريباً";
+  static const String recommendedPrice =
+      "السعر المقترح {priceKey} لمسافة {distanceKey} تقريباً";
 
   static const String when = "إمتى";
 
@@ -97,7 +104,7 @@ class MyStrings {
 
   static const String newRide = "المشاوير الجديدة";
 
-  static const String acceptedRide = "المشاوير المقبولة";
+  static const String acceptedRide = "مشوار مقبول";
 
   static const String active = "نشط";
   static const String running = "شغال";
@@ -118,7 +125,7 @@ class MyStrings {
 
   static const String ridePlaced = "تم طلب المشوار";
 
-  static const String rideCompleted = "المشوار جـاهز ";
+  static const String rideCompleted = "المشوار خلص";
   static const String rideCompletedSuccessFully = "المشوار خلص بنجاح";
 
   static const String createdTime = "وقت الطلب";
@@ -140,7 +147,8 @@ class MyStrings {
 
   static const String checkRunningRide = "شوف مشوارك اللي شغال";
 
-  static const String runningRideMessage = 'خلص مشوارك الحالي الأول عشان تبدأ واحد جديد. مينفعش تبدأ مشوار وأنت لسه مخلصتش اللي في إيدك';
+  static const String runningRideMessage =
+      'خلص مشوارك الحالي الأول عشان تبدأ واحد جديد. مينفعش تبدأ مشوار وأنت لسه مخلصتش اللي في إيدك';
 
   static const String addCouponCode = "إضافة كود خصم";
 
@@ -259,7 +267,8 @@ class MyStrings {
 
   static const String deleteYourAccount = "احذف حسابك";
 
-  static const String deleteBottomSheetSubtitle = 'هتخسر كل بياناتك لو مسحت الحساب. الخطوة دي مفيش فيها رجوع.';
+  static const String deleteBottomSheetSubtitle =
+      'هتخسر كل بياناتك لو مسحت الحساب. الخطوة دي مفيش فيها رجوع.';
 
   static const String typeYourPassword = 'اكتب كلمة السر بتاعتك';
 
@@ -289,7 +298,7 @@ class MyStrings {
 
   static const String any = "أي";
 
-  static const String pay = "ادفـع ";
+  static const String pay = "دفع";
 
   static const String register = "تسجيل";
 
@@ -355,9 +364,11 @@ class MyStrings {
 
   static const String kycUnderReviewMsg = 'بيانات توثيقك تحت المراجعة دلوقتي';
 
-  static const String driverVerificationUnderReviewMsg = 'توثيق الكابتن تحت المراجعة';
+  static const String driverVerificationUnderReviewMsg =
+      'توثيق الكابتن تحت المراجعة';
 
-  static const String vehicleVerificationUnderReviewMsg = 'توثيق العربية تحت المراجعة';
+  static const String vehicleVerificationUnderReviewMsg =
+      'توثيق العربية تحت المراجعة';
 
   static const String kycAlreadyVerifiedMsg = 'أنت موثق فعلاً';
 
@@ -399,7 +410,8 @@ class MyStrings {
 
   static const String resetPassword = "إعادة تعيين كلمة السر";
 
-  static const String subText = "كلمة السر الجديدة لازم تكون مختلفة عن \n اللي استخدمتها قبل كده";
+  static const String subText =
+      "كلمة السر الجديدة لازم تكون مختلفة عن \n اللي استخدمتها قبل كده";
 
   static const String newPassword = "كلمة السر الجديدة";
 
@@ -439,13 +451,14 @@ class MyStrings {
 
   static const String updateProfile = "تحديث البيانات";
 
-  static const String completeProfile = "تأكـيد";
+  static const String completeProfile = "كمل بياناتك";
 
   static const String selectALanguage = 'اختار اللغة';
 
   static const String twoFactorAuth = 'المصادقة الثنائية (تأمين زيادة)';
 
-  static const String twoFactorMsg = 'دخل الكود المكون من 6 أرقام من تطبيق المصادقة بتاعك.';
+  static const String twoFactorMsg =
+      'دخل الكود المكون من 6 أرقام من تطبيق المصادقة بتاعك.';
 
   static const String exitTitle = "متأكد إنك عايز تقفل التطبيق؟";
 
@@ -476,19 +489,24 @@ class MyStrings {
 
   static const String fieldErrorMsg = "يا ريت تملى الخانة دي";
 
-  static const String resetPassContent = "عشان تأمن حسابك، يا ريت تختار كلمة سر قوية";
+  static const String resetPassContent =
+      "عشان تأمن حسابك، يا ريت تختار كلمة سر قوية";
 
-  static const String forgetPasswordSubText = "دخل إيميلك أو اسم المستخدم وهنبعتلك كود تأكيد عشان تغير كلمة السر";
+  static const String forgetPasswordSubText =
+      "دخل إيميلك أو اسم المستخدم وهنبعتلك كود تأكيد عشان تغير كلمة السر";
   static const String verifyCodeSendToSubText = "كود التأكيد اتبعث لـ";
-  static const String verifyPasswordSubText = "كود مكون من 6 أرقام اتبعث لإيميلك";
+  static const String verifyPasswordSubText =
+      "كود مكون من 6 أرقام اتبعث لإيميلك";
 
   static const String phoneNo = "رقم التليفون";
 
-  static const String passwordResetEmailSentTo = 'إيميل تغيير كلمة السر اتبعث لـ';
+  static const String passwordResetEmailSentTo =
+      'إيميل تغيير كلمة السر اتبعث لـ';
 
   static const String emailVerification = "تأكيد الإيميل";
 
-  static const String viaEmailVerify = "بعتنا كود للدخول على إيميلك عشان نتأكد منه";
+  static const String viaEmailVerify =
+      "بعتنا كود للدخول على إيميلك عشان نتأكد منه";
 
   static const String didNotReceiveCode = "موصلكش الكود؟";
 
@@ -577,7 +595,8 @@ class MyStrings {
 
   static const String createNewPassword = "عمل كلمة سر جديدة";
 
-  static const String createPasswordSubText = "يا ريت تختار كلمة سر قوية عشان تحمي حسابك";
+  static const String createPasswordSubText =
+      "يا ريت تختار كلمة سر قوية عشان تحمي حسابك";
 
   static const String enterCurrentPassword = 'دخل كلمة السر الحالية';
 
@@ -660,7 +679,8 @@ class MyStrings {
   static const String fullName = "الاسم بالكامل";
   static const String kLastNameNullError = "دخل اسمك الأخير";
 
-  static const String kShortUserNameError = "اسم المستخدم لازم يكون 6 خانات على الأقل";
+  static const String kShortUserNameError =
+      "اسم المستخدم لازم يكون 6 خانات على الأقل";
 
   static const String passVerification = 'تأكيد كلمة السر';
 
@@ -760,17 +780,21 @@ class MyStrings {
 
   static const String remarkType = "نوع الملاحظة";
 
-  static const String agreePolicyMessage = "لازم توافق على سياسة الخصوصية بتاعتنا";
+  static const String agreePolicyMessage =
+      "لازم توافق على سياسة الخصوصية بتاعتنا";
 
   static const String myLocation = "مكاني";
 
-  static var locationServiceDisableMsg = "خدمة الموقع (GPS) مقفولة. يا ريت تفتحها";
+  static var locationServiceDisableMsg =
+      "خدمة الموقع (GPS) مقفولة. يا ريت تفتحها";
 
   static var locationPermissionDenied = "صلاحية الوصول للموقع اترفضت";
 
-  static const String locationPermissionPermanentDenied = "صلاحية الموقع مرفوضة نهائياً، مش هنقدر نطلبها تاني.";
+  static const String locationPermissionPermanentDenied =
+      "صلاحية الموقع مرفوضة نهائياً، مش هنقدر نطلبها تاني.";
   static const String locationPermissionNeedTitle = "محتاجين صلاحية الموقع";
-  static const String locationPermissionNeedMSG = "صلاحية الموقع مقفولة من الإعدادات. افتحها عشان تقدر تستخدم خدمات الخرائط والموقع.";
+  static const String locationPermissionNeedMSG =
+      "صلاحية الموقع مقفولة من الإعدادات. افتحها عشان تقدر تستخدم خدمات الخرائط والموقع.";
   static const String openSettings = "فتح الإعدادات";
   static var tapOnLocationPicker = "دوس على تحديد الموقع";
 
@@ -802,9 +826,11 @@ class MyStrings {
 
   static const String driverVerificationRequired = "لازم توثق أوراق السواقة";
 
-  static const String kycVerificationMsg = "يا ريت ترفع الأوراق المطلوبة عشان نوثق حسابك، وإلا مش هتعرف تعمل طلبات سحب لفلوسك.";
+  static const String kycVerificationMsg =
+      "يا ريت ترفع الأوراق المطلوبة عشان نوثق حسابك، وإلا مش هتعرف تعمل طلبات سحب لفلوسك.";
 
-  static const String driverKycPendingMsg = "شكراً إنك بعت أوراقك. فريقنا بيراجع البيانات دلوقتي.";
+  static const String driverKycPendingMsg =
+      "شكراً إنك بعت أوراقك. فريقنا بيراجع البيانات دلوقتي.";
 
   static const String reviewForUser = "تقييم للراكب";
 
@@ -818,9 +844,10 @@ class MyStrings {
 
   static const String codeHasBeenSendTo = "الكود اتبعث لـ";
 
-  static const String profileCompleteTitle = "جاهز تشتـغَل ؟";
+  static const String profileCompleteTitle = "جاهز تسوق!";
 
-  static const String profileCompleteSubTitle = "خلص إعداد ملفك وابدأ اكسب النهاردة!";
+  static const String profileCompleteSubTitle =
+      "خلص إعداد ملفك وابدأ اكسب النهاردة!";
 
   static const String reviewMsgHintText = "اكتب لنا عن تجربتك في المشوار";
 
@@ -834,11 +861,13 @@ class MyStrings {
 
   static const String viewMap = "عرض الخريطة";
 
-  static const String pleaseEnableLocationPermission = "يا ريت تفتح صلاحية الموقع";
+  static const String pleaseEnableLocationPermission =
+      "يا ريت تفتح صلاحية الموقع";
 
   static const String bidNOW = "قدم عرضك دلوقتي";
 
-  static const String vehicleVerificationSubTitle = "يا ريت تبعت البيانات دي عشان نكمل توثيق عربيتك. ده بيساعدنا نوفر تجربة آمنة وموثوقة ليك وللركاب. شكراً ليك!";
+  static const String vehicleVerificationSubTitle =
+      "يا ريت تبعت البيانات دي عشان نكمل توثيق عربيتك. ده بيساعدنا نوفر تجربة آمنة وموثوقة ليك وللركاب. شكراً ليك!";
 
   static const String noRideFoundInYourArea = "مفيش مشاوير في منطقتك دلوقتي";
   static const String cancelReason = "سبب الإلغاء";
@@ -854,11 +883,12 @@ class MyStrings {
 
   static const String sorryThereIsNoActiveRideFound = "مفيش مشوار شغال دلوقتي";
 
-  static const String sorryThereIsNoPendingRideFound = "مفيش مشاوير تحت الانتظار";
+  static const String sorryThereIsNoPendingRideFound =
+      "مفيش مشاوير تحت الانتظار";
   static const String noZoneFound = "للأسف مفيش منطقة موجودة";
 
   static const String endRide = "إنهاء المشوار";
-  static const String waitingForPayment = "مستنيين الدفع ...";
+  static const String waitingForPayment = "مستنيين الدفع";
 
   static const String paymentReceived = "تم استلام الفلوس";
 
@@ -874,21 +904,25 @@ class MyStrings {
 
   static const String firstOrder = "أول أوردر";
 
-  static const String waitForUserPayment = "مستنييـن الأفنـدي يدفع ... ";
+  static const String waitForUserPayment = "مستنيين الزبون يدفع";
 
   static const String yourReferences = "الناس اللي رشحتهم";
 
   static const String driverDocumentVerification = "توثيق ورق السواق";
 
-  static const String yourVehicleVerificationUnderReview = "توثيق عربيتك تحت المراجعة";
+  static const String yourVehicleVerificationUnderReview =
+      "توثيق عربيتك تحت المراجعة";
 
   static const String pleaseVerifyYourVehicle = "يا ريت توثق عربيتك";
 
-  static const String verifyVehicleAndStartRide = "وثق عربيتك وابدأ مشاوير، اكسب أكتر وسوق أكتر";
+  static const String verifyVehicleAndStartRide =
+      "وثق عربيتك وابدأ مشاوير، اكسب أكتر وسوق أكتر";
 
-  static const String waitUntilAdminApprovedYourVerificationRequest = "استنى لما الإدارة توافق على طلب التوثيق بتاعك";
+  static const String waitUntilAdminApprovedYourVerificationRequest =
+      "استنى لما الإدارة توافق على طلب التوثيق بتاعك";
 
-  static const String pleaseUploadYourAppOnPlayStore = "يا ريت ترفع تطبيقك على بلاي ستور";
+  static const String pleaseUploadYourAppOnPlayStore =
+      "يا ريت ترفع تطبيقك على بلاي ستور";
 
   static const String nA = "غير متاح";
 
@@ -978,18 +1012,22 @@ class MyStrings {
   static const String youWantToCloseThisTicket = "عايز تقفل التذكرة دي؟";
   static const String regTerm = "شروط التسجيل";
 
-  static const String maintenanceSubtitle = "بنعمل شوية تحسينات عشان نقدملك تجربة أحسن، هنرجع نشتغل في أسرع وقت!";
+  static const String maintenanceSubtitle =
+      "بنعمل شوية تحسينات عشان نقدملك تجربة أحسن، هنرجع نشتغل في أسرع وقت!";
 
-  static const String pleaseReceivePaymentSubtitle = "يا ريت تتأكد إنك استلمت المبلغ كامل من الراكب قبل ما تقفل المشوار.";
+  static const String pleaseReceivePaymentSubtitle =
+      "يا ريت تتأكد إنك استلمت المبلغ كامل من الراكب قبل ما تقفل المشوار.";
 
   static const String disable2Fa = "إلغاء تأمين الحساب (2FA)";
 
   static const String addYourAccount = "ضيف حسابك";
 
-  static const String useQRCODETips = "استخدم تطبيق Google Authenticator عشان تمسح كود الـ QR وتفعل حماية حسابك.";
+  static const String useQRCODETips =
+      "استخدم تطبيق Google Authenticator عشان تمسح كود الـ QR وتفعل حماية حسابك.";
 
   static const String enable2Fa = "تفعيل تأمين الحساب (2FA)";
-  static const String somethingWentWrongWhileTakingLocation = "حصلت مشكلة وأحنا بنحدد مكانك.. اتأكد إن الـ GPS شغال وحاول تاني";
+  static const String somethingWentWrongWhileTakingLocation =
+      "حصلت مشكلة وأحنا بنحدد مكانك.. اتأكد إن الـ GPS شغال وحاول تاني";
 
   static const String selectedService = "الخدمة اللي اخترتها";
 
@@ -1013,6 +1051,8 @@ class MyStrings {
 
   static const String reviewRequired = "لازم تكتب تقييم";
 
+  static const String ratingRequired = "لازم تختار عدد النجوم";
+
   static const String pleaseReceivePayment = "يا ريت تستلم الفلوس من الراكب";
 
   static const String pleaseConfirm = "يا ريت تأكد";
@@ -1029,11 +1069,14 @@ class MyStrings {
   static const String driverVerification = "توثيق الكابتن";
   // static const String locationPermissionDenied = "تم رفض صلاحية الوصول للموقع";
   static const String pleaseSelectAService = "يا ريت تختار خدمة";
-  static const String pleaseSelectPickupAndDestination = "يا ريت تختار مكان الركوب والوجهة";
+  static const String pleaseSelectPickupAndDestination =
+      "يا ريت تختار مكان الركوب والوجهة";
   static const String runningRideAlertTitle = "عندك رحلة شغالة!";
-  static const String runningRideAlertSubTitle = "يا بطل، لسه في رحلة شغالة في حسابك، لازم تخلصها الأول عشان تبدأ رحلة جديدة.";
+  static const String runningRideAlertSubTitle =
+      "يا بطل، لسه في رحلة شغالة في حسابك، لازم تخلصها الأول عشان تبدأ رحلة جديدة.";
 
-  static const String useQRCODETips2 = "جوجل (Authenticator) هو تطبيق لتأمين حسابك، بيطلع أكواد متغيرة بتستخدمها وأنت بتسجل دخولك.";
+  static const String useQRCODETips2 =
+      "جوجل (Authenticator) هو تطبيق لتأمين حسابك، بيطلع أكواد متغيرة بتستخدمها وأنت بتسجل دخولك.";
 
   static const String accept = "قبول";
   static const String acceptRequest = "قبول الطلب";
@@ -1046,7 +1089,8 @@ class MyStrings {
   static const String availableBids = "العروض المتاحة";
   static const String average = "المتوسط";
   static const String awaitingPayment = "في انتظار الدفع";
-  static const String bidFoundSubTitle = "وافق على واحد عشان تبدأ الرحلة، وإحنا لسه بندور لك على عروض أحسن.";
+  static const String bidFoundSubTitle =
+      "وافق على واحد عشان تبدأ الرحلة، وإحنا لسه بندور لك على عروض أحسن.";
   static const String bidFoundTitle = "وصلت لك عروض من سواقين";
   static const String bidList = "قائمة العروض";
   static const String billToPay = "الفاتورة";
@@ -1088,16 +1132,20 @@ class MyStrings {
   static const String payment_ = 'دفع';
   static const String person = "فرد";
   static const String pickUpDestination = "نقطة الوصول";
-  static const String pleaseAcceptDriverBeforeCall = "وافق على السواق الأول قبل ما تتصل";
-  static const String pleaseAcceptDriverBeforeChat = "وافق على السواق الأول قبل ما تشات";
-  static const String pleaseSelectYourPickupAndDestinationLocation = "يا ريت تختار مكان الركوب والوجهة";
+  static const String pleaseAcceptDriverBeforeCall =
+      "وافق على السواق الأول قبل ما تتصل";
+  static const String pleaseAcceptDriverBeforeChat =
+      "وافق على السواق الأول قبل ما تشات";
+  static const String pleaseSelectYourPickupAndDestinationLocation =
+      "يا ريت تختار مكان الركوب والوجهة";
   static const String ratingDriver = "تقييم السواق";
   static const String ratingUser = "تقييم المستخدم";
   static const String reFerred = "تم ترشيحه";
   static const String referanceName = "اسم المرجع";
   static const String referralAFriends = "دعوة الأصدقاء";
   static const String referralNameOptional = "اسم المرجع (اختياري)";
-  static const String referralSubtitle = "ادعو صحابك يسجلوا من لينك بتاعك وهتاخد";
+  static const String referralSubtitle =
+      "ادعو صحابك يسجلوا من لينك بتاعك وهتاخد";
   static const String regApple = "تسجيل الدخول بحساب أبل";
   static const String regGoogle = "كمل عن طريق جوجل";
   static const String reject = "رفض";
@@ -1123,17 +1171,22 @@ class MyStrings {
   static const String whereToGo = "على فين؟";
   static const String youDontHaveAnyRideYet = "لسه ما عملتش أي رحلات.";
   // static const String yourTrip = "رحلتك";
-  static const String zoomInToSetExactLocation = "اعمل زووم عشان تحدد مكانك بدقة";
+  static const String zoomInToSetExactLocation =
+      "اعمل زووم عشان تحدد مكانك بدقة";
 
   static const String loginRiderScreenTitle = "مشوارك الجاي يبدأ هنا";
 
-  static const String loginRiderScreenSubTitle = "سجل دخول عشان تلاقي مشوارك الجاي وتخلي كل رحلة ذكرى حلوة";
+  static const String loginRiderScreenSubTitle =
+      "سجل دخول عشان تلاقي مشوارك الجاي وتخلي كل رحلة ذكرى حلوة";
 
   static const String howWouldYouLikeToContinue = "عايز تكمل إزاي؟";
   static const String chooseYourRole = "اختار دورك";
-  static const String youCanChangeThisAnytimeFromSettings = "تقدر تغير ده في أي وقت من الإعدادات";
+  static const String youCanChangeThisAnytimeFromSettings =
+      "تقدر تغير ده في أي وقت من الإعدادات";
   static const String imARider = "أنا راكب";
-  static const String bookARideToAnywhereAnytime = "احجز مشوار لأي مكان وفي أي وقت";
+  static const String bookARideToAnywhereAnytime =
+      "احجز مشوار لأي مكان وفي أي وقت";
   static const String imADriver = "أنا سواق";
-  static const String earnMoneyByAcceptingRideRequests = "اكسب فلوس بقبول طلبات الركوب";
+  static const String earnMoneyByAcceptingRideRequests =
+      "اكسب فلوس بقبول طلبات الركوب";
 }

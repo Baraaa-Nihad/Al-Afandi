@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:ovoride/core/utils/dimensions.dart';
 import 'package:ovoride/core/utils/my_color.dart';
 import 'package:ovoride/core/utils/style.dart';
-import 'package:ovoride/data/services/arabic_numbers.dart';
 
 class CardColumn extends StatelessWidget {
   final String header;
@@ -39,19 +38,6 @@ class CardColumn extends StatelessWidget {
     this.alignmentCenter = false,
     this.space,
   });
-  String formatDuration(String rawMinutes) {
-    // تنظيف النص من أي كلمات مثل Min وتحويله لرقم
-    double totalMinutes = double.tryParse(rawMinutes.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0;
-
-    int hours = totalMinutes ~/ 60; // القسمة الصحيحة للحصول على الساعات
-    int minutes = (totalMinutes % 60).toInt(); // باقي القسمة للحصول على الدقائق
-
-    if (hours > 0) {
-      return "$hours ساعة و $minutes دقيقة".toArabicNumbers();
-    } else {
-      return "$minutes دقيقة".toArabicNumbers();
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,12 +46,13 @@ class CardColumn extends StatelessWidget {
             crossAxisAlignment: alignmentEnd
                 ? CrossAxisAlignment.end
                 : alignmentCenter
-                    ? CrossAxisAlignment.center
-                    : CrossAxisAlignment.start,
+                ? CrossAxisAlignment.center
+                : CrossAxisAlignment.start,
             children: [
               Text(
                 header.tr,
-                style: headerTextStyle ??
+                style:
+                    headerTextStyle ??
                     regularSmall.copyWith(
                       color: MyColor.getGreyText(),
                       fontWeight: FontWeight.w600,
@@ -79,12 +66,13 @@ class CardColumn extends StatelessWidget {
             crossAxisAlignment: alignmentEnd
                 ? CrossAxisAlignment.end
                 : alignmentCenter
-                    ? CrossAxisAlignment.center
-                    : CrossAxisAlignment.start,
+                ? CrossAxisAlignment.center
+                : CrossAxisAlignment.start,
             children: [
               Text(
                 header.tr,
-                style: headerTextStyle ??
+                style:
+                    headerTextStyle ??
                     regularSmall.copyWith(
                       color: MyColor.getTextColor().withValues(alpha: 0.6),
                     ),
@@ -92,10 +80,8 @@ class CardColumn extends StatelessWidget {
                 maxLines: maxLine,
               ),
               SizedBox(height: space),
-              // داخل الـ Widget الخاص بك:
               Text(
-                // نتحقق إذا كان النص يحتوي على دقائق لنقوم بتحويله
-                body.toLowerCase().contains('min') || double.tryParse(body) != null ? formatDuration(body) : body.tr,
+                body.tr,
                 maxLines: bodyMaxLine,
                 style: isDate
                     ? regularDefault.copyWith(
@@ -104,10 +90,10 @@ class CardColumn extends StatelessWidget {
                         fontSize: Dimensions.fontSmall,
                       )
                     : bodyTextStyle ??
-                        regularSmall.copyWith(
-                          color: textColor ?? MyColor.getTextColor(),
-                          fontWeight: FontWeight.w500,
-                        ),
+                          regularSmall.copyWith(
+                            color: textColor ?? MyColor.getTextColor(),
+                            fontWeight: FontWeight.w500,
+                          ),
                 overflow: TextOverflow.ellipsis,
                 textAlign: alignmentEnd ? TextAlign.end : TextAlign.start,
               ),
@@ -123,13 +109,14 @@ class CardColumn extends StatelessWidget {
                               fontSize: Dimensions.fontSmall,
                             )
                           : subBodyTextStyle ??
-                              regularSmall.copyWith(
-                                color: textColor ??
-                                    MyColor.getTextColor().withValues(
-                                      alpha: 0.5,
-                                    ),
-                                fontWeight: FontWeight.w500,
-                              ),
+                                regularSmall.copyWith(
+                                  color:
+                                      textColor ??
+                                      MyColor.getTextColor().withValues(
+                                        alpha: 0.5,
+                                      ),
+                                  fontWeight: FontWeight.w500,
+                                ),
                       overflow: TextOverflow.ellipsis,
                     )
                   : const SizedBox.shrink(),

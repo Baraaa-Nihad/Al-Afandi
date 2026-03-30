@@ -1,8 +1,5 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:ovoride/core/helper/string_format_helper.dart';
 import 'package:ovoride/core/route/route.dart';
 import 'package:ovoride/core/utils/dimensions.dart';
@@ -31,21 +28,27 @@ class ProfileCompleteScreen extends StatefulWidget {
 }
 
 class _ProfileCompleteScreenState extends State<ProfileCompleteScreen> {
-  final formKey = GlobalKey<FormState>();
+  bool isNumberBlank = false;
+  bool isZoneEmpty = false;
 
   @override
   void initState() {
-    super.initState();
-
     Get.put(ProfileRepo(apiClient: Get.find()));
     final controller = Get.put(
-      DriverProfileCompleteController(profileRepo: Get.find()),
+      ProfileCompleteController(profileRepo: Get.find()),
     );
-
+    super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       controller.initialData();
     });
   }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  final formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -54,9 +57,8 @@ class _ProfileCompleteScreenState extends State<ProfileCompleteScreen> {
       child: AnnotatedRegionWidget(
         child: Scaffold(
           backgroundColor: MyColor.colorWhite,
-          body: GetBuilder<DriverProfileCompleteController>(
+          body: GetBuilder<ProfileCompleteController>(
             builder: (controller) => SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -87,7 +89,7 @@ class _ProfileCompleteScreenState extends State<ProfileCompleteScreen> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.symmetric(
+                          padding: EdgeInsets.symmetric(
                             horizontal: Dimensions.space20,
                           ),
                           child: Column(
@@ -118,24 +120,26 @@ class _ProfileCompleteScreenState extends State<ProfileCompleteScreen> {
                     ),
                   ),
                   Transform.translate(
-                    offset: const Offset(0, -Dimensions.space20),
+                    offset: Offset(0, -Dimensions.space20),
                     child: Container(
                       decoration: BoxDecoration(
                         color: MyColor.colorWhite,
-                        borderRadius: const BorderRadius.only(
+                        borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(Dimensions.radius25),
                           topRight: Radius.circular(Dimensions.radius25),
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: MyColor.colorBlack.withValues(alpha: 0.05),
-                            offset: const Offset(0, -30),
+                            color: MyColor.colorBlack.withValues(
+                              alpha: 0.05,
+                            ), // soft top shadow
+                            offset: const Offset(0, -30), // ⬆️ Shadow goes up
                             blurRadius: 15,
                             spreadRadius: -3,
                           ),
                         ],
                       ),
-                      padding: const EdgeInsets.symmetric(
+                      padding: EdgeInsets.symmetric(
                         horizontal: Dimensions.space20,
                         vertical: Dimensions.space20,
                       ),
@@ -148,7 +152,8 @@ class _ProfileCompleteScreenState extends State<ProfileCompleteScreen> {
                                 children: [
                                   CustomTextField(
                                     labelText: MyStrings.username.tr,
-                                    hintText: "${MyStrings.enterYour.tr} ${MyStrings.username.toLowerCase().tr}",
+                                    hintText:
+                                        "${MyStrings.enterYour.tr} ${MyStrings.username.toLowerCase().tr}",
                                     textInputType: TextInputType.text,
                                     inputAction: TextInputAction.next,
                                     focusNode: controller.userNameFocusNode,
@@ -158,7 +163,7 @@ class _ProfileCompleteScreenState extends State<ProfileCompleteScreen> {
                                       return;
                                     },
                                     validator: (value) {
-                                      if (value == null || value.isEmpty) {
+                                      if (value != null && value.isEmpty) {
                                         return MyStrings.enterYourUsername.tr;
                                       } else if (value.length < 6) {
                                         return MyStrings.kShortUserNameError;
@@ -167,19 +172,18 @@ class _ProfileCompleteScreenState extends State<ProfileCompleteScreen> {
                                       }
                                     },
                                   ),
-                                  const SizedBox(
-                                    height: Dimensions.space20,
-                                  ),
+                                  const SizedBox(height: Dimensions.space20),
                                   CustomTextField(
                                     labelText: MyStrings.phone.tr,
                                     hintText: "XXX-XXX-XXXX",
                                     textInputType: TextInputType.number,
-                                    inputAction: TextInputAction.done,
-                                    focusNode: controller.mobileNoFocusNode,
+                                    inputAction: TextInputAction.next,
+                                    focusNode: controller.countryFocusNode,
                                     controller: controller.mobileNoController,
+                                    nextFocus: controller.addressFocusNode,
                                     prefixIcon: IntrinsicWidth(
                                       child: Padding(
-                                        padding: const EdgeInsets.symmetric(
+                                        padding: EdgeInsetsGeometry.symmetric(
                                           horizontal: Dimensions.space10,
                                         ),
                                         child: GestureDetector(
@@ -190,27 +194,40 @@ class _ProfileCompleteScreenState extends State<ProfileCompleteScreen> {
                                             );
                                           },
                                           child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
                                             children: [
                                               spaceSide(Dimensions.space3),
                                               MyImageWidget(
-                                                imageUrl: UrlContainer.countryFlagImageLink.replaceAll(
-                                                  "{countryCode}",
-                                                  controller.selectedCountryData.countryCode.toString().toLowerCase(),
-                                                ),
+                                                imageUrl: UrlContainer
+                                                    .countryFlagImageLink
+                                                    .replaceAll(
+                                                      "{countryCode}",
+                                                      controller
+                                                          .selectedCountryData
+                                                          .countryCode
+                                                          .toString()
+                                                          .toLowerCase(),
+                                                    ),
                                                 height: Dimensions.space25,
                                                 width: Dimensions.space40,
                                               ),
                                               spaceSide(Dimensions.space5),
                                               Text(
                                                 "+${controller.selectedCountryData.dialCode}",
-                                                style: regularMediumLarge.copyWith(
-                                                  fontSize: Dimensions.fontOverLarge,
-                                                ),
+                                                style: regularMediumLarge
+                                                    .copyWith(
+                                                      fontSize: Dimensions
+                                                          .fontOverLarge,
+                                                    ),
                                               ),
                                               Icon(
-                                                Icons.keyboard_arrow_down_rounded,
-                                                color: MyColor.getBodyTextColor(),
+                                                Icons
+                                                    .keyboard_arrow_down_rounded,
+                                                color:
+                                                    MyColor.getBodyTextColor(),
                                               ),
                                               spaceSide(Dimensions.space2),
                                               Container(
@@ -227,179 +244,121 @@ class _ProfileCompleteScreenState extends State<ProfileCompleteScreen> {
                                       return;
                                     },
                                     validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return MyStrings.enterYourPhoneNumber.tr;
+                                      if (value != null && value.isEmpty) {
+                                        return MyStrings
+                                            .enterYourPhoneNumber
+                                            .tr;
                                       } else {
                                         return null;
                                       }
                                     },
                                   ),
-                                  const SizedBox(height: 20),
-
-                                  /// 🔥 Zone (رجعناه)
+                                  const SizedBox(height: Dimensions.space20),
                                   CustomTextField(
-                                      readOnly: true,
-                                      labelText: MyStrings.selectYourZone.tr,
-                                      hintText: MyStrings.selectYourZone.tr,
-                                      controller: TextEditingController(
-                                        text: controller.selectedZone.id == "-1" ? MyStrings.selectYourZone.tr : (controller.selectedZone.name ?? '').toTitleCase(),
-                                      ),
-                                      onTap: () {
-                                        ZoneBottomSheet.bottomSheet(
-                                          context,
-                                          controller,
-                                        );
-                                      },
-                                      onChanged: (value) {}),
-
-                                  const SizedBox(height: 20),
-                                  const SizedBox(
-                                    height: Dimensions.space20,
-                                  ),
-
-                                  Text(
-                                    'الموقع الحـالي :',
-                                    style: boldLarge.copyWith(
-                                      color: MyColor.getHeadingTextColor(),
-                                      fontWeight: FontWeight.w600,
+                                    readOnly: true,
+                                    labelText: MyStrings.selectYourZone.tr,
+                                    hintText: MyStrings.selectYourZone.tr,
+                                    textInputType: TextInputType.text,
+                                    inputAction: TextInputAction.next,
+                                    focusNode: controller.zoneFocusNode,
+                                    controller: TextEditingController(
+                                      text: controller.selectedZone.id == "-1"
+                                          ? MyStrings.selectYourZone.tr
+                                          : (controller.selectedZone.name ?? '')
+                                                .toTitleCase(),
                                     ),
-                                  ),
-
-                                  const SizedBox(height: Dimensions.space15),
-
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(
-                                      Dimensions.radius25,
-                                    ),
-                                    child: SizedBox(
-                                      height: 150,
-                                      width: double.infinity,
-                                      child: Stack(
-                                        alignment: Alignment.center,
-                                        children: [
-                                          GoogleMap(
-                                            initialCameraPosition: CameraPosition(
-                                              target: LatLng(
-                                                controller.selectedLatitude,
-                                                controller.selectedLongitude,
-                                              ),
-                                              zoom: 16,
-                                            ),
-                                            myLocationEnabled: true,
-                                            myLocationButtonEnabled: false,
-                                            zoomControlsEnabled: false,
-                                            mapToolbarEnabled: false,
-                                            scrollGesturesEnabled: true,
-                                            zoomGesturesEnabled: true,
-                                            rotateGesturesEnabled: true,
-                                            tiltGesturesEnabled: true,
-                                            gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
-                                              Factory<OneSequenceGestureRecognizer>(
-                                                () => EagerGestureRecognizer(),
-                                              ),
-                                            },
-                                            onMapCreated: controller.onMapCreated,
-                                            onCameraMove: controller.onCameraMove,
-                                            onCameraIdle: controller.onCameraIdle,
-                                          ),
-                                          const IgnorePointer(
-                                            child: Icon(
-                                              Icons.location_pin,
-                                              size: 42,
-                                              color: Colors.red,
-                                            ),
-                                          ),
-                                        ],
+                                    nextFocus: controller.stateFocusNode,
+                                    onTap: () {
+                                      ZoneBottomSheet.bottomSheet(
+                                        context,
+                                        controller,
+                                      );
+                                    },
+                                    isShowSuffixIcon: true,
+                                    suffixWidget: SizedBox(
+                                      height: 30,
+                                      width: 30,
+                                      child: Icon(
+                                        Icons.keyboard_arrow_down,
+                                        color: MyColor.colorGrey,
                                       ),
                                     ),
+                                    onChanged: (value) {
+                                      return;
+                                    },
                                   ),
-                                  const SizedBox(height: Dimensions.space15),
-
-                                  Container(
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.all(14),
-                                    decoration: BoxDecoration(
-                                      color: MyColor.primaryColor.withValues(alpha: 0.06),
-                                      borderRadius: BorderRadius.circular(
-                                        Dimensions.radius25,
-                                      ),
-                                      border: Border.all(
-                                        color: MyColor.primaryColor.withValues(alpha: 0.15),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Icon(
-                                          Icons.place_outlined,
-                                          color: MyColor.primaryColor,
-                                          size: 20,
-                                        ),
-                                        const SizedBox(width: 10),
-                                        Expanded(
-                                          child: Text(
-                                            controller.selectedAddressText.isEmpty ? 'جارٍ تحديد العنوان...' : " مكانك الآن : ${controller.selectedAddressText.split(RegExp(r'[,|،]')).map((e) => e.trim()).where((e) => e.isNotEmpty).toSet().join(' - ')}",
-                                            style: regularDefault.copyWith(
-                                              color: MyColor.getHeadingTextColor(),
-                                              height: 1.5,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                  const SizedBox(height: Dimensions.space20),
+                                  CustomTextField(
+                                    labelText: MyStrings.address.tr,
+                                    hintText:
+                                        "${MyStrings.enterYour.tr} ${MyStrings.address.toLowerCase().tr}",
+                                    textInputType: TextInputType.text,
+                                    inputAction: TextInputAction.next,
+                                    focusNode: controller.addressFocusNode,
+                                    controller: controller.addressController,
+                                    nextFocus: controller.stateFocusNode,
+                                    onChanged: (value) {
+                                      return;
+                                    },
                                   ),
-                                  // const SizedBox(height: Dimensions.space12),
-
-                                  // Align(
-                                  //   alignment: AlignmentDirectional.centerStart,
-                                  //   child: InkWell(
-                                  //     onTap: controller.moveToCurrentLocation,
-                                  //     borderRadius: BorderRadius.circular(50),
-                                  //     child: Container(
-                                  //       padding: const EdgeInsets.symmetric(
-                                  //         horizontal: 14,
-                                  //         vertical: 10,
-                                  //       ),
-                                  //       decoration: BoxDecoration(
-                                  //         color: MyColor.colorWhite,
-                                  //         borderRadius: BorderRadius.circular(50),
-                                  //         border: Border.all(
-                                  //           color: MyColor.primaryColor.withValues(alpha: 0.15),
-                                  //         ),
-                                  //         boxShadow: [
-                                  //           BoxShadow(
-                                  //             color: MyColor.colorBlack.withValues(alpha: 0.06),
-                                  //             blurRadius: 10,
-                                  //             offset: const Offset(0, 4),
-                                  //           ),
-                                  //         ],
-                                  //       ),
-                                  //       child: Row(
-                                  //         mainAxisSize: MainAxisSize.min,
-                                  //         children: [
-                                  //           Icon(
-                                  //             Icons.my_location,
-                                  //             color: MyColor.primaryColor,
-                                  //             size: 18,
-                                  //           ),
-                                  //           const SizedBox(width: 8),
-                                  //           Text(
-                                  //             'تغيـير الموقع الحالي ؟',
-                                  //             style: regularDefault.copyWith(
-                                  //               color: MyColor.getHeadingTextColor(),
-                                  //               fontWeight: FontWeight.w500,
-                                  //             ),
-                                  //           ),
-                                  //         ],
-                                  //       ),
-                                  //     ),
+                                  const SizedBox(height: Dimensions.space20),
+                                  CustomTextField(
+                                    labelText: MyStrings.state,
+                                    hintText:
+                                        "${MyStrings.enterYour.tr} ${MyStrings.state.toLowerCase().tr}",
+                                    textInputType: TextInputType.text,
+                                    inputAction: TextInputAction.next,
+                                    focusNode: controller.stateFocusNode,
+                                    controller: controller.stateController,
+                                    nextFocus: controller.cityFocusNode,
+                                    onChanged: (value) {
+                                      return;
+                                    },
+                                  ),
+                                  const SizedBox(height: Dimensions.space20),
+                                  CustomTextField(
+                                    labelText: MyStrings.city.tr,
+                                    hintText:
+                                        "${MyStrings.enterYour.tr} ${MyStrings.city.toLowerCase().tr}",
+                                    textInputType: TextInputType.text,
+                                    inputAction: TextInputAction.next,
+                                    focusNode: controller.cityFocusNode,
+                                    controller: controller.cityController,
+                                    nextFocus: controller.zipCodeFocusNode,
+                                    onChanged: (value) {
+                                      return;
+                                    },
+                                  ),
+                                  const SizedBox(height: Dimensions.space20),
+                                  CustomTextField(
+                                    labelText: MyStrings.zipCode.tr,
+                                    hintText:
+                                        "${MyStrings.enterYour.tr} ${MyStrings.zipCode.toLowerCase().tr}",
+                                    textInputType: TextInputType.text,
+                                    inputAction: TextInputAction.done,
+                                    focusNode: controller.zipCodeFocusNode,
+                                    controller: controller.zipCodeController,
+                                    onChanged: (value) {
+                                      return;
+                                    },
+                                  ),
+                                  // if (controller.loginType == "google") ...[
+                                  //   const SizedBox(
+                                  //     height: Dimensions.space20,
                                   //   ),
-                                  // ),
-
-                                  const SizedBox(
-                                    height: Dimensions.space35,
-                                  ),
-
+                                  //   CustomTextField(
+                                  //     labelText: MyStrings.referanceName,
+                                  //     hintText: MyStrings.referanceName.tr,
+                                  //     textInputType: TextInputType.text,
+                                  //     inputAction: TextInputAction.next,
+                                  //     controller: controller.referController,
+                                  //     nextFocus: controller.addressFocusNode,
+                                  //     onChanged: (value) {
+                                  //       return;
+                                  //     },
+                                  //   ),
+                                  // ],
+                                  const SizedBox(height: Dimensions.space35),
                                   RoundedButton(
                                     isLoading: controller.submitLoading,
                                     text: MyStrings.completeProfile.tr,

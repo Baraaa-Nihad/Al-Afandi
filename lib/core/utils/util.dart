@@ -39,8 +39,6 @@ class MyUtils {
     }
   }
 
-
-
   static void splashScreen() {
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
@@ -80,8 +78,10 @@ class MyUtils {
     });
   }
 
-  static Future<void> precacheImagesFromPathList(BuildContext context,
-      List<String> paths,) async {
+  static Future<void> precacheImagesFromPathList(
+    BuildContext context,
+    List<String> paths,
+  ) async {
     for (final path in paths) {
       late ImageProvider imageProvider;
 
@@ -139,7 +139,6 @@ class MyUtils {
       return MyStrings.onlinePayment;
     }
   }
-
 
   static dynamic getBottomSheetShadow() {
     return [
@@ -247,46 +246,45 @@ class MyUtils {
       if (Get.context != null) {
         await showCupertinoDialog(
           context: Get.context!,
-          builder: (ctx) =>
-              CupertinoAlertDialog(
-                title: Text(
-                  MyStrings.locationPermissionNeedTitle.tr,
+          builder: (ctx) => CupertinoAlertDialog(
+            title: Text(
+              MyStrings.locationPermissionNeedTitle.tr,
+              style: regularLarge.copyWith(
+                color: MyColor.getTextColor(),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            content: Text(
+              MyStrings.locationPermissionNeedMSG.tr,
+              style: regularSmall.copyWith(
+                color: MyColor.getTextColor(),
+                fontWeight: FontWeight.normal,
+              ),
+            ),
+            actions: [
+              CupertinoDialogAction(
+                child: Text(
+                  MyStrings.cancel.tr,
+                  style: regularLarge.copyWith(),
+                ),
+                onPressed: () => Navigator.of(ctx).pop(),
+              ),
+              CupertinoDialogAction(
+                isDefaultAction: true,
+                onPressed: () async {
+                  Navigator.of(ctx).pop();
+                  await Geolocator.openAppSettings();
+                },
+                child: Text(
+                  MyStrings.openSettings.tr,
                   style: regularLarge.copyWith(
-                    color: MyColor.getTextColor(),
+                    color: MyColor.redCancelTextColor,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                content: Text(
-                  MyStrings.locationPermissionNeedMSG.tr,
-                  style: regularSmall.copyWith(
-                    color: MyColor.getTextColor(),
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-                actions: [
-                  CupertinoDialogAction(
-                    child: Text(
-                      MyStrings.cancel.tr,
-                      style: regularLarge.copyWith(),
-                    ),
-                    onPressed: () => Navigator.of(ctx).pop(),
-                  ),
-                  CupertinoDialogAction(
-                    isDefaultAction: true,
-                    onPressed: () async {
-                      Navigator.of(ctx).pop();
-                      await Geolocator.openAppSettings();
-                    },
-                    child: Text(
-                      MyStrings.openSettings.tr,
-                      style: regularLarge.copyWith(
-                        color: MyColor.redCancelTextColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
               ),
+            ],
+          ),
         );
       }
       return false;
@@ -346,8 +344,9 @@ class MyUtils {
 
       final String mask = '*' * maskLength;
 
-      final String maskedInput = maskLength > 4 ? input.replaceRange(
-          5, maskLength, mask) : input.replaceRange(0, maskLength, mask);
+      final String maskedInput = maskLength > 4
+          ? input.replaceRange(5, maskLength, mask)
+          : input.replaceRange(0, maskLength, mask);
 
       return maskedInput;
     } catch (e) {
@@ -363,7 +362,8 @@ class MyUtils {
   }
 
   static List<GlobalFormModel> dynamicFormSelectValueFormatter(
-      List<GlobalFormModel>? dynamicFormList,) {
+    List<GlobalFormModel>? dynamicFormList,
+  ) {
     List<GlobalFormModel> mainFormList = [];
 
     if (dynamicFormList != null && dynamicFormList.isNotEmpty) {
@@ -448,7 +448,8 @@ class MyUtils {
     if (str.length <= 2) {
       return str.substring(0, 1) + "*" * (str.length - 1);
     } else {
-      return str.substring(0, 1) + "*" * (str.length - 2) +
+      return str.substring(0, 1) +
+          "*" * (str.length - 2) +
           str.substring(str.length - 1);
     }
   }
@@ -460,7 +461,6 @@ class MyUtils {
       return Colors.blueAccent;
     }
   }
-
 
   static Future<Position> getCurrentPosition() => getCurrentLocationPosition();
 

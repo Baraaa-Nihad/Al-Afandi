@@ -4,6 +4,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:ovoride/core/helper/string_format_helper.dart';
+import 'package:ovoride/core/route/route.dart';
 import 'package:ovoride/core/utils/my_strings.dart';
 import 'package:ovoride/core/utils/url_container.dart';
 import 'package:ovoride/core/utils/util.dart';
@@ -85,10 +86,7 @@ class RideDetailsController extends GetxController {
     tipsList = repo.apiClient.getTipsList();
     update();
 
-    await Future.wait([
-      getRideBidList(id),
-      getRideDetails(id),
-    ]);
+    await Future.wait([getRideBidList(id), getRideDetails(id)]);
 
     // تفعيل الاستماع للبوشر بعد تحميل البيانات الأولية
     subscribeToPusher();
@@ -109,24 +107,41 @@ class RideDetailsController extends GetxController {
 
     ResponseModel responseModel = await repo.getRideDetails(id);
     if (responseModel.statusCode == 200) {
-      RideDetailsResponseModel model = RideDetailsResponseModel.fromJson((responseModel.responseJson));
+      RideDetailsResponseModel model = RideDetailsResponseModel.fromJson(
+        (responseModel.responseJson),
+      );
       if (model.status == MyStrings.success) {
         RideModel? tempRide = model.data?.ride;
         if (tempRide != null) {
           ride = tempRide;
           driverTotalCompletedRide = model.data?.driverTotalRide ?? '';
           pickupLatLng = LatLng(
-            StringConverter.formatDouble(tempRide.pickupLatitude.toString(), precision: 16),
-            StringConverter.formatDouble(tempRide.pickupLongitude.toString(), precision: 16),
+            StringConverter.formatDouble(
+              tempRide.pickupLatitude.toString(),
+              precision: 16,
+            ),
+            StringConverter.formatDouble(
+              tempRide.pickupLongitude.toString(),
+              precision: 16,
+            ),
           );
           destinationLatLng = LatLng(
-            StringConverter.formatDouble(tempRide.destinationLatitude.toString(), precision: 16),
-            StringConverter.formatDouble(tempRide.destinationLongitude.toString(), precision: 14),
+            StringConverter.formatDouble(
+              tempRide.destinationLatitude.toString(),
+              precision: 16,
+            ),
+            StringConverter.formatDouble(
+              tempRide.destinationLongitude.toString(),
+              precision: 14,
+            ),
           );
         }
-        serviceImagePath = '${UrlContainer.domainUrl}/${model.data?.serviceImagePath ?? ''}';
-        brandImagePath = '${UrlContainer.domainUrl}/${model.data?.brandImagePath ?? ''}';
-        driverImagePath = '${UrlContainer.domainUrl}/${model.data?.driverImagePath}';
+        serviceImagePath =
+            '${UrlContainer.domainUrl}/${model.data?.serviceImagePath ?? ''}';
+        brandImagePath =
+            '${UrlContainer.domainUrl}/${model.data?.brandImagePath ?? ''}';
+        driverImagePath =
+            '${UrlContainer.domainUrl}/${model.data?.driverImagePath}';
 
         update();
         mapController.loadMap(
@@ -136,7 +151,9 @@ class RideDetailsController extends GetxController {
         );
       } else {
         Get.back();
-        CustomSnackBar.error(errorList: model.message ?? [MyStrings.somethingWentWrong]);
+        CustomSnackBar.error(
+          errorList: model.message ?? [MyStrings.somethingWentWrong],
+        );
       }
     } else {
       CustomSnackBar.error(errorList: [responseModel.message]);
@@ -152,7 +169,9 @@ class RideDetailsController extends GetxController {
     try {
       ResponseModel responseModel = await repo.getRideBidList(id: id);
       if (responseModel.statusCode == 200) {
-        BidListResponseModel model = BidListResponseModel.fromJson((responseModel.responseJson));
+        BidListResponseModel model = BidListResponseModel.fromJson(
+          (responseModel.responseJson),
+        );
         if (model.status == "success") {
           bids = model.data?.bids ?? [];
           totalBids = bids.length;
@@ -191,15 +210,23 @@ class RideDetailsController extends GetxController {
     try {
       ResponseModel responseModel = await repo.acceptBid(bidId: id);
       if (responseModel.statusCode == 200) {
-        RideDetailsResponseModel model = RideDetailsResponseModel.fromJson((responseModel.responseJson));
+        RideDetailsResponseModel model = RideDetailsResponseModel.fromJson(
+          (responseModel.responseJson),
+        );
         if (model.status == "success") {
           await getRideDetails(ride.id ?? "", shouldLoading: false);
           onSuccess?.call();
         } else {
-          CustomSnackBar.error(errorList: model.message ?? [MyStrings.somethingWentWrong], dismissAll: false);
+          CustomSnackBar.error(
+            errorList: model.message ?? [MyStrings.somethingWentWrong],
+            dismissAll: false,
+          );
         }
       } else {
-        CustomSnackBar.error(errorList: [responseModel.message], dismissAll: false);
+        CustomSnackBar.error(
+          errorList: [responseModel.message],
+          dismissAll: false,
+        );
       }
     } catch (e) {
       printX(e);
@@ -217,15 +244,23 @@ class RideDetailsController extends GetxController {
     try {
       ResponseModel responseModel = await repo.rejectBid(id: id);
       if (responseModel.statusCode == 200) {
-        RideDetailsResponseModel model = RideDetailsResponseModel.fromJson((responseModel.responseJson));
+        RideDetailsResponseModel model = RideDetailsResponseModel.fromJson(
+          (responseModel.responseJson),
+        );
         if (model.status == "success") {
           await getRideDetails(ride.id ?? "", shouldLoading: false);
           onSuccess?.call();
         } else {
-          CustomSnackBar.error(errorList: model.message ?? [MyStrings.somethingWentWrong], dismissAll: false);
+          CustomSnackBar.error(
+            errorList: model.message ?? [MyStrings.somethingWentWrong],
+            dismissAll: false,
+          );
         }
       } else {
-        CustomSnackBar.error(errorList: [responseModel.message], dismissAll: false);
+        CustomSnackBar.error(
+          errorList: [responseModel.message],
+          dismissAll: false,
+        );
       }
     } catch (e) {
       printX(e);
@@ -248,11 +283,15 @@ class RideDetailsController extends GetxController {
         latLng: LatLng(position.latitude, position.longitude),
       );
       if (responseModel.statusCode == 200) {
-        AuthorizationResponseModel model = AuthorizationResponseModel.fromJson((responseModel.responseJson));
+        AuthorizationResponseModel model = AuthorizationResponseModel.fromJson(
+          (responseModel.responseJson),
+        );
         if (model.status == "success") {
           sosMsgController.text = '';
           update();
-          CustomSnackBar.success(successList: model.message ?? ["Success"]);
+          CustomSnackBar.success(
+            successList: model.message ?? [MyStrings.requestSuccess],
+          );
         }
       }
     } catch (e) {
@@ -268,13 +307,20 @@ class RideDetailsController extends GetxController {
     isCancelLoading = true;
     update();
     try {
-      ResponseModel responseModel = await repo.cancelRide(id: ride.id ?? "-1", reason: cancelReasonController.text);
+      ResponseModel responseModel = await repo.cancelRide(
+        id: ride.id ?? "-1",
+        reason: cancelReasonController.text,
+      );
       if (responseModel.statusCode == 200) {
-        AuthorizationResponseModel model = AuthorizationResponseModel.fromJson((responseModel.responseJson));
+        AuthorizationResponseModel model = AuthorizationResponseModel.fromJson(
+          (responseModel.responseJson),
+        );
         if (model.status == "success") {
           await getRideDetails(rideId, shouldLoading: false);
-          Get.back();
-          CustomSnackBar.success(successList: model.message ?? ["Success"]);
+          Get.offAllNamed(RouteHelper.riderDashboard);
+          CustomSnackBar.success(
+            successList: model.message ?? [MyStrings.requestSuccess],
+          );
         }
       }
     } catch (e) {
@@ -291,11 +337,20 @@ class RideDetailsController extends GetxController {
     isReviewLoading = true;
     update();
     try {
-      ResponseModel responseModel = await repo.reviewRide(rideId: rideId, rating: rating.toString(), review: reviewMsgController.text);
+      ResponseModel responseModel = await repo.reviewRide(
+        rideId: rideId,
+        rating: rating.toString(),
+        review: reviewMsgController.text,
+      );
       if (responseModel.statusCode == 200) {
-        AuthorizationResponseModel model = AuthorizationResponseModel.fromJson((responseModel.responseJson));
+        AuthorizationResponseModel model = AuthorizationResponseModel.fromJson(
+          (responseModel.responseJson),
+        );
         if (model.status == MyStrings.success) {
-          ride.driverReview = UserReview(rating: rating.toString(), review: reviewMsgController.text);
+          ride.driverReview = UserReview(
+            rating: rating.toString(),
+            review: reviewMsgController.text,
+          );
           reviewMsgController.text = '';
           rating = 0.0;
           update();

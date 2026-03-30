@@ -23,7 +23,8 @@ class EmailVerificationScreen extends StatefulWidget {
   const EmailVerificationScreen({super.key});
 
   @override
-  State<EmailVerificationScreen> createState() => _EmailVerificationScreenState();
+  State<EmailVerificationScreen> createState() =>
+      _EmailVerificationScreenState();
 }
 
 class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
@@ -31,7 +32,10 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   void initState() {
     Get.put(GeneralSettingRepo(apiClient: Get.find()));
     Get.put(SmsEmailVerificationRepo(apiClient: Get.find()), tag: 'rider');
-    final controller = Get.put(EmailVerificationController(repo: Get.find(tag: 'rider')), tag: 'rider');
+    final controller = Get.put(
+      EmailVerificationController(repo: Get.find(tag: 'rider')),
+      tag: 'rider',
+    );
 
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -52,7 +56,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         statusBarColor: MyColor.transparentColor,
         child: Scaffold(
           backgroundColor: MyColor.screenBgColor,
-          body: GetBuilder<EmailVerificationController>(tag: 'rider',
+          body: GetBuilder<EmailVerificationController>(
+            tag: 'rider',
             builder: (controller) => controller.isLoading
                 ? Center(
                     child: CircularProgressIndicator(
@@ -113,7 +118,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                                 ),
                                 spaceDown(Dimensions.space8),
                                 DefaultText(
-                                  text: '${MyStrings.verifyCodeSendToSubText.tr} ${MyUtils.maskEmail(controller.userEmail)}',
+                                  text:
+                                      '${MyStrings.verifyCodeSendToSubText.tr} ${MyUtils.maskEmail(controller.userEmail)}',
                                   textAlign: TextAlign.center,
                                   fontSize: Dimensions.fontLarge,
                                   textColor: MyColor.getBodyTextColor(),
@@ -165,7 +171,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                                               maxLines: 2,
                                               overflow: TextOverflow.ellipsis,
                                               style: boldLarge.copyWith(
-                                                color: MyColor.getPrimaryColor(),
+                                                color:
+                                                    MyColor.getPrimaryColor(),
                                               ),
                                             ),
                                     ),

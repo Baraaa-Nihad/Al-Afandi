@@ -15,7 +15,8 @@ class MyIcons {
   static const String deposit = "assets/icon/deposit.svg";
   static const String depositHistory = "assets/icon/deposit_history.svg";
   static const String withdrawHistory = "assets/icon/withdraw_history.svg";
-  static const String transactionHistory = "assets/icon/transaction_history.svg";
+  static const String transactionHistory =
+      "assets/icon/transaction_history.svg";
   static const String twoFaIcon = "assets/icon/twofa_icon.svg";
   static const String language = "assets/icon/language.svg";
   static const String support = "assets/icon/support.svg";
@@ -54,7 +55,7 @@ class MyIcons {
   static const String sendArrow = "assets/icon/send_arrow.svg";
   static const String callIcon = "assets/icon/call.svg";
   static const String doc = "assets/icon/doc.svg";
-  static const String xlsx = "assets/icons/xlsx.svg";
+  static const String xlsx = "assets/icon/xlsx.svg";
   static const String pdfFile = "assets/icon/pdf.svg";
   static const String driverIcon = "assets/icon/driver.svg";
   static const String avatar = "assets/icon/avatar.svg";

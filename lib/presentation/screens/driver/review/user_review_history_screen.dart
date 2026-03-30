@@ -31,7 +31,10 @@ class _UserReviewHistoryState extends State<UserReviewHistory> {
   @override
   void initState() {
     Get.put(ReviewRepo(apiClient: Get.find()), tag: 'driver');
-    final controller = Get.put(ReviewController(repo: Get.find(tag: 'driver')), tag: 'driver');
+    final controller = Get.put(
+      ReviewController(repo: Get.find(tag: 'driver')),
+      tag: 'driver',
+    );
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((t) {
       if (Get.arguments != null) {
@@ -43,7 +46,8 @@ class _UserReviewHistoryState extends State<UserReviewHistory> {
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegionWidget(
-      child: GetBuilder<ReviewController>(tag: 'driver', 
+      child: GetBuilder<ReviewController>(
+        tag: 'driver',
         builder: (controller) {
           return Scaffold(
             backgroundColor: MyColor.secondaryScreenBgColor,
@@ -73,7 +77,8 @@ class _UserReviewHistoryState extends State<UserReviewHistory> {
                         : Row(
                             children: [
                               MyImageWidget(
-                                imageUrl: '${controller.userImagePath}/${controller.rider?.avatar}',
+                                imageUrl:
+                                    '${controller.userImagePath}/${controller.rider?.avatar}',
                                 height: Dimensions.space50,
                                 width: Dimensions.space50,
                                 radius: Dimensions.radiusHuge,
@@ -120,7 +125,8 @@ class _UserReviewHistoryState extends State<UserReviewHistory> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   RatingBar.builder(
-                                    initialRating: double.tryParse(
+                                    initialRating:
+                                        double.tryParse(
                                           controller.rider?.avgRating ?? "0",
                                         ) ??
                                         0,
@@ -146,14 +152,18 @@ class _UserReviewHistoryState extends State<UserReviewHistory> {
                                         TextSpan(
                                           text: '${MyStrings.avgRating.tr} ',
                                           style: regularDefault.copyWith(
-                                            color: MyColor.getBodyTextColor().withValues(alpha: 0.8),
+                                            color: MyColor.getBodyTextColor()
+                                                .withValues(alpha: 0.8),
                                             fontSize: Dimensions.fontDefault,
                                           ),
                                         ),
                                         TextSpan(
-                                          text: ' ${(double.tryParse(controller.rider?.avgRating ?? "0") ?? 0)}'.toCapitalized(),
+                                          text:
+                                              ' ${(double.tryParse(controller.rider?.avgRating ?? "0") ?? 0)}'
+                                                  .toCapitalized(),
                                           style: boldDefault.copyWith(
-                                            color: MyColor.getHeadingTextColor(),
+                                            color:
+                                                MyColor.getHeadingTextColor(),
                                             fontSize: Dimensions.fontLarge,
                                           ),
                                         ),
@@ -180,7 +190,8 @@ class _UserReviewHistoryState extends State<UserReviewHistory> {
                     child: controller.isLoading
                         ? ListView.separated(
                             itemCount: 20,
-                            separatorBuilder: (context, index) => const SizedBox(height: Dimensions.space10),
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: Dimensions.space10),
                             itemBuilder: (context, index) {
                               return Container(
                                 decoration: BoxDecoration(
@@ -199,132 +210,151 @@ class _UserReviewHistoryState extends State<UserReviewHistory> {
                               );
                             },
                           )
-                        : (controller.reviews.isEmpty && controller.isLoading == false)
-                            ? NoDataWidget(margin: 6)
-                            : ListView.builder(
-                                itemCount: controller.reviews.length,
-                                itemBuilder: (context, index) {
-                                  final review = controller.reviews[index];
-                                  return Container(
-                                    decoration: BoxDecoration(
-                                      color: MyColor.getCardBgColor(),
-                                      boxShadow: MyUtils.getCardShadow(),
-                                      borderRadius: BorderRadius.circular(
-                                        Dimensions.moreRadius,
-                                      ),
-                                    ),
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: Dimensions.space16,
-                                      vertical: Dimensions.space16,
-                                    ),
-                                    margin: EdgeInsets.only(
-                                      bottom: Dimensions.space16,
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                        : (controller.reviews.isEmpty &&
+                              controller.isLoading == false)
+                        ? NoDataWidget(margin: 6)
+                        : ListView.builder(
+                            itemCount: controller.reviews.length,
+                            itemBuilder: (context, index) {
+                              final review = controller.reviews[index];
+                              return Container(
+                                decoration: BoxDecoration(
+                                  color: MyColor.getCardBgColor(),
+                                  boxShadow: MyUtils.getCardShadow(),
+                                  borderRadius: BorderRadius.circular(
+                                    Dimensions.moreRadius,
+                                  ),
+                                ),
+                                width: double.infinity,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: Dimensions.space16,
+                                  vertical: Dimensions.space16,
+                                ),
+                                margin: EdgeInsets.only(
+                                  bottom: Dimensions.space16,
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            MyImageWidget(
-                                              imageUrl: '${controller.driverImagePath}/${review.ride?.driver?.avatar}',
-                                              height: Dimensions.space50,
-                                              width: Dimensions.space50,
-                                              radius: Dimensions.radiusHuge,
-                                              isProfile: true,
-                                            ),
-                                            SizedBox(width: Dimensions.space10),
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                        MyImageWidget(
+                                          imageUrl:
+                                              '${controller.driverImagePath}/${review.ride?.driver?.avatar}',
+                                          height: Dimensions.space50,
+                                          width: Dimensions.space50,
+                                          radius: Dimensions.radiusHuge,
+                                          isProfile: true,
+                                        ),
+                                        SizedBox(width: Dimensions.space10),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
                                                 children: [
-                                                  Row(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    mainAxisAlignment: MainAxisAlignment.start,
-                                                    children: [
-                                                      Expanded(
-                                                        child: Text(
-                                                          '${review.ride?.driver?.getFullName().toCapitalized()}',
-                                                          style: boldMediumLarge.copyWith(
-                                                            color: MyColor.getHeadingTextColor(),
-                                                            fontSize: Dimensions.fontTitleLarge,
+                                                  Expanded(
+                                                    child: Text(
+                                                      '${review.ride?.driver?.getFullName().toCapitalized()}',
+                                                      style: boldMediumLarge
+                                                          .copyWith(
+                                                            color:
+                                                                MyColor.getHeadingTextColor(),
+                                                            fontSize: Dimensions
+                                                                .fontTitleLarge,
                                                           ),
-                                                        ),
-                                                      ),
-                                                      spaceSide(Dimensions.space10),
-                                                      Text(
-                                                        DateConverter.estimatedDate(
-                                                          DateTime.tryParse(
-                                                                '${review.createdAt}',
-                                                              ) ??
-                                                              DateTime.now(),
-                                                          formatType: DateFormatType.onlyDate,
-                                                        ),
-                                                        style: boldLarge.copyWith(
-                                                          color: MyColor.getBodyTextColor(),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  SizedBox(
-                                                    height: Dimensions.space5,
-                                                  ),
-                                                  RatingBar.builder(
-                                                    initialRating: StringConverter.formatDouble(
-                                                      review.rating ?? '0',
                                                     ),
-                                                    minRating: 1,
-                                                    direction: Axis.horizontal,
-                                                    allowHalfRating: false,
-                                                    itemCount: 5,
-                                                    itemPadding: const EdgeInsets.symmetric(
-                                                      horizontal: 0,
-                                                    ),
-                                                    itemSize: Dimensions.fontExtraLarge,
-                                                    itemBuilder: (context, _) => const Icon(
-                                                      Icons.star_rate_rounded,
-                                                      color: MyColor.colorOrange,
-                                                    ),
-                                                    ignoreGestures: true,
-                                                    onRatingUpdate: (v) {},
                                                   ),
-                                                  SizedBox(
-                                                    height: Dimensions.space5,
+                                                  spaceSide(Dimensions.space10),
+                                                  Text(
+                                                    DateConverter.estimatedDate(
+                                                      DateTime.tryParse(
+                                                            '${review.createdAt}',
+                                                          ) ??
+                                                          DateTime.now(),
+                                                      formatType: DateFormatType
+                                                          .onlyDate,
+                                                    ),
+                                                    style: boldLarge.copyWith(
+                                                      color:
+                                                          MyColor.getBodyTextColor(),
+                                                    ),
                                                   ),
                                                 ],
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                        spaceDown(Dimensions.space10),
-                                        InnerShadowContainer(
-                                          width: double.infinity,
-                                          backgroundColor: MyColor.neutral50,
-                                          borderRadius: Dimensions.largeRadius,
-                                          blur: 6,
-                                          offset: Offset(3, 3),
-                                          shadowColor: MyColor.colorBlack.withValues(alpha: 0.04),
-                                          isShadowTopLeft: true,
-                                          isShadowBottomRight: true,
-                                          padding: EdgeInsetsGeometry.symmetric(
-                                            vertical: Dimensions.space16,
-                                            horizontal: Dimensions.space16,
-                                          ),
-                                          child: Align(
-                                            alignment: AlignmentDirectional.centerStart,
-                                            child: Text(
-                                              review.review ?? '',
-                                              style: lightDefault.copyWith(),
-                                            ),
+                                              SizedBox(
+                                                height: Dimensions.space5,
+                                              ),
+                                              RatingBar.builder(
+                                                initialRating:
+                                                    StringConverter.formatDouble(
+                                                      review.rating ?? '0',
+                                                    ),
+                                                minRating: 1,
+                                                direction: Axis.horizontal,
+                                                allowHalfRating: false,
+                                                itemCount: 5,
+                                                itemPadding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 0,
+                                                    ),
+                                                itemSize:
+                                                    Dimensions.fontExtraLarge,
+                                                itemBuilder: (context, _) =>
+                                                    const Icon(
+                                                      Icons.star_rate_rounded,
+                                                      color:
+                                                          MyColor.colorOrange,
+                                                    ),
+                                                ignoreGestures: true,
+                                                onRatingUpdate: (v) {},
+                                              ),
+                                              SizedBox(
+                                                height: Dimensions.space5,
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ],
                                     ),
-                                  );
-                                },
-                              ),
+                                    spaceDown(Dimensions.space10),
+                                    InnerShadowContainer(
+                                      width: double.infinity,
+                                      backgroundColor: MyColor.neutral50,
+                                      borderRadius: Dimensions.largeRadius,
+                                      blur: 6,
+                                      offset: Offset(3, 3),
+                                      shadowColor: MyColor.colorBlack
+                                          .withValues(alpha: 0.04),
+                                      isShadowTopLeft: true,
+                                      isShadowBottomRight: true,
+                                      padding: EdgeInsetsGeometry.symmetric(
+                                        vertical: Dimensions.space16,
+                                        horizontal: Dimensions.space16,
+                                      ),
+                                      child: Align(
+                                        alignment:
+                                            AlignmentDirectional.centerStart,
+                                        child: Text(
+                                          review.review ?? '',
+                                          style: lightDefault.copyWith(),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
                   ),
                 ],
               ),

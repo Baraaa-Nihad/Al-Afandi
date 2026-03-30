@@ -28,7 +28,10 @@ class RiderHomeScreenAppBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: Dimensions.space16, vertical: Dimensions.space16),
+        padding: EdgeInsets.symmetric(
+          horizontal: Dimensions.space16,
+          vertical: Dimensions.space16,
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -39,9 +42,12 @@ class RiderHomeScreenAppBar extends StatelessWidget {
                   child: Row(
                     children: [
                       GestureDetector(
-                        onTap: () => Get.toNamed(RouteHelper.riderProfileScreen),
+                        onTap: () =>
+                            Get.toNamed(RouteHelper.riderProfileScreen),
                         child: MyImageWidget(
-                          imageUrl: controller.user.image != null ? '${UrlContainer.domainUrl}/${controller.userImagePath}/${controller.user.image}' : '', // سيقوم MyImageWidget بعرض صورة افتراضية في هذه الحالة
+                          imageUrl: controller.user.image != null
+                              ? '${UrlContainer.domainUrl}/${controller.userImagePath}/${controller.user.image}'
+                              : '', // سيقوم MyImageWidget بعرض صورة افتراضية في هذه الحالة
                           height: 50,
                           width: 50,
                           radius: 50,
@@ -56,7 +62,11 @@ class RiderHomeScreenAppBar extends StatelessWidget {
                             FittedBox(
                               fit: BoxFit.scaleDown,
                               child: HeaderText(
-                                text: (controller.user.id == '-1' || controller.user.id == null) ? "الأفندي" : controller.user.getFullName(),
+                                text:
+                                    (controller.user.id == '-1' ||
+                                        controller.user.id == null)
+                                    ? "الأفندي"
+                                    : controller.user.getFullName(),
                                 style: boldLarge.copyWith(
                                   color: MyColor.getTextColor(),
                                   fontSize: Dimensions.fontLarge,
@@ -73,7 +83,9 @@ class RiderHomeScreenAppBar extends StatelessWidget {
                                 spaceSide(Dimensions.space5),
                                 Expanded(
                                   child: Text(
-                                    controller.appLocationController.currentAddress,
+                                    controller
+                                        .appLocationController
+                                        .currentAddress,
                                     style: regularDefault.copyWith(
                                       color: MyColor.getBodyTextColor(),
                                       fontSize: Dimensions.fontDefault,
@@ -93,53 +105,62 @@ class RiderHomeScreenAppBar extends StatelessWidget {
                 ),
 
                 // --- الجزء المضاف: أيقونة الإشعارات الذكية ---
-                GetBuilder<NotificationController>(builder: (notificationController) {
-                  return InkWell(
-                    onTap: () => Get.toNamed(RouteHelper.notificationScreen),
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: MyColor.cardBgColor,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: MyColor.naturalTextColor.withOpacity(0.2)),
-                          ),
-                          child: Icon(
-                            Icons.notifications_none_rounded,
-                            color: MyColor.primaryColor,
-                            size: 24,
-                          ),
-                        ),
-                        if (notificationController.unreadCount > 0)
-                          Positioned(
-                            top: -2,
-                            right: -2,
-                            child: Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: const BoxDecoration(
-                                color: Colors.red,
-                                shape: BoxShape.circle,
-                              ),
-                              constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
-                              child: Text(
-                                '${notificationController.unreadCount}',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
+                GetBuilder<NotificationController>(
+                  builder: (notificationController) {
+                    return InkWell(
+                      onTap: () => Get.toNamed(RouteHelper.notificationScreen),
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: MyColor.cardBgColor,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: MyColor.naturalTextColor.withValues(
+                                  alpha: 0.2,
                                 ),
-                                textAlign: TextAlign.center,
                               ),
                             ),
+                            child: Icon(
+                              Icons.notifications_none_rounded,
+                              color: MyColor.primaryColor,
+                              size: 24,
+                            ),
                           ),
-                      ],
-                    ),
-                  );
-                }),
-                // ------------------------------------------
+                          if (notificationController.unreadCount > 0)
+                            Positioned(
+                              top: -2,
+                              right: -2,
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                ),
+                                constraints: const BoxConstraints(
+                                  minWidth: 18,
+                                  minHeight: 18,
+                                ),
+                                child: Text(
+                                  '${notificationController.unreadCount}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
 
+                // ------------------------------------------
                 spaceSide(Dimensions.space10),
 
                 InkWell(
@@ -147,11 +168,16 @@ class RiderHomeScreenAppBar extends StatelessWidget {
                   splashFactory: NoSplash.splashFactory,
                   splashColor: MyColor.transparentColor,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 10,
+                    ),
                     decoration: BoxDecoration(
                       color: MyColor.cardBgColor,
                       border: Border.all(color: MyColor.naturalTextColor),
-                      borderRadius: BorderRadius.circular(Dimensions.largeRadius),
+                      borderRadius: BorderRadius.circular(
+                        Dimensions.largeRadius,
+                      ),
                     ),
                     child: SvgPicture.asset(MyIcons.sideMenu),
                   ),

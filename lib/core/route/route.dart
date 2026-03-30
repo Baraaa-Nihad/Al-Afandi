@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:ovoride/presentation/screens/shared/notification/notification.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,18 +12,26 @@ import 'package:ovoride/data/services/push_notification_service.dart';
 import 'package:ovoride/presentation/screens/driver/account/change-password/change_password_screen.dart';
 import 'package:ovoride/presentation/screens/shared/auth/email_verification_page/email_verification_screen.dart';
 import 'package:ovoride/presentation/screens/shared/auth/forget_password/forget_password/forget_password.dart';
-import 'package:ovoride/presentation/screens/rider/auth/forget_password/forget_password/forget_password.dart' as riderForgetPw;
-import 'package:ovoride/presentation/screens/rider/auth/forget_password/verify_forget_password/verify_forget_password_screen.dart' as riderVerifyForgetPw;
-import 'package:ovoride/presentation/screens/rider/auth/forget_password/reset_password/reset_password_screen.dart' as riderResetPw;
+import 'package:ovoride/presentation/screens/rider/auth/forget_password/forget_password/forget_password.dart'
+    as rider_forget_pw;
+import 'package:ovoride/presentation/screens/rider/auth/forget_password/verify_forget_password/verify_forget_password_screen.dart'
+    as rider_verify_forget_pw;
+import 'package:ovoride/presentation/screens/rider/auth/forget_password/reset_password/reset_password_screen.dart'
+    as rider_reset_pw;
 
 import 'package:ovoride/presentation/screens/shared/auth/forget_password/reset_password/reset_password_screen.dart';
 import 'package:ovoride/presentation/screens/shared/auth/forget_password/verify_forget_password/verify_forget_password_screen.dart';
 import 'package:ovoride/presentation/screens/shared/auth/login/login_screen.dart';
-import 'package:ovoride/presentation/screens/rider/auth/login/login_screen.dart' as riderLogin;
-import 'package:ovoride/presentation/screens/rider/auth/registration/registration_screen.dart' as riderRegistration;
-import 'package:ovoride/presentation/screens/rider/auth/email_verification/email_verification_screen.dart' as riderEmailVerif;
-import 'package:ovoride/presentation/screens/rider/auth/sms_verification/sms_verification_screen.dart' as riderSmsVerif;
-import 'package:ovoride/presentation/screens/rider/auth/profile_complete/profile_complete_screen.dart' as riderProfileComplete;
+import 'package:ovoride/presentation/screens/rider/auth/login/login_screen.dart'
+    as rider_login;
+import 'package:ovoride/presentation/screens/rider/auth/registration/registration_screen.dart'
+    as rider_registration;
+import 'package:ovoride/presentation/screens/rider/auth/email_verification/email_verification_screen.dart'
+    as rider_email_verif;
+import 'package:ovoride/presentation/screens/rider/auth/sms_verification/sms_verification_screen.dart'
+    as rider_sms_verif;
+import 'package:ovoride/presentation/screens/rider/auth/profile_complete/profile_complete_screen.dart'
+    as rider_profile_complete;
 import 'package:ovoride/presentation/screens/shared/auth/profile_complete/profile_complete_screen.dart';
 import 'package:ovoride/presentation/screens/shared/auth/registration/registration_screen.dart';
 import 'package:ovoride/presentation/screens/shared/auth/sms_verification_page/sms_verification_screen.dart';
@@ -41,27 +50,48 @@ import 'package:ovoride/presentation/screens/driver/support_ticket/support_ticke
 import 'package:ovoride/presentation/screens/driver/support_ticket/ticket_details/ticket_details_screen.dart';
 
 // Driver screens
-import 'package:ovoride/presentation/screens/driver/ride_history/ride_activity_screen.dart' as driver_ride_history;
-import 'package:ovoride/presentation/screens/driver/ride_details/ride_details_screen.dart' as driver_ride_details;
-import 'package:ovoride/presentation/screens/driver/payment_history/payment_history_screen.dart' as driver_payment_history;
-import 'package:ovoride/presentation/screens/driver/review/my_review_history_screen.dart' as driver_my_review;
-import 'package:ovoride/presentation/screens/driver/review/user_review_history_screen.dart' as driver_user_review;
-import 'package:ovoride/presentation/screens/driver/inbox/ride_message_screen.dart' as driver_inbox;
+import 'package:ovoride/presentation/screens/driver/ride_history/ride_activity_screen.dart'
+    as driver_ride_history;
+import 'package:ovoride/presentation/screens/driver/ride_details/ride_details_screen.dart'
+    as driver_ride_details;
+import 'package:ovoride/presentation/screens/driver/payment_history/payment_history_screen.dart'
+    as driver_payment_history;
+import 'package:ovoride/presentation/screens/driver/review/my_review_history_screen.dart'
+    as driver_my_review;
+import 'package:ovoride/presentation/screens/driver/review/user_review_history_screen.dart'
+    as driver_user_review;
+import 'package:ovoride/presentation/screens/driver/inbox/ride_message_screen.dart'
+    as driver_inbox;
 
 // Rider screens
-import 'package:ovoride/presentation/screens/rider/ride/ride_activity_screen.dart' as rider_ride_activity;
-import 'package:ovoride/presentation/screens/rider/ride/ride_details_screen.dart' as rider_ride_details;
-import 'package:ovoride/presentation/screens/rider/payment_history/payments_history_screen.dart' as rider_payment_history;
-import 'package:ovoride/presentation/screens/rider/review/my_review_history_screen.dart' as rider_my_review;
-import 'package:ovoride/presentation/screens/rider/review/driver_review_history_screen.dart' as rider_driver_review;
-import 'package:ovoride/presentation/screens/rider/review/ride_review_screen.dart' as rider_ride_review;
-import 'package:ovoride/presentation/screens/rider/dashboard/dashboard_screen.dart' as rider_dashboard;
-import 'package:ovoride/presentation/screens/rider/home/home_screen.dart' as rider_home;
-import 'package:ovoride/presentation/screens/rider/account/profile_screen.dart' as rider_profile_screen;
-import 'package:ovoride/presentation/screens/rider/support_ticket/support_ticket_screen.dart' as rider_support;
-import 'package:ovoride/presentation/screens/rider/support_ticket/new_ticket_screen/add_new_ticket_screen.dart' as rider_new_ticket;
-import 'package:ovoride/presentation/screens/rider/support_ticket/ticket_details/ticket_details_screen.dart' as rider_ticket_details;
-import 'package:ovoride/presentation/screens/rider/account/edit_profile_screen.dart' as rider_edit_profile_screen;
+import 'package:ovoride/presentation/screens/rider/ride/ride_activity_screen.dart'
+    as rider_ride_activity;
+import 'package:ovoride/presentation/screens/rider/ride/ride_details_screen.dart'
+    as rider_ride_details;
+import 'package:ovoride/presentation/screens/rider/payment_history/payments_history_screen.dart'
+    as rider_payment_history;
+import 'package:ovoride/presentation/screens/rider/review/my_review_history_screen.dart'
+    as rider_my_review;
+import 'package:ovoride/presentation/screens/rider/review/driver_review_history_screen.dart'
+    as rider_driver_review;
+import 'package:ovoride/presentation/screens/rider/review/ride_review_screen.dart'
+    as rider_ride_review;
+import 'package:ovoride/presentation/screens/rider/inbox/ride_message_screen.dart'
+    as rider_inbox;
+import 'package:ovoride/presentation/screens/rider/dashboard/dashboard_screen.dart'
+    as rider_dashboard;
+import 'package:ovoride/presentation/screens/rider/home/home_screen.dart'
+    as rider_home;
+import 'package:ovoride/presentation/screens/rider/account/profile_screen.dart'
+    as rider_profile_screen;
+import 'package:ovoride/presentation/screens/rider/support_ticket/support_ticket_screen.dart'
+    as rider_support;
+import 'package:ovoride/presentation/screens/rider/support_ticket/new_ticket_screen/add_new_ticket_screen.dart'
+    as rider_new_ticket;
+import 'package:ovoride/presentation/screens/rider/support_ticket/ticket_details/ticket_details_screen.dart'
+    as rider_ticket_details;
+import 'package:ovoride/presentation/screens/rider/account/edit_profile_screen.dart'
+    as rider_edit_profile_screen;
 
 import 'package:ovoride/presentation/screens/driver/user_role/user_role_screen.dart';
 import 'package:ovoride/presentation/screens/driver/dashboard/dashboard_screen.dart';
@@ -82,7 +112,8 @@ import 'package:ovoride/presentation/screens/rider/payment/payment_screen.dart';
 import 'package:ovoride/presentation/screens/rider/coupon/coupon_screen.dart';
 import 'package:ovoride/presentation/screens/rider/location/screen/locationpicker/location_picker_screen.dart';
 import 'package:ovoride/presentation/screens/rider/location/screen/locationpicker/location_edit_screen.dart';
-import 'package:ovoride/presentation/screens/rider/web_view/web_view_screen.dart' as rider_web_view;
+import 'package:ovoride/presentation/screens/rider/web_view/web_view_screen.dart'
+    as rider_web_view;
 
 import '../../data/services/api_client.dart';
 
@@ -90,8 +121,18 @@ class RouteHelper {
   // ── Shared ──
   static String getLoginScreen() {
     final prefs = Get.find<SharedPreferences>();
-    final role = prefs.getString(SharedPreferenceHelper.userRoleKey) ?? 'driver';
+    final role =
+        prefs.getString(SharedPreferenceHelper.userRoleKey) ?? 'driver';
     return role == 'rider' ? riderLoginScreen : loginScreen;
+  }
+
+  static Widget getRideMessagePage() {
+    final prefs = Get.find<SharedPreferences>();
+    final role =
+        prefs.getString(SharedPreferenceHelper.userRoleKey) ?? 'driver';
+    return role == 'rider'
+        ? rider_inbox.RideMessageScreen(rideID: '-1')
+        : driver_inbox.RideMessageScreen(rideID: '-1');
   }
 
   static const String splashScreen = "/splash_screen";
@@ -104,15 +145,19 @@ class RouteHelper {
   static const String registrationScreen = "/registration_screen";
   static const String riderRegistartionScreen = "/rider_registration_screen";
   static const String profileCompleteScreen = "/profile_complete_screen";
-  static const String riderProfileCompleteScreen = "/rider_profile_complete_screen";
+  static const String riderProfileCompleteScreen =
+      "/rider_profile_complete_screen";
   static const String emailVerificationScreen = "/verify_email_screen";
-  static const String riderEmailVerificationScreen = "/rider_verify_email_screen";
+  static const String riderEmailVerificationScreen =
+      "/rider_verify_email_screen";
   static const String riderSmsVerificationScreen = "/rider_verify_sms_screen";
   static const String smsVerificationScreen = "/verify_sms_screen";
   static const String verifyPassCodeScreen = "/verify_pass_code_screen";
   static const String resetPasswordScreen = "/reset_pass_screen";
-  static const String riderForgetPasswordScreen = "/rider_forget_password_screen";
-  static const String riderVerifyForgetPasswordScreen = "/rider_verify_forget_password_screen";
+  static const String riderForgetPasswordScreen =
+      "/rider_forget_password_screen";
+  static const String riderVerifyForgetPasswordScreen =
+      "/rider_verify_forget_password_screen";
   static const String riderResetPasswordScreen = "/rider_reset_password_screen";
   static const String profileScreen = "/profile_screen";
   static const String riderProfileScreen = "/rider_profile_screen";
@@ -125,13 +170,16 @@ class RouteHelper {
   static const String maintenanceScreen = '/maintenance_screen';
   static const String previewImageScreen = "/preview-image-screen";
   static const String paymentHistoryScreen = '/payment_history_screen';
-  static const String riderPaymentHistoryScreen = '/rider_payment_history_screen';
+  static const String riderPaymentHistoryScreen =
+      '/rider_payment_history_screen';
   static const String supportTicketScreen = '/support_ticket_screen';
   static const String riderSupportTicketScreen = '/rider_support_ticket_screen';
   static const String riderNewTicketScreen = '/rider_new_ticket_screen';
   static const String riderTicketDetailsScreen = '/rider_ticket_details_screen';
-  static const String createSupportTicketScreen = '/create_support_ticket_screen';
-  static const String supportTicketDetailsScreen = '/support_ticket_details_screen';
+  static const String createSupportTicketScreen =
+      '/create_support_ticket_screen';
+  static const String supportTicketDetailsScreen =
+      '/support_ticket_details_screen';
   static const String notificationScreen = "/notification_screen";
   static const String rideMessageScreen = '/inbox_message_screen';
 
@@ -147,8 +195,10 @@ class RouteHelper {
   static const String depositsScreen = "/deposits";
   static const String newDepositScreenScreen = "/deposits_money";
   static const String depositWebViewScreen = '/deposit_webView';
-  static const String vehicleVerificationScreen = '/vehicle_verification_screen';
-  static const String driverProfileVerificationScreen = '/driver_verification_screen';
+  static const String vehicleVerificationScreen =
+      '/vehicle_verification_screen';
+  static const String driverProfileVerificationScreen =
+      '/driver_verification_screen';
   static const String driverRideActivityScreen = '/driver_ride_activity_screen';
   static const String driverRideDetailsScreen = '/driver_ride_details_screen';
   static const String myReviewScreen = '/driver_review_screen';
@@ -176,16 +226,40 @@ class RouteHelper {
     GetPage(name: onboardScreen, page: () => const OnBoardIntroScreen()),
     GetPage(name: userRoleScreen, page: () => const UserRoleScreen()),
     GetPage(name: loginScreen, page: () => const LoginScreen()),
-    GetPage(name: riderRegistartionScreen, page: () => const riderRegistration.RegistrationScreen()),
-    GetPage(name: riderLoginScreen, page: () => const riderLogin.LoginScreen()),
-    GetPage(name: forgotPasswordScreen, page: () => const ForgetPasswordScreen()),
-    GetPage(name: changePasswordScreen, page: () => const ChangePasswordScreen()),
+    GetPage(
+      name: riderRegistartionScreen,
+      page: () => const rider_registration.RegistrationScreen(),
+    ),
+    GetPage(
+      name: riderLoginScreen,
+      page: () => const rider_login.LoginScreen(),
+    ),
+    GetPage(
+      name: forgotPasswordScreen,
+      page: () => const ForgetPasswordScreen(),
+    ),
+    GetPage(
+      name: changePasswordScreen,
+      page: () => const ChangePasswordScreen(),
+    ),
     GetPage(name: registrationScreen, page: () => const RegistrationScreen()),
-    GetPage(name: profileCompleteScreen, page: () => const ProfileCompleteScreen()),
-    GetPage(name: riderProfileCompleteScreen, page: () => const riderProfileComplete.ProfileCompleteScreen()),
+    GetPage(
+      name: profileCompleteScreen,
+      page: () => const ProfileCompleteScreen(),
+    ),
+    GetPage(
+      name: riderProfileCompleteScreen,
+      page: () => const rider_profile_complete.ProfileCompleteScreen(),
+    ),
     GetPage(name: profileScreen, page: () => const ProfileScreen()),
-    GetPage(name: riderProfileScreen, page: () => const rider_profile_screen.ProfileScreen()),
-    GetPage(name: riderEditProfileScreen, page: () => const rider_edit_profile_screen.EditProfileScreen()),
+    GetPage(
+      name: riderProfileScreen,
+      page: () => const rider_profile_screen.ProfileScreen(),
+    ),
+    GetPage(
+      name: riderEditProfileScreen,
+      page: () => const rider_edit_profile_screen.EditProfileScreen(),
+    ),
     GetPage(name: editProfileScreen, page: () => const EditProfileScreen()),
     GetPage(
       name: profileAndSettingsScreen,
@@ -194,28 +268,73 @@ class RouteHelper {
       transitionDuration: const Duration(milliseconds: 300),
     ),
     GetPage(name: notificationScreen, page: () => const NotificationScreen()),
-    GetPage(name: rideMessageScreen, page: () => driver_inbox.RideMessageScreen(rideID: '-1')),
+    GetPage(name: rideMessageScreen, page: () => getRideMessagePage()),
     GetPage(name: languageScreen, page: () => const LanguageScreen()),
-    GetPage(name: paymentHistoryScreen, page: () => const driver_payment_history.PaymentHistoryScreen()),
-    GetPage(name: riderPaymentHistoryScreen, page: () => const rider_payment_history.RiderPaymentHistoryScreen()),
+    GetPage(
+      name: paymentHistoryScreen,
+      page: () => const driver_payment_history.PaymentHistoryScreen(),
+    ),
+    GetPage(
+      name: riderPaymentHistoryScreen,
+      page: () => const rider_payment_history.RiderPaymentHistoryScreen(),
+    ),
     GetPage(name: privacyScreen, page: () => const PrivacyPolicyScreen()),
     GetPage(name: faqScreen, page: () => const FaqScreen()),
-    GetPage(name: createSupportTicketScreen, page: () => const AddNewTicketScreen()),
+    GetPage(
+      name: createSupportTicketScreen,
+      page: () => const AddNewTicketScreen(),
+    ),
     GetPage(name: supportTicketScreen, page: () => const SupportTicketScreen()),
-    GetPage(name: riderSupportTicketScreen, page: () => const rider_support.SupportTicketScreen()),
-    GetPage(name: riderNewTicketScreen, page: () => const rider_new_ticket.AddNewTicketScreen()),
-    GetPage(name: riderTicketDetailsScreen, page: () => const rider_ticket_details.TicketDetailsScreen()),
-    GetPage(name: supportTicketDetailsScreen, page: () => const TicketDetailsScreen()),
-    GetPage(name: previewImageScreen, page: () => PreviewImageScreen(url: Get.arguments)),
+    GetPage(
+      name: riderSupportTicketScreen,
+      page: () => const rider_support.SupportTicketScreen(),
+    ),
+    GetPage(
+      name: riderNewTicketScreen,
+      page: () => const rider_new_ticket.AddNewTicketScreen(),
+    ),
+    GetPage(
+      name: riderTicketDetailsScreen,
+      page: () => const rider_ticket_details.TicketDetailsScreen(),
+    ),
+    GetPage(
+      name: supportTicketDetailsScreen,
+      page: () => const TicketDetailsScreen(),
+    ),
+    GetPage(
+      name: previewImageScreen,
+      page: () => PreviewImageScreen(url: Get.arguments),
+    ),
     GetPage(name: maintenanceScreen, page: () => MaintenanceScreen()),
-    GetPage(name: smsVerificationScreen, page: () => const SmsVerificationScreen()),
-    GetPage(name: riderSmsVerificationScreen, page: () => const riderSmsVerif.SmsVerificationScreen()),
-    GetPage(name: riderEmailVerificationScreen, page: () => const riderEmailVerif.EmailVerificationScreen()),
-    GetPage(name: verifyPassCodeScreen, page: () => const VerifyForgetPassScreen()),
+    GetPage(
+      name: smsVerificationScreen,
+      page: () => const SmsVerificationScreen(),
+    ),
+    GetPage(
+      name: riderSmsVerificationScreen,
+      page: () => const rider_sms_verif.SmsVerificationScreen(),
+    ),
+    GetPage(
+      name: riderEmailVerificationScreen,
+      page: () => const rider_email_verif.EmailVerificationScreen(),
+    ),
+    GetPage(
+      name: verifyPassCodeScreen,
+      page: () => const VerifyForgetPassScreen(),
+    ),
     GetPage(name: resetPasswordScreen, page: () => const ResetPasswordScreen()),
-    GetPage(name: riderForgetPasswordScreen, page: () => const riderForgetPw.ForgetPasswordScreen()),
-    GetPage(name: riderVerifyForgetPasswordScreen, page: () => riderVerifyForgetPw.VerifyForgetPassScreen()),
-    GetPage(name: riderResetPasswordScreen, page: () => riderResetPw.ResetPasswordScreen()),
+    GetPage(
+      name: riderForgetPasswordScreen,
+      page: () => const rider_forget_pw.ForgetPasswordScreen(),
+    ),
+    GetPage(
+      name: riderVerifyForgetPasswordScreen,
+      page: () => rider_verify_forget_pw.VerifyForgetPassScreen(),
+    ),
+    GetPage(
+      name: riderResetPasswordScreen,
+      page: () => rider_reset_pw.ResetPasswordScreen(),
+    ),
 
     // ── Driver-only routes ──
     GetPage(
@@ -242,20 +361,43 @@ class RouteHelper {
     ),
     GetPage(name: withdrawScreen, page: () => const WithdrawScreen()),
     GetPage(name: newWithdrawScreen, page: () => const AddWithdrawMethod()),
-    GetPage(name: withdrawConfirmScreenScreen, page: () => const WithdrawConfirmScreen()),
-    GetPage(name: transactionHistoryScreen, page: () => const TransactionsScreen()),
+    GetPage(
+      name: withdrawConfirmScreenScreen,
+      page: () => const WithdrawConfirmScreen(),
+    ),
+    GetPage(
+      name: transactionHistoryScreen,
+      page: () => const TransactionsScreen(),
+    ),
     GetPage(name: twoFactorScreen, page: () => TwoFactorVerificationScreen()),
-    GetPage(name: twoFactorSetupScreen, page: () => const TwoFactorSetupScreen()),
-    GetPage(name: vehicleVerificationScreen, page: () => const VehicleVerificationScreen()),
-    GetPage(name: driverProfileVerificationScreen, page: () => const DriverProfileVerificationScreen()),
+    GetPage(
+      name: twoFactorSetupScreen,
+      page: () => const TwoFactorSetupScreen(),
+    ),
+    GetPage(
+      name: vehicleVerificationScreen,
+      page: () => const VehicleVerificationScreen(),
+    ),
+    GetPage(
+      name: driverProfileVerificationScreen,
+      page: () => const DriverProfileVerificationScreen(),
+    ),
     GetPage(
       name: depositWebViewScreen,
-      page: () => MyWebViewScreen(depositInsertData: Get.arguments as DepositInsertData),
+      page: () => MyWebViewScreen(
+        depositInsertData: Get.arguments as DepositInsertData,
+      ),
     ),
     GetPage(name: depositsScreen, page: () => const DepositsScreen()),
     GetPage(name: newDepositScreenScreen, page: () => const NewDepositScreen()),
-    GetPage(name: myReviewScreen, page: () => driver_my_review.MyReviewHistoryScreen()),
-    GetPage(name: userReviewScreen, page: () => driver_user_review.UserReviewHistory()),
+    GetPage(
+      name: myReviewScreen,
+      page: () => driver_my_review.MyReviewHistoryScreen(),
+    ),
+    GetPage(
+      name: userReviewScreen,
+      page: () => driver_user_review.UserReviewHistory(),
+    ),
     GetPage(
       name: emailVerificationScreen,
       page: () => EmailVerificationScreen(),
@@ -277,7 +419,9 @@ class RouteHelper {
     ),
     GetPage(
       name: riderRideDetailsScreen,
-      page: () => rider_ride_details.RiderRideDetailsScreen(rideId: Get.arguments.toString()),
+      page: () => rider_ride_details.RiderRideDetailsScreen(
+        rideId: Get.arguments.toString(),
+      ),
     ),
     GetPage(
       name: rideBidScreen,
@@ -305,11 +449,15 @@ class RouteHelper {
     ),
     GetPage(
       name: driverReviewScreen,
-      page: () => rider_driver_review.DriverReviewHistoryScreen(driverId: Get.arguments),
+      page: () => rider_driver_review.DriverReviewHistoryScreen(
+        driverId: Get.arguments,
+      ),
     ),
     GetPage(
       name: riderMyReviewScreen,
-      page: () => rider_my_review.RiderMyReviewHistoryScreen(avgRating: Get.arguments.toString()),
+      page: () => rider_my_review.RiderMyReviewHistoryScreen(
+        avgRating: Get.arguments.toString(),
+      ),
     ),
     GetPage(
       name: webViewScreen,
@@ -319,7 +467,8 @@ class RouteHelper {
     ),
     GetPage(
       name: locationPickUpScreen,
-      page: () => LocationPickerScreen(pickupLocationForIndex: Get.arguments[0]),
+      page: () =>
+          LocationPickerScreen(pickupLocationForIndex: Get.arguments[0]),
     ),
     GetPage(
       name: editLocationPickUpScreen,
@@ -339,17 +488,44 @@ class RouteHelper {
     bool isTwoFactorEnable = user?.tv == '1' ? false : true;
 
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    await sharedPreferences.setBool(SharedPreferenceHelper.rememberMeKey, isRemember);
-    await sharedPreferences.setString(SharedPreferenceHelper.userIdKey, user?.id.toString() ?? '-1');
-    await sharedPreferences.setString(SharedPreferenceHelper.userEmailKey, user?.email ?? '');
-    await sharedPreferences.setString(SharedPreferenceHelper.userPhoneNumberKey, user?.mobile ?? '');
-    await sharedPreferences.setString(SharedPreferenceHelper.userNameKey, user?.username ?? '');
-    await sharedPreferences.setString(SharedPreferenceHelper.userRoleKey, 'driver');
+    await sharedPreferences.setBool(
+      SharedPreferenceHelper.rememberMeKey,
+      isRemember,
+    );
+    await sharedPreferences.setString(
+      SharedPreferenceHelper.userIdKey,
+      user?.id.toString() ?? '-1',
+    );
+    await sharedPreferences.setString(
+      SharedPreferenceHelper.userEmailKey,
+      user?.email ?? '',
+    );
+    await sharedPreferences.setString(
+      SharedPreferenceHelper.userPhoneNumberKey,
+      user?.mobile ?? '',
+    );
+    await sharedPreferences.setString(
+      SharedPreferenceHelper.userNameKey,
+      user?.username ?? '',
+    );
+    await sharedPreferences.setString(
+      SharedPreferenceHelper.userRoleKey,
+      'driver',
+    );
 
     if (accessToken.isNotEmpty) {
-      await sharedPreferences.setString(SharedPreferenceHelper.accessTokenKey, accessToken);
-      await sharedPreferences.setString(SharedPreferenceHelper.accessTokenType, tokenType);
-      await sharedPreferences.setBool(SharedPreferenceHelper.rememberMeKey, true);
+      await sharedPreferences.setString(
+        SharedPreferenceHelper.accessTokenKey,
+        accessToken,
+      );
+      await sharedPreferences.setString(
+        SharedPreferenceHelper.accessTokenType,
+        tokenType,
+      );
+      await sharedPreferences.setBool(
+        SharedPreferenceHelper.rememberMeKey,
+        true,
+      );
       Get.find<ApiClient>().initToken();
     }
 
@@ -380,17 +556,44 @@ class RouteHelper {
     bool needSmsVerification = user?.sv == '1' ? false : true;
 
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    await sharedPreferences.setBool(SharedPreferenceHelper.rememberMeKey, isRemember);
-    await sharedPreferences.setString(SharedPreferenceHelper.userIdKey, user?.id.toString() ?? '-1');
-    await sharedPreferences.setString(SharedPreferenceHelper.userEmailKey, user?.email ?? '');
-    await sharedPreferences.setString(SharedPreferenceHelper.userPhoneNumberKey, user?.mobile ?? '');
-    await sharedPreferences.setString(SharedPreferenceHelper.userNameKey, user?.username ?? '');
-    await sharedPreferences.setString(SharedPreferenceHelper.userRoleKey, 'rider');
+    await sharedPreferences.setBool(
+      SharedPreferenceHelper.rememberMeKey,
+      isRemember,
+    );
+    await sharedPreferences.setString(
+      SharedPreferenceHelper.userIdKey,
+      user?.id.toString() ?? '-1',
+    );
+    await sharedPreferences.setString(
+      SharedPreferenceHelper.userEmailKey,
+      user?.email ?? '',
+    );
+    await sharedPreferences.setString(
+      SharedPreferenceHelper.userPhoneNumberKey,
+      user?.mobile ?? '',
+    );
+    await sharedPreferences.setString(
+      SharedPreferenceHelper.userNameKey,
+      user?.username ?? '',
+    );
+    await sharedPreferences.setString(
+      SharedPreferenceHelper.userRoleKey,
+      'rider',
+    );
 
     if (accessToken.isNotEmpty) {
-      await sharedPreferences.setString(SharedPreferenceHelper.accessTokenKey, accessToken);
-      await sharedPreferences.setString(SharedPreferenceHelper.accessTokenType, tokenType);
-      await sharedPreferences.setBool(SharedPreferenceHelper.rememberMeKey, true);
+      await sharedPreferences.setString(
+        SharedPreferenceHelper.accessTokenKey,
+        accessToken,
+      );
+      await sharedPreferences.setString(
+        SharedPreferenceHelper.accessTokenType,
+        tokenType,
+      );
+      await sharedPreferences.setBool(
+        SharedPreferenceHelper.rememberMeKey,
+        true,
+      );
       Get.find<ApiClient>().initToken();
     }
 

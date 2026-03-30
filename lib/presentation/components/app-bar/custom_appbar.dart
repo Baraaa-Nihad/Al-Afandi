@@ -51,7 +51,8 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   State<CustomAppBar> createState() => _CustomAppBarState();
 
   @override
-  Size get preferredSize => const Size(double.maxFinite, Dimensions.space50 * 1.3);
+  Size get preferredSize =>
+      const Size(double.maxFinite, Dimensions.space50 * 1.3);
 }
 
 class _CustomAppBarState extends State<CustomAppBar> {
@@ -75,28 +76,30 @@ class _CustomAppBarState extends State<CustomAppBar> {
             ),
             leading: widget.isShowBackBtn
                 ? widget.customBackBtn ??
-                    IconButton(
-                      onPressed: () {
-                        if (widget.backBtnPress != null) {
-                          widget.backBtnPress!();
-                        } else if (widget.fromAuth) {
-                          Get.offAllNamed(RouteHelper.loginScreen);
-                        } else if (widget.isProfileCompleted) {
-                          showExitDialog(Get.context!);
-                        } else {
-                          Navigator.maybePop(context);
-                        }
-                      },
-                      icon: Icon(
-                        Icons.arrow_back_ios_new_rounded,
-                        color: MyColor.getHeadingTextColor(),
-                        size: Dimensions.space25,
-                      ),
-                    )
+                      IconButton(
+                        onPressed: () {
+                          if (widget.backBtnPress != null) {
+                            widget.backBtnPress!();
+                          } else if (widget.fromAuth) {
+                            Get.offAllNamed(RouteHelper.loginScreen);
+                          } else if (widget.isProfileCompleted) {
+                            showExitDialog(Get.context!);
+                          } else {
+                            Navigator.maybePop(context);
+                          }
+                        },
+                        icon: Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          color: MyColor.getHeadingTextColor(),
+                          size: Dimensions.space25,
+                        ),
+                      )
                 : const SizedBox.shrink(),
-            backgroundColor: widget.bgColor ?? MyColor.getAppBarColor().withValues(alpha: 0.15),
+            backgroundColor:
+                widget.bgColor ??
+                MyColor.getAppBarColor().withValues(alpha: 0.15),
             title: Text(
-              "صفحة ${widget.title.tr}",
+              widget.title.tr,
               style: boldDefault.copyWith(
                 color: MyColor.getHeadingTextColor(),
                 fontSize: Dimensions.fontOverLarge22,
@@ -109,7 +112,10 @@ class _CustomAppBarState extends State<CustomAppBar> {
                   ? ActionButtonIconWidget(
                       pressed: widget.actionPress!,
                       isImage: widget.isActionImage,
-                      icon: widget.isActionImage ? Icons.add : widget.actionIcon, //just for demo purpose we put it here
+                      icon: widget.isActionImage
+                          ? Icons.add
+                          : widget
+                                .actionIcon, //just for demo purpose we put it here
                       imageSrc: widget.isActionImage ? widget.actionIcon : '',
                     )
                   : const SizedBox.shrink(),
@@ -127,7 +133,9 @@ class _CustomAppBarState extends State<CustomAppBar> {
         : AppBar(
             titleSpacing: 0,
             elevation: widget.elevation,
-            backgroundColor: widget.bgColor ?? MyColor.getAppBarColor().withValues(alpha: 0.15),
+            backgroundColor:
+                widget.bgColor ??
+                MyColor.getAppBarColor().withValues(alpha: 0.15),
             title: Text(
               widget.title.tr,
               style: boldDefault.copyWith(

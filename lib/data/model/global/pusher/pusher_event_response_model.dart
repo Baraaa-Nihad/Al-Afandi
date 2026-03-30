@@ -4,7 +4,8 @@ import 'package:ovoride/data/model/global/app/ride_model.dart';
 import 'package:ovoride/data/model/global/app/ride_meassage_model.dart';
 import 'package:ovoride/data/model/global/bid/bid_model.dart';
 
-PusherResponseModel pusherResponseModelFromJson(String str) => PusherResponseModel.fromJson(json.decode(str));
+PusherResponseModel pusherResponseModelFromJson(String str) =>
+    PusherResponseModel.fromJson(json.decode(str));
 
 class PusherResponseModel {
   String? channelName;
@@ -14,10 +15,15 @@ class PusherResponseModel {
   PusherResponseModel({this.channelName, this.eventName, this.data});
 
   factory PusherResponseModel.fromJson(Map<String, dynamic> json) {
+    final dynamic rawData = json["data"];
     return PusherResponseModel(
-      channelName: json["channelName"].toString(),
-      eventName: json["eventName"].toString(),
-      data: EventData.fromJson(json["data"]),
+      channelName: json["channelName"]?.toString(),
+      eventName: json["eventName"]?.toString(),
+      data: rawData is Map<String, dynamic>
+          ? EventData.fromJson(rawData)
+          : rawData is Map
+          ? EventData.fromJson(Map<String, dynamic>.from(rawData))
+          : null,
     );
   }
 }
@@ -56,11 +62,15 @@ class EventData {
       driverId: json["driverId"].toString(),
       rideId: json["rideId"].toString(),
       driverTotalRide: json["driver_total_ride"].toString(),
-      message: json["message"] != null ? RideMessage.fromJson(json["message"]) : null,
+      message: json["message"] != null
+          ? RideMessage.fromJson(json["message"])
+          : null,
       driverLatitude: json["latitude"].toString(),
       driverLongitude: json["longitude"].toString(),
       ride: json["ride"] != null ? RideModel.fromJson(json["ride"]) : null,
-      service: json["service"] != null ? AppService.fromJson(json["service"]) : null,
+      service: json["service"] != null
+          ? AppService.fromJson(json["service"])
+          : null,
       bid: json["bid"] != null ? BidModel.fromJson(json["bid"]) : null,
     );
   }

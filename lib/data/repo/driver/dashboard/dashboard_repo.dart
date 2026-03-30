@@ -9,7 +9,8 @@ class DashBoardRepo {
   DashBoardRepo({required this.apiClient});
 
   Future<ResponseModel> getDashboardData({String page = '1'}) async {
-    String url = "${UrlContainer.baseUrl}${UrlContainer.dashBoardEndPoint}?page=$page";
+    String url =
+        "${UrlContainer.baseUrl}${UrlContainer.dashBoardEndPoint}?page=$page";
     ResponseModel responseModel = await apiClient.request(
       url,
       Method.getMethod,
@@ -70,7 +71,8 @@ class DashBoardRepo {
 
   Future<String?> getActualAddress(double lat, double lng) async {
     const apiKey = Environment.mapKey;
-    final url = '${UrlContainer.googleMapLocationSearch}?latlng=$lat,$lng&key=$apiKey';
+    final url =
+        '${UrlContainer.googleMapBaseUrl}/geocode/json?latlng=$lat,$lng&key=$apiKey';
 
     final response = await apiClient.request(url, Method.getMethod, null);
 
@@ -81,7 +83,12 @@ class DashBoardRepo {
       if (data['results'] != null && data['results'].isNotEmpty) {
         for (var result in data['results']) {
           final types = result['types'];
-          if (types != null && (types.contains('street_address') || types.contains('premise') || types.contains('subpremise') || types.contains('route') || types.contains('locality'))) {
+          if (types != null &&
+              (types.contains('street_address') ||
+                  types.contains('premise') ||
+                  types.contains('subpremise') ||
+                  types.contains('route') ||
+                  types.contains('locality'))) {
             return result['formatted_address'];
           }
         }
@@ -91,7 +98,8 @@ class DashBoardRepo {
       }
 
       // Final fallback: Plus Code
-      if (data['plus_code'] != null && data['plus_code']['compound_code'] != null) {
+      if (data['plus_code'] != null &&
+          data['plus_code']['compound_code'] != null) {
         return data['plus_code']['compound_code'];
       }
     }

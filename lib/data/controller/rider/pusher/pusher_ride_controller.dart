@@ -37,7 +37,10 @@ class PusherRideController extends GetxController {
   PusherConfig pusherConfig = PusherConfig();
 
   /// دالة الاشتراك في قناة الرحلة لضمان وصول العروض لحظياً
-  Future<void> subscribeToRide(String rideId, Function(dynamic) onUpdate) async {
+  Future<void> subscribeToRide(
+    String rideId,
+    Function(dynamic) onUpdate,
+  ) async {
     try {
       rideID = rideId; // تحديث الـ ID الحالي
       String channelName = "ride.$rideId"; // تنسيق القناة الخاص بالرحلة
@@ -135,9 +138,12 @@ class PusherRideController extends GetxController {
   }
 
   void _handleMessageReceived(PusherResponseModel eventResponse) {
-    if (eventResponse.data?.message != null) {
-      if (eventResponse.data!.ride != null && eventResponse.data!.ride!.id != rideID) {
-        printX('Message for different ride: ${eventResponse.data!.ride!.id}, current ride: $rideID');
+    final eventData = eventResponse.data;
+    if (eventData?.message != null) {
+      if (eventData?.ride != null && eventData!.ride!.id != rideID) {
+        printX(
+          'Message for different ride: ${eventResponse.data!.ride!.id}, current ride: $rideID',
+        );
         return;
       }
       if (isRideDetailsPage()) {
@@ -146,18 +152,29 @@ class PusherRideController extends GetxController {
         }
       }
 
-      rideMessageController.addEventMessage(eventResponse.data!.message!);
+      rideMessageController.addEventMessage(eventData!.message!);
     }
   }
 
   void _handleLiveLocation(PusherResponseModel eventResponse) {
-    if (eventResponse.data!.ride != null && eventResponse.data!.ride!.id != rideID) {
-      printX('Message for different ride: ${eventResponse.data!.ride!.id}, current ride: $rideID');
+    final eventData = eventResponse.data;
+    if (eventData?.ride != null && eventData!.ride!.id != rideID) {
+      printX(
+        'Message for different ride: ${eventData.ride!.id}, current ride: $rideID',
+      );
       return;
     }
-    if (rideDetailsController.ride.status == AppStatus.RIDE_ACTIVE.toString() || rideDetailsController.ride.status == AppStatus.RIDE_RUNNING.toString()) {
-      final lat = StringConverter.formatDouble(eventResponse.data?.driverLatitude ?? '0', precision: 10);
-      final lng = StringConverter.formatDouble(eventResponse.data?.driverLongitude ?? '0', precision: 10);
+    if (rideDetailsController.ride.status == AppStatus.RIDE_ACTIVE.toString() ||
+        rideDetailsController.ride.status ==
+            AppStatus.RIDE_RUNNING.toString()) {
+      final lat = StringConverter.formatDouble(
+        eventData?.driverLatitude ?? '0',
+        precision: 10,
+      );
+      final lng = StringConverter.formatDouble(
+        eventData?.driverLongitude ?? '0',
+        precision: 10,
+      );
       rideDetailsController.mapController.updateDriverLocation(
         latLng: LatLng(lat, lng),
         isRunning: false,
@@ -166,25 +183,35 @@ class PusherRideController extends GetxController {
   }
 
   void _handleNewBid(PusherResponseModel eventResponse) {
-    if (eventResponse.data!.bid != null && eventResponse.data!.bid!.rideId != rideID) {
-      printX('Message for different ride: ${eventResponse.data!.bid!.rideId}, current ride: $rideID');
+    final eventData = eventResponse.data;
+    final bid = eventData?.bid;
+
+    if (bid == null) {
+      printX('New bid event received without bid payload.');
       return;
     }
-    final bid = eventResponse.data?.bid;
-    if (bid != null) {
-      AudioUtils.playAudio(apiClient.getNotificationAudio());
-      if (rideDetailsController.repo.apiClient.isNotificationAudioEnable()) {
-        MyUtils.vibrate();
-      }
 
-      CustomBidDialog.newBid(
-        bid: bid,
-        currency: rideDetailsController.currencySym,
-        driverImagePath: '${rideDetailsController.driverImagePath}/${bid.driver?.avatar}',
-        serviceImagePath: '${rideDetailsController.serviceImagePath}/${eventResponse.data?.service?.image}',
-        totalRideCompleted: eventResponse.data?.driverTotalRide ?? '0',
+    if (bid.rideId != null && bid.rideId != rideID) {
+      printX(
+        'Message for different ride: ${bid.rideId}, current ride: $rideID',
       );
+      return;
     }
+
+    AudioUtils.playAudio(apiClient.getNotificationAudio());
+    if (rideDetailsController.repo.apiClient.isNotificationAudioEnable()) {
+      MyUtils.vibrate();
+    }
+
+    CustomBidDialog.newBid(
+      bid: bid,
+      currency: rideDetailsController.currencySym,
+      driverImagePath:
+          '${rideDetailsController.driverImagePath}/${bid.driver?.avatar ?? ''}',
+      serviceImagePath:
+          '${rideDetailsController.serviceImagePath}/${eventData?.service?.image ?? ''}',
+      totalRideCompleted: eventData?.driverTotalRide ?? '0',
+    );
     rideDetailsController.updateBidCount(false);
   }
 
@@ -194,18 +221,22 @@ class PusherRideController extends GetxController {
   }
 
   void _updateRideIfAvailable(PusherResponseModel eventResponse) {
-    if (eventResponse.data!.ride != null && eventResponse.data!.ride!.id != rideID) {
-      printX('Message for different ride: ${eventResponse.data!.ride!.id}, current ride: $rideID');
+    final eventData = eventResponse.data;
+    if (eventData?.ride != null && eventData!.ride!.id != rideID) {
+      printX(
+        'Message for different ride: ${eventData.ride!.id}, current ride: $rideID',
+      );
       return;
     }
-    final ride = eventResponse.data?.ride;
+    final ride = eventData?.ride;
     if (ride != null) {
       rideDetailsController.updateRide(ride);
     }
   }
 
   /// Utility
-  bool isRideDetailsPage() => Get.currentRoute == RouteHelper.riderRideDetailsScreen;
+  bool isRideDetailsPage() =>
+      Get.currentRoute == RouteHelper.riderRideDetailsScreen;
 
   @override
   void onClose() {
@@ -215,8 +246,14 @@ class PusherRideController extends GetxController {
 
   Future<void> ensureConnection({String? channelName}) async {
     try {
-      var userId = apiClient.sharedPreferences.getString(SharedPreferenceHelper.userIdKey) ?? '';
-      await PusherManager().checkAndInitIfNeeded(channelName ?? "private-rider-user-$userId");
+      var userId =
+          apiClient.sharedPreferences.getString(
+            SharedPreferenceHelper.userIdKey,
+          ) ??
+          '';
+      await PusherManager().checkAndInitIfNeeded(
+        channelName ?? "private-rider-user-$userId",
+      );
     } catch (e) {
       printX("Error ensuring connection: $e");
     }

@@ -23,18 +23,18 @@ class RiderHomeScreen extends StatefulWidget {
   State<RiderHomeScreen> createState() => _RiderHomeScreenState();
 }
 
-class _RiderHomeScreenState extends State<RiderHomeScreen> with SingleTickerProviderStateMixin {
+class _RiderHomeScreenState extends State<RiderHomeScreen>
+    with SingleTickerProviderStateMixin {
   double appBarSize = 90.0;
 
   @override
   void initState() {
-    Get.put(NotificationController(localStorageService: Get.find(), apiClient: Get.find()));
+    Get.find<NotificationController>();
     Get.put(HomeRepo(apiClient: Get.find()));
     Get.put(AppLocationController());
     final controller = Get.put(
       HomeController(homeRepo: Get.find(), appLocationController: Get.find()),
     );
-    Get.put(NotificationController(localStorageService: Get.find(), apiClient: Get.find()));
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
@@ -72,7 +72,9 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> with SingleTickerProv
               },
               child: SingleChildScrollView(
                 padding: EdgeInsets.symmetric(horizontal: Dimensions.space16),
-                physics: const AlwaysScrollableScrollPhysics(parent: ClampingScrollPhysics()),
+                physics: const AlwaysScrollableScrollPhysics(
+                  parent: ClampingScrollPhysics(),
+                ),
                 child: Column(
                   children: [
                     LocationPickUpHomeWidget(controller: controller),

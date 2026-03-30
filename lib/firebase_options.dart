@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
-import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:flutter/foundation.dart'
+    show defaultTargetPlatform, kIsWeb, TargetPlatform;
 
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
@@ -32,11 +33,11 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyB1lEgwpLYjob5mb3mdLhvSYHnlfNFzPyw',
-    appId: '1:1037368853288:android:bd6da7aaab62513ba0461d',
-    messagingSenderId: '1037368853288',
-    projectId: 'ovo-ride',
-    storageBucket: 'ovo-ride.firebasestorage.app',
+    apiKey: 'AIzaSyA_zl8hRMxRjnzUNR1HsA3PYeBo07x1nJg',
+    appId: '1:860142308523:android:79fa364cc70bbd173a3bee',
+    messagingSenderId: '860142308523',
+    projectId: 'al-afandi',
+    storageBucket: 'al-afandi.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
@@ -45,8 +46,10 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1037368853288',
     projectId: 'ovo-ride',
     storageBucket: 'ovo-ride.firebasestorage.app',
-    androidClientId: '1037368853288-52v19o4a590lmsfvqbh12iks1jf55727.apps.googleusercontent.com',
-    iosClientId: '1037368853288-m5sd6u7i1euq16eojtdken8g3jrouru3.apps.googleusercontent.com',
+    androidClientId:
+        '1037368853288-52v19o4a590lmsfvqbh12iks1jf55727.apps.googleusercontent.com',
+    iosClientId:
+        '1037368853288-m5sd6u7i1euq16eojtdken8g3jrouru3.apps.googleusercontent.com',
     iosBundleId: 'com.afandi.app',
   );
 }

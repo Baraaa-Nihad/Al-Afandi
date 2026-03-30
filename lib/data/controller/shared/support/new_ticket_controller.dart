@@ -43,7 +43,7 @@ class NewTicketController extends GetxController {
       if (attachmentList.length < 5) {
         attachmentList.add(File(result.files[i].path!));
       } else {
-        CustomSnackBar.error(errorList: ['Maximum file 5']);
+        CustomSnackBar.error(errorList: [MyStrings.maxAttachmentError]);
       }
       update();
     }

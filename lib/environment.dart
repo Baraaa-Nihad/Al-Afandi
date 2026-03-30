@@ -5,7 +5,8 @@ class Environment {
 
   // Ride and Bids
   static const int bidAcceptSecond = 30; //Bid ACCEPT second
-  static const int driverLocationUpdateAfterNmetersOrMovements = 50; //Driver location update after n meters or movements
+  static const int driverLocationUpdateAfterNmetersOrMovements =
+      50; //Driver location update after n meters or movements
 
   //Language
   // Default display name for the app's language (used in UI language selectors)
@@ -18,8 +19,10 @@ class Environment {
   static const String defaultCountryCode = 'Egt';
 
   //MAP CONFIG
-  static const bool addressPickerFromGoogleMapApi = true; //If true, use Google Map API for formate address picker from lat , long, else use free service reverse geocode
-  static const String mapKey = "Enter Your Map Api Key"; // Enter Your Map Api Key
+  static const bool addressPickerFromGoogleMapApi =
+      true; //If true, use Google Map API for formate address picker from lat , long, else use free service reverse geocode
+  static const String mapKey = "AIzaSyDEvgxfcLzhx5gI9A0qOOaBHV9oXTufyeQ";
   static const double mapDefaultZoom = 20;
-  static const String devToken = "\$2y\$12\$mEVBW3QASB5HMBv8igls3ejh6zw2A0Xb480HWAmYq6BY9xEifyBjG"; //Do not change this token
+  static const String devToken =
+      "\$2y\$12\$mEVBW3QASB5HMBv8igls3ejh6zw2A0Xb480HWAmYq6BY9xEifyBjG"; //Do not change this token
 }

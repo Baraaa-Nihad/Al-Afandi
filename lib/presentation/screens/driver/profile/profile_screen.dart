@@ -7,8 +7,10 @@ import 'package:ovoride/core/utils/my_strings.dart';
 import 'package:ovoride/core/helper/shared_preference_helper.dart';
 import 'package:ovoride/data/services/api_client.dart';
 import 'package:ovoride/data/controller/shared/account/profile_controller.dart';
-import 'package:ovoride/data/controller/rider/account/profile_controller.dart' as riderProfileCtrl;
-import 'package:ovoride/data/repo/rider/account/profile_repo.dart' as riderProfile;
+import 'package:ovoride/data/controller/rider/account/profile_controller.dart'
+    as rider_profile_ctrl;
+import 'package:ovoride/data/repo/rider/account/profile_repo.dart'
+    as rider_profile;
 import 'package:ovoride/data/repo/shared/account/profile_repo.dart';
 import 'package:ovoride/presentation/components/annotated_region/annotated_region_widget.dart';
 import 'package:ovoride/presentation/components/app-bar/custom_appbar.dart';
@@ -30,10 +32,21 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
-    final role = Get.find<ApiClient>().sharedPreferences.getString(SharedPreferenceHelper.userRoleKey) ?? 'driver';
+    final role =
+        Get.find<ApiClient>().sharedPreferences.getString(
+          SharedPreferenceHelper.userRoleKey,
+        ) ??
+        'driver';
     if (role == 'rider') {
-      if (!Get.isRegistered<riderProfileCtrl.ProfileController>(tag: 'rider')) {
-        Get.put(riderProfileCtrl.ProfileController(profileRepo: Get.find<riderProfile.ProfileRepo>(tag: 'rider')), tag: 'rider');
+      if (!Get.isRegistered<rider_profile_ctrl.ProfileController>(
+        tag: 'rider',
+      )) {
+        Get.put(
+          rider_profile_ctrl.ProfileController(
+            profileRepo: Get.find<rider_profile.ProfileRepo>(tag: 'rider'),
+          ),
+          tag: 'rider',
+        );
       }
     } else {
       Get.put(ProfileRepo(apiClient: Get.find()));
@@ -81,32 +94,57 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                                 child: AppBodyWidgetCard(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       spaceDown(Dimensions.space50),
                                       ProfileCardColumn(
-                                        header: MyStrings.username.tr.toUpperCase(),
-                                        body: controller.model.data?.driver?.username ?? "",
+                                        header: MyStrings.username.tr
+                                            .toUpperCase(),
+                                        body:
+                                            controller
+                                                .model
+                                                .data
+                                                ?.driver
+                                                ?.username ??
+                                            "",
                                       ),
                                       spaceDown(Dimensions.space10),
                                       ProfileCardColumn(
-                                        header: MyStrings.fullName.tr.toUpperCase(),
-                                        body: '${controller.model.data?.driver?.firstname ?? ''} ${controller.model.data?.driver?.lastname ?? ''}'.toTitleCase(),
+                                        header: MyStrings.fullName.tr
+                                            .toUpperCase(),
+                                        body:
+                                            '${controller.model.data?.driver?.firstname ?? ''} ${controller.model.data?.driver?.lastname ?? ''}'
+                                                .toTitleCase(),
                                       ),
                                       spaceDown(Dimensions.space10),
                                       ProfileCardColumn(
-                                        header: MyStrings.email.tr.toUpperCase(),
-                                        body: controller.model.data?.driver?.email?.toLowerCase() ?? "",
+                                        header: MyStrings.email.tr
+                                            .toUpperCase(),
+                                        body:
+                                            controller.model.data?.driver?.email
+                                                ?.toLowerCase() ??
+                                            "",
                                       ),
                                       spaceDown(Dimensions.space10),
                                       ProfileCardColumn(
-                                        header: MyStrings.phone.tr.toUpperCase(),
-                                        body: "+${controller.model.data?.driver?.dialCode?.toLowerCase() ?? ""}${controller.model.data?.driver?.mobile?.toLowerCase() ?? ""}",
+                                        header: MyStrings.phone.tr
+                                            .toUpperCase(),
+                                        body:
+                                            "+${controller.model.data?.driver?.dialCode?.toLowerCase() ?? ""}${controller.model.data?.driver?.mobile?.toLowerCase() ?? ""}",
                                       ),
                                       spaceDown(Dimensions.space10),
                                       ProfileCardColumn(
-                                        header: MyStrings.country.tr.toUpperCase(),
-                                        body: controller.model.data?.driver?.countryName?.toTitleCase() ?? "",
+                                        header: MyStrings.country.tr
+                                            .toUpperCase(),
+                                        body:
+                                            controller
+                                                .model
+                                                .data
+                                                ?.driver
+                                                ?.countryName
+                                                ?.toTitleCase() ??
+                                            "",
                                       ),
                                     ],
                                   ),

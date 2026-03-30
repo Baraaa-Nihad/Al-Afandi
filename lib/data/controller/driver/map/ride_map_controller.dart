@@ -9,6 +9,7 @@ import 'package:ovoride/core/utils/my_color.dart';
 import 'package:ovoride/core/utils/my_icons.dart';
 import 'package:ovoride/data/controller/driver/ride/ride_details/ride_details_controller.dart';
 import 'package:ovoride/environment.dart';
+import 'package:ovoride/core/helper/string_format_helper.dart';
 import 'package:ovoride/presentation/packages/polyline_animation/polyline_animation_v1.dart';
 
 class RideMapController extends GetxController {
@@ -32,7 +33,9 @@ class RideMapController extends GetxController {
           AppStatus.RIDE_RUNNING,
           AppStatus.RIDE_ACTIVE,
           AppStatus.RIDE_COMPLETED,
-        ].contains(Get.find<RideDetailsController>(tag: 'driver').ride.status)) {
+        ].contains(
+          Get.find<RideDetailsController>(tag: 'driver').ride.status,
+        )) {
           animator.animatePolyline(
             data,
             'polyline_id',
@@ -45,7 +48,9 @@ class RideMapController extends GetxController {
                   AppStatus.RIDE_RUNNING,
                   AppStatus.RIDE_ACTIVE,
                   AppStatus.RIDE_COMPLETED,
-                ].contains(Get.find<RideDetailsController>(tag: 'driver').ride.status)) {
+                ].contains(
+                  Get.find<RideDetailsController>(tag: 'driver').ride.status,
+                )) {
                   update();
                 }
               }
@@ -87,25 +92,32 @@ class RideMapController extends GetxController {
   List<LatLng> polylineCoordinates = [];
   Future<List<LatLng>> getPolyLinePoints() async {
     List<LatLng> polylineCoordinates = [];
-    PolylinePoints polylinePoints = PolylinePoints(apiKey: Environment.mapKey);
-    // Create Routes API request
-    RoutesApiRequest request = RoutesApiRequest(
-      origin: PointLatLng(pickupLatLng.latitude, pickupLatLng.longitude),
-      destination: PointLatLng(
-        destinationLatLng.latitude,
-        destinationLatLng.longitude,
-      ),
-      travelMode: TravelMode.driving,
-      routingPreference: RoutingPreference.trafficAware,
-    );
+    try {
+      PolylinePoints polylinePoints = PolylinePoints(
+        apiKey: Environment.mapKey,
+      );
+      // Create Routes API request
+      RoutesApiRequest request = RoutesApiRequest(
+        origin: PointLatLng(pickupLatLng.latitude, pickupLatLng.longitude),
+        destination: PointLatLng(
+          destinationLatLng.latitude,
+          destinationLatLng.longitude,
+        ),
+        travelMode: TravelMode.driving,
+        routingPreference: RoutingPreference.trafficAware,
+      );
 
-    // Get route using Routes API
-    RoutesApiResponse response = await polylinePoints.getRouteBetweenCoordinatesV2(request: request);
+      // Get route using Routes API
+      RoutesApiResponse response = await polylinePoints
+          .getRouteBetweenCoordinatesV2(request: request);
 
-    if (response.primaryRoute?.polylinePoints case List<PointLatLng> points) {
-      for (var point in points) {
-        polylineCoordinates.add(LatLng(point.latitude, point.longitude));
+      if (response.primaryRoute?.polylinePoints case List<PointLatLng> points) {
+        for (var point in points) {
+          polylineCoordinates.add(LatLng(point.latitude, point.longitude));
+        }
       }
+    } catch (e) {
+      printX('Error getting polyline points V2: $e');
     }
 
     return polylineCoordinates;

@@ -19,7 +19,7 @@ class RideRepo {
     return responseModel;
   }
 
-// دالة التفاوض (Counter Offer)
+  // دالة التفاوض (Counter Offer)
   Future<ResponseModel> counterOffer({
     required String bidId,
     required String amount,
@@ -42,7 +42,8 @@ class RideRepo {
     required String status,
     String page = '1',
   }) async {
-    String url = "${UrlContainer.baseUrl}${UrlContainer.riderRideList}?ride_type=$rideType&status=$status&page=$page";
+    String url =
+        "${UrlContainer.baseUrl}${UrlContainer.riderRideList}?ride_type=$rideType&status=$status&page=$page";
     ResponseModel responseModel = await apiClient.request(
       url,
       Method.getMethod,
@@ -56,7 +57,8 @@ class RideRepo {
     required String id,
     required String page,
   }) async {
-    String url = "${UrlContainer.baseUrl}${UrlContainer.riderRideMessageList}/$id?page=$page";
+    String url =
+        "${UrlContainer.baseUrl}${UrlContainer.riderRideMessageList}/$id?page=$page";
     ResponseModel responseModel = await apiClient.request(
       url,
       Method.getMethod,
@@ -123,7 +125,7 @@ class RideRepo {
     required String id,
     required String reason,
   }) async {
-    String url = "${UrlContainer.baseUrl}${UrlContainer.cancelBid}/$id";
+    String url = "${UrlContainer.baseUrl}${UrlContainer.riderCancelRide}/$id";
     Map<String, String> params = {'cancel_reason': reason};
     ResponseModel responseModel = await apiClient.request(
       url,
@@ -139,7 +141,8 @@ class RideRepo {
     required String review,
     required String rating,
   }) async {
-    String url = "${UrlContainer.baseUrl}${UrlContainer.riderReviewRide}/$rideId";
+    String url =
+        "${UrlContainer.baseUrl}${UrlContainer.riderReviewRide}/$rideId";
     Map<String, String> params = {'review': review, 'rating': rating};
     ResponseModel responseModel = await apiClient.request(
       url,

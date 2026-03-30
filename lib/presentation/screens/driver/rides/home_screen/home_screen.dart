@@ -36,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    Get.put(NotificationController(localStorageService: Get.find(), apiClient: Get.find()));
+    Get.find<NotificationController>();
     super.initState();
     _initData();
   }
@@ -51,7 +51,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _scrollListener() {
     final controller = Get.find<DashBoardController>();
-    if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
+    if (scrollController.position.pixels ==
+        scrollController.position.maxScrollExtent) {
       if (controller.hasNext()) {
         controller.loadData();
       }
@@ -81,18 +82,23 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: MyColor.primaryColor,
                 onRefresh: () async => controller.initialData(shouldLoad: true),
                 child: CustomScrollView(
-                  physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+                  physics: const BouncingScrollPhysics(
+                    parent: AlwaysScrollableScrollPhysics(),
+                  ),
                   controller: scrollController,
                   slivers: [
                     _buildKYCSections(),
-                    if (!controller.isLoading) _buildRunningRideSection(controller),
+                    if (!controller.isLoading)
+                      _buildRunningRideSection(controller),
                     _buildRideListSection(controller),
-                    const SliverToBoxAdapter(child: SizedBox(height: Dimensions.space100)),
+                    const SliverToBoxAdapter(
+                      child: SizedBox(height: Dimensions.space100),
+                    ),
                   ],
                 ),
               ),
               // --- إضافة رادار حالة اتصال Pusher هنا ---
-              //       _buildPusherStatusMonitor(),
+              _buildPusherStatusMonitor(),
             ],
           ),
         ),
@@ -120,18 +126,28 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: isConnected ? Colors.green.withOpacity(0.9) : Colors.red.withOpacity(0.9),
+              color: isConnected
+                  ? Colors.green.withValues(alpha: 0.9)
+                  : Colors.red.withValues(alpha: 0.9),
               borderRadius: BorderRadius.circular(12),
               boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(isConnected ? Icons.bolt : Icons.bolt_outlined, color: Colors.white, size: 12),
+                Icon(
+                  isConnected ? Icons.bolt : Icons.bolt_outlined,
+                  color: Colors.white,
+                  size: 12,
+                ),
                 const SizedBox(width: 4),
                 Text(
                   pusherController.connectionState,
-                  style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 9,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
@@ -155,7 +171,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildRunningRideSection(DashBoardController controller) {
-    if (controller.runningRide == null) return const SliverToBoxAdapter(child: SizedBox.shrink());
+    if (controller.runningRide == null)
+      return const SliverToBoxAdapter(child: SizedBox.shrink());
 
     return SliverToBoxAdapter(
       child: Container(
@@ -167,21 +184,33 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 10),
             Text(
               MyStrings.runningRide.tr,
-              style: semiBoldLarge.copyWith(color: MyColor.primaryColor, fontSize: 16),
+              style: semiBoldLarge.copyWith(
+                color: MyColor.primaryColor,
+                fontSize: 16,
+              ),
             ),
             const SizedBox(height: 10),
             NewRideCardWidget(
-              isActive: true,
-              ride: controller.runningRide!,
-              currency: controller.currencySym,
-              driverImagePath: '${controller.userImagePath}/${controller.runningRide?.user?.avatar}',
-              press: () => Get.toNamed(RouteHelper.driverRideDetailsScreen, arguments: controller.runningRide!.id),
-            ).animate(onPlay: (c) => c.repeat()).shakeX(duration: 1000.ms, delay: 4000.ms, hz: 4),
+                  isActive: true,
+                  ride: controller.runningRide!,
+                  currency: controller.currencySym,
+                  driverImagePath:
+                      '${controller.userImagePath}/${controller.runningRide?.user?.avatar}',
+                  press: () => Get.toNamed(
+                    RouteHelper.driverRideDetailsScreen,
+                    arguments: controller.runningRide!.id,
+                  ),
+                )
+                .animate(onPlay: (c) => c.repeat())
+                .shakeX(duration: 1000.ms, delay: 4000.ms, hz: 4),
             spaceDown(Dimensions.space10),
             if (controller.rideList.isNotEmpty) ...[
               Text(
                 MyStrings.newRide.tr,
-                style: regularDefault.copyWith(color: MyColor.colorBlack, fontSize: 18),
+                style: regularDefault.copyWith(
+                  color: MyColor.colorBlack,
+                  fontSize: 18,
+                ),
               ),
               spaceDown(Dimensions.space10),
             ],
@@ -198,11 +227,12 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.symmetric(horizontal: Dimensions.space16),
           child: Column(
             children: List.generate(
-                8,
-                (index) => const Padding(
-                      padding: EdgeInsets.only(bottom: Dimensions.space10),
-                      child: RideShimmer(),
-                    )),
+              8,
+              (index) => const Padding(
+                padding: EdgeInsets.only(bottom: Dimensions.space10),
+                child: RideShimmer(),
+              ),
+            ),
           ),
         ),
       );
@@ -223,7 +253,10 @@ class _HomeScreenState extends State<HomeScreen> {
         (context, index) {
           if (index == controller.rideList.length) {
             return const Padding(
-              padding: EdgeInsets.symmetric(horizontal: Dimensions.space16, vertical: Dimensions.space5),
+              padding: EdgeInsets.symmetric(
+                horizontal: Dimensions.space16,
+                vertical: Dimensions.space5,
+              ),
               child: RideShimmer(),
             );
           }
@@ -235,16 +268,25 @@ class _HomeScreenState extends State<HomeScreen> {
               horizontal: Dimensions.space16,
               vertical: Dimensions.space5,
             ),
-            child: NewRideCardWidget(
-              isActive: true,
-              ride: ride,
-              currency: controller.currencySym,
-              driverImagePath: '${controller.userImagePath}/${ride.user?.avatar}',
-              press: () {
-                controller.updateMainAmount(StringConverter.formatDouble(ride.amount.toString()));
-                CustomBottomSheet(child: OfferBidBottomSheet(ride: ride)).customBottomSheet(context);
-              },
-            ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.2, end: 0, curve: Curves.easeOutQuad),
+            child:
+                NewRideCardWidget(
+                      isActive: true,
+                      ride: ride,
+                      currency: controller.currencySym,
+                      driverImagePath:
+                          '${controller.userImagePath}/${ride.user?.avatar}',
+                      press: () {
+                        controller.updateMainAmount(
+                          StringConverter.formatDouble(ride.amount.toString()),
+                        );
+                        CustomBottomSheet(
+                          child: OfferBidBottomSheet(ride: ride),
+                        ).customBottomSheet(context);
+                      },
+                    )
+                    .animate()
+                    .fadeIn(duration: 400.ms)
+                    .slideY(begin: 0.2, end: 0, curve: Curves.easeOutQuad),
           );
         },
         childCount: controller.rideList.length + (controller.hasNext() ? 1 : 0),

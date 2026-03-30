@@ -1,12 +1,14 @@
 class UrlContainer {
-  static const String domainUrl = 'https://appalafandi.com'; //YOUR WEBSITE DOMAIN URL HERE
+  static const String domainUrl =
+      'https://appalafandi.com'; //YOUR WEBSITE DOMAIN URL HERE
 
   static const String baseUrl = '$domainUrl/api/';
   static const String dashBoardEndPoint = 'driver/dashboard';
   static const String depositHistoryUrl = 'driver/deposit/history';
   static const String depositMethodUrl = 'driver/deposit/methods';
   static const String depositInsertUrl = 'driver/deposit/insert';
-  static const String counterOffer = "رابط_التفاوض_هنا"; // مثال: rider/ride/counter-offer
+  static const String counterOffer =
+      "رابط_التفاوض_هنا"; // مثال: rider/ride/counter-offer
   static const String registrationEndPoint = 'driver/register';
   static const String loginEndPoint = 'driver/login';
   static const String socialLoginEndPoint = 'driver/social-login';
@@ -30,13 +32,15 @@ class UrlContainer {
 
   static const String addWithdrawRequestUrl = 'driver/withdraw-request';
   static const String withdrawMethodUrl = 'driver/withdraw-method';
-  static const String withdrawRequestConfirm = 'driver/withdraw-request/confirm';
+  static const String withdrawRequestConfirm =
+      'driver/withdraw-request/confirm';
   static const String withdrawHistoryUrl = 'driver/withdraw/history';
   static const String withdrawStoreUrl = 'driver/withdraw/store/';
   static const String withdrawConfirmScreenUrl = 'driver/withdraw/preview/';
 
   static const String driverVerificationFormUrl = 'driver/driver-verification';
-  static const String vehicleVerificationFormUrl = 'driver/vehicle-verification';
+  static const String vehicleVerificationFormUrl =
+      'driver/vehicle-verification';
   static const String kycSubmitUrl = 'driver/kyc-submit';
 
   static const String generalSettingEndPoint = 'general-setting';
@@ -74,7 +78,8 @@ class UrlContainer {
   static const String cancelBid = 'driver/rides/cancel';
   static const String rideDetails = 'driver/rides/details';
   static const String riderRideDetails = 'ride/details';
-  static const String acceptCashPaymentRides = 'driver/rides/received-cash-payment';
+  static const String acceptCashPaymentRides =
+      'driver/rides/received-cash-payment';
 
   static const String completedRides = 'driver/rides/completed';
   static const String canceledRides = 'driver/rides/canceled';
@@ -148,6 +153,7 @@ class UrlContainer {
   static const String activeRide = 'ride/active';
   static const String completedRide = 'ride/completed';
   static const String canceledRide = 'ride/canceled';
+  static const String riderCancelRide = 'ride/cancel';
   static const String rideBidList = 'ride/bids';
   static const String acceptBid = 'ride/accept';
   static const String rejectBid = 'ride/reject';
@@ -160,6 +166,7 @@ class UrlContainer {
   static const String serviceImagePath = 'assets/images/service/';
 
   // others url
-  static const String countryFlagImageLink = 'https://flagpedia.net/data/flags/h60/{countryCode}.webp';
-  static const String googleMapLocationSearch = 'https://maps.googleapis.com/maps/api/geocode/json';
+  static const String countryFlagImageLink =
+      'https://flagpedia.net/data/flags/h60/{countryCode}.webp';
+  static const String googleMapBaseUrl = 'https://maps.googleapis.com/maps/api';
 }

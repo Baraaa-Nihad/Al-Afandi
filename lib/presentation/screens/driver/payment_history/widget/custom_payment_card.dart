@@ -33,7 +33,8 @@ class CustomPaymentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<PaymentHistoryController>(tag: 'driver', 
+    return GetBuilder<PaymentHistoryController>(
+      tag: 'driver',
       builder: (controller) => CustomAppCard(
         width: double.infinity,
         child: Column(
@@ -85,8 +86,12 @@ class CustomPaymentCard extends StatelessWidget {
                   ),
                 ),
                 PaymentStatusWidget(
-                  status: paymentType == "1" ? MyStrings.onlinePayment.tr : MyStrings.cashPayment.tr,
-                  color: paymentType == "1" ? MyColor.informationColor : MyColor.greenSuccessColor,
+                  status: paymentType == "1"
+                      ? MyStrings.onlinePayment.tr
+                      : MyStrings.cashPayment.tr,
+                  color: paymentType == "1"
+                      ? MyColor.informationColor
+                      : MyColor.greenSuccessColor,
                 ),
               ],
             ),

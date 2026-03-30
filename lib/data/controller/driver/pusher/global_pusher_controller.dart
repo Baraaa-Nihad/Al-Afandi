@@ -1,12 +1,16 @@
+import 'dart:async';
 import 'dart:convert';
+
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:ovoride/core/helper/shared_preference_helper.dart';
 import 'package:ovoride/core/route/route.dart';
 import 'package:ovoride/core/utils/audio_utils.dart';
 import 'package:ovoride/data/controller/driver/dashboard/ride_queue_manager.dart';
 import 'package:ovoride/data/model/global/pusher/pusher_event_response_model.dart';
-import 'package:ovoride/data/model/global/app/ride_model.dart';
+import 'package:ovoride/data/services/app_notification_helper.dart';
 import 'package:ovoride/data/services/pusher_service.dart';
+import 'package:ovoride/data/services/push_notification_service.dart';
 import 'package:pusher_channels_flutter/pusher_channels_flutter.dart';
 import 'package:ovoride/core/helper/string_format_helper.dart';
 import 'package:ovoride/data/services/api_client.dart';
@@ -25,6 +29,7 @@ class GlobalPusherController extends GetxController {
   void onInit() {
     super.onInit();
     PusherManager().addListener(onEvent);
+    PusherManager().addConnectionStateListener(updateConnectionState);
   }
 
   List<String> activeEventList = [
@@ -34,7 +39,7 @@ class GlobalPusherController extends GetxController {
   ];
   String connectionState = "DISCONNECTED"; // الحالة الافتراضية
 
-// داخل دالة onInit أو دالة الربط مع Pusher
+  // داخل دالة onInit أو دالة الربط مع Pusher
   void updateConnectionState(String state) {
     connectionState = state;
     update(); // لتحديث الواجهة فوراً
@@ -44,19 +49,41 @@ class GlobalPusherController extends GetxController {
   void onEvent(PusherEvent event) {
     try {
       printX("Global pusher event: ${event.eventName}");
-      if (event.data == null || event.eventName == "" || event.data.toString() == "{}") return;
+      if (event.data == null ||
+          event.eventName == "" ||
+          event.data.toString() == "{}")
+        return;
 
-      final eventName = event.eventName.toLowerCase();
+      final eventName = AppNotificationHelper.normalizeRemark(
+        event.eventName.toLowerCase(),
+      );
+      if (eventName == null) {
+        return;
+      }
 
       // --- التعديل الجوهري لحدث الطلبات الجديدة ---
-      if (eventName == "new_ride" && !isRideDetailsPage()) {
+      if (AppNotificationHelper.isNewRideType(eventName) &&
+          !isRideDetailsPage()) {
+        final notification = AppNotificationHelper.fromPusherEvent(event);
+
+        if (notification != null && _shouldShowBackgroundRideNotification()) {
+          unawaited(
+            PushNotificationService.showRealtimeNotification(notification),
+          );
+        }
+
         // 1. تشغيل صوت التنبيه فوراً
         AudioUtils.playAudio(apiClient.getNotificationAudio());
 
         // 2. فك تشفير البيانات القادمة من Pusher
-        PusherResponseModel model = PusherResponseModel.fromJson(
-          jsonDecode(event.data),
-        );
+        dynamic decodedData;
+        if (event.data is String) {
+          decodedData = jsonDecode(event.data);
+        } else {
+          decodedData = event.data;
+        }
+
+        PusherResponseModel model = PusherResponseModel.fromJson(decodedData);
 
         final modifyData = PusherResponseModel(
           eventName: eventName,
@@ -72,21 +99,25 @@ class GlobalPusherController extends GetxController {
 
           // 4. تحديث المبالغ في الواجهة
           dashBoardController.updateMainAmount(
-            double.tryParse(newRide.amount.toString() ?? "0.00") ?? 0,
+            double.tryParse(newRide.amount?.toString() ?? "0.00") ?? 0,
           );
         }
 
         // 5. إدارة طابور المنبثقات (Popups) كما هي
-        final queueManager = Get.isRegistered<RideQueueManager>() ? Get.find<RideQueueManager>() : Get.put(RideQueueManager());
+        if (newRide != null) {
+          final queueManager = Get.isRegistered<RideQueueManager>()
+              ? Get.find<RideQueueManager>()
+              : Get.put(RideQueueManager());
 
-        queueManager.addRideToQueue(
-          RideQueueItem(
-            ride: newRide ?? RideModel(id: "-1"),
-            currency: apiClient.getCurrency(),
-            currencySym: apiClient.getCurrency(isSymbol: true),
-            dashboardController: dashBoardController,
-          ),
-        );
+          queueManager.addRideToQueue(
+            RideQueueItem(
+              ride: newRide,
+              currency: apiClient.getCurrency(),
+              currencySym: apiClient.getCurrency(isSymbol: true),
+              dashboardController: dashBoardController,
+            ),
+          );
+        }
 
         // 6. مزامنة صامتة مع السيرفر لضمان دقة البيانات 100%
         dashBoardController.initialData(shouldLoad: false);
@@ -99,8 +130,15 @@ class GlobalPusherController extends GetxController {
 
       // الانتقال لصفحة التفاصيل عند قبول المزايدة أو الدفع
       if (activeEventList.contains(eventName) && !isRideDetailsPage()) {
+        dynamic activeDecodedData;
+        if (event.data is String) {
+          activeDecodedData = jsonDecode(event.data);
+        } else {
+          activeDecodedData = event.data;
+        }
+
         PusherResponseModel model = PusherResponseModel.fromJson(
-          jsonDecode(event.data),
+          activeDecodedData,
         );
         final pusherData = PusherResponseModel(
           eventName: eventName,
@@ -122,21 +160,30 @@ class GlobalPusherController extends GetxController {
     return Get.currentRoute == RouteHelper.driverRideDetailsScreen;
   }
 
+  bool _shouldShowBackgroundRideNotification() {
+    final AppLifecycleState? state = WidgetsBinding.instance.lifecycleState;
+    return state != AppLifecycleState.resumed;
+  }
+
   @override
   void onClose() {
     PusherManager().removeListener(onEvent);
+    PusherManager().removeConnectionStateListener(updateConnectionState);
     super.onClose();
   }
 
   Future<void> ensureConnection({String? channelName}) async {
     try {
-      var userId = apiClient.sharedPreferences.getString(
+      updateConnectionState(PusherManager().currentConnectionState);
+      var userId =
+          apiClient.sharedPreferences.getString(
             SharedPreferenceHelper.userIdKey,
           ) ??
           '';
       await PusherManager().checkAndInitIfNeeded(
         channelName ?? "private-rider-driver-$userId",
       );
+      updateConnectionState(PusherManager().currentConnectionState);
     } catch (e) {
       printX("Error ensuring connection: $e");
     }

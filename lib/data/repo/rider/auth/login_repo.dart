@@ -7,6 +7,7 @@ import 'package:ovoride/core/utils/url_container.dart';
 import 'package:ovoride/data/model/auth/verification/email_verification_model.dart';
 import 'package:ovoride/data/model/global/response_model/response_model.dart';
 import 'package:ovoride/data/services/api_client.dart';
+import 'package:ovoride/data/services/push_notification_service.dart';
 import 'package:ovoride/presentation/components/snack_bar/show_custom_snackbar.dart';
 
 class LoginRepo {
@@ -30,7 +31,8 @@ class LoginRepo {
 
   Future<String> forgetPassword(String type, String value) async {
     final map = modelToMap(value, type);
-    String url = '${UrlContainer.baseUrl}${UrlContainer.riderForgetPasswordEndPoint}';
+    String url =
+        '${UrlContainer.baseUrl}${UrlContainer.riderForgetPasswordEndPoint}';
     final response = await apiClient.request(
       url,
       Method.postMethod,
@@ -39,7 +41,9 @@ class LoginRepo {
       passHeader: true,
     );
 
-    EmailVerificationModel model = EmailVerificationModel.fromJson((response.responseJson));
+    EmailVerificationModel model = EmailVerificationModel.fromJson(
+      (response.responseJson),
+    );
 
     if (model.status.toLowerCase() == "success") {
       apiClient.sharedPreferences.setString(
@@ -64,13 +68,15 @@ class LoginRepo {
   }
 
   Future<EmailVerificationModel> verifyForgetPassCode(String code) async {
-    String? email = apiClient.sharedPreferences.getString(
+    String? email =
+        apiClient.sharedPreferences.getString(
           SharedPreferenceHelper.userEmailKey,
         ) ??
         '';
     Map<String, String> map = {'code': code, 'email': email};
 
-    String url = '${UrlContainer.baseUrl}${UrlContainer.riderPasswordVerifyEndPoint}';
+    String url =
+        '${UrlContainer.baseUrl}${UrlContainer.riderPasswordVerifyEndPoint}';
 
     final response = await apiClient.request(
       url,
@@ -80,7 +86,9 @@ class LoginRepo {
       isOnlyAcceptType: true,
     );
 
-    EmailVerificationModel model = EmailVerificationModel.fromJson((response.responseJson));
+    EmailVerificationModel model = EmailVerificationModel.fromJson(
+      (response.responseJson),
+    );
     if (model.status == 'success') {
       model.setCode(200);
       return model;
@@ -102,7 +110,8 @@ class LoginRepo {
       'password_confirmation': password,
     };
 
-    String url = '${UrlContainer.baseUrl}${UrlContainer.riderResetPasswordEndPoint}';
+    String url =
+        '${UrlContainer.baseUrl}${UrlContainer.riderResetPasswordEndPoint}';
     final response = await apiClient.request(
       url,
       Method.postMethod,
@@ -111,7 +120,9 @@ class LoginRepo {
       isOnlyAcceptType: true,
     );
 
-    EmailVerificationModel model = EmailVerificationModel.fromJson((response.responseJson));
+    EmailVerificationModel model = EmailVerificationModel.fromJson(
+      (response.responseJson),
+    );
 
     if (model.status == 'success') {
       CustomSnackBar.success(successList: model.message ?? []);
@@ -129,7 +140,8 @@ class LoginRepo {
     if (apiClient.sharedPreferences.containsKey(
       SharedPreferenceHelper.fcmDeviceKey,
     )) {
-      deviceToken = apiClient.sharedPreferences.getString(
+      deviceToken =
+          apiClient.sharedPreferences.getString(
             SharedPreferenceHelper.fcmDeviceKey,
           ) ??
           '';
@@ -141,32 +153,56 @@ class LoginRepo {
     bool success = false;
 
     if (deviceToken.isEmpty) {
-      firebaseMessaging.getToken().then((fcmDeviceToken) async {
-        printX('------$fcmDeviceToken');
-        success = await sendUpdatedToken(fcmDeviceToken ?? '');
-      });
+      final fcmDeviceToken = await firebaseMessaging.getToken();
+      printX('------$fcmDeviceToken');
+      if (fcmDeviceToken == null || fcmDeviceToken.isEmpty) {
+        return false;
+      }
+
+      await apiClient.sharedPreferences.setString(
+        SharedPreferenceHelper.fcmDeviceKey,
+        fcmDeviceToken,
+      );
+      success = await sendUpdatedToken(fcmDeviceToken);
     } else {
-      firebaseMessaging.onTokenRefresh.listen((fcmDeviceToken) async {
-        printX('------$fcmDeviceToken');
-        if (deviceToken == fcmDeviceToken) {
-          success = true;
-        } else {
-          apiClient.sharedPreferences.setString(
-            SharedPreferenceHelper.fcmDeviceKey,
-            fcmDeviceToken,
-          );
-          success = await sendUpdatedToken(fcmDeviceToken);
-        }
-      });
+      success = true;
     }
+
+    await PushNotificationService.registerTokenRefreshListener(
+      firebaseMessaging: firebaseMessaging,
+      onTokenRefresh: (fcmDeviceToken) async {
+        printX('------$fcmDeviceToken');
+        final currentToken =
+            apiClient.sharedPreferences.getString(
+              SharedPreferenceHelper.fcmDeviceKey,
+            ) ??
+            '';
+        if (currentToken == fcmDeviceToken) {
+          return;
+        }
+
+        await apiClient.sharedPreferences.setString(
+          SharedPreferenceHelper.fcmDeviceKey,
+          fcmDeviceToken,
+        );
+        await sendUpdatedToken(fcmDeviceToken);
+      },
+    );
+
     return success;
   }
 
   Future<bool> sendUpdatedToken(String deviceToken) async {
-    String url = '${UrlContainer.baseUrl}${UrlContainer.riderDeviceTokenEndPoint}';
+    String url =
+        '${UrlContainer.baseUrl}${UrlContainer.riderDeviceTokenEndPoint}';
     Map<String, String> map = deviceTokenMap(deviceToken);
-    await apiClient.request(url, Method.postMethod, map, passHeader: true);
-    return true;
+    final response = await apiClient.request(
+      url,
+      Method.postMethod,
+      map,
+      passHeader: true,
+    );
+    return response.statusCode == 200;
   }
 
   Map<String, String> deviceTokenMap(String deviceToken) {

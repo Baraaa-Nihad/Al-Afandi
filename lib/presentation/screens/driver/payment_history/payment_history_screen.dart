@@ -26,7 +26,8 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
   final ScrollController scrollController = ScrollController();
 
   void scrollListener() {
-    if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
+    if (scrollController.position.pixels ==
+        scrollController.position.maxScrollExtent) {
       if (Get.find<PaymentHistoryController>(tag: 'driver').hasNext()) {
         Get.find<PaymentHistoryController>(tag: 'driver').loadPaymentHistory();
       }
@@ -37,7 +38,8 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
   void initState() {
     Get.put(PaymentHistoryRepo(apiClient: Get.find()), tag: 'driver');
     final controller = Get.put(
-      PaymentHistoryController(paymentHistoryRepo: Get.find(tag: 'driver')), tag: 'driver',
+      PaymentHistoryController(paymentHistoryRepo: Get.find(tag: 'driver')),
+      tag: 'driver',
     );
 
     super.initState();
@@ -49,7 +51,8 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<PaymentHistoryController>(tag: 'driver', 
+    return GetBuilder<PaymentHistoryController>(
+      tag: 'driver',
       builder: (controller) => Scaffold(
         appBar: CustomAppBar(title: MyStrings.paymentHistory.tr),
         body: controller.isLoading
@@ -59,7 +62,8 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
                   horizontal: Dimensions.space16,
                   vertical: Dimensions.space20,
                 ),
-                separatorBuilder: (context, index) => const SizedBox(height: Dimensions.space10),
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: Dimensions.space10),
                 itemBuilder: (context, index) {
                   return Container(
                     decoration: BoxDecoration(
@@ -78,47 +82,54 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
                   );
                 },
               )
-            : controller.paymentHistoryList.isEmpty && controller.isLoading == false
-                ? const Center(
-                    child: NoDataWidget(text: MyStrings.noDataToShow, margin: 6),
-                  )
-                : ListView.separated(
-                    controller: scrollController,
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    padding: EdgeInsets.symmetric(
-                      horizontal: Dimensions.space16,
-                      vertical: Dimensions.space20,
+            : controller.paymentHistoryList.isEmpty &&
+                  controller.isLoading == false
+            ? const Center(
+                child: NoDataWidget(text: MyStrings.noDataToShow, margin: 6),
+              )
+            : ListView.separated(
+                controller: scrollController,
+                physics: const AlwaysScrollableScrollPhysics(),
+                shrinkWrap: true,
+                padding: EdgeInsets.symmetric(
+                  horizontal: Dimensions.space16,
+                  vertical: Dimensions.space20,
+                ),
+                scrollDirection: Axis.vertical,
+                itemCount: controller.paymentHistoryList.length + 1,
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: Dimensions.space10),
+                itemBuilder: (context, index) {
+                  if (controller.paymentHistoryList.length == index) {
+                    return controller.hasNext()
+                        ? Container(
+                            height: 40,
+                            width: MediaQuery.of(context).size.width,
+                            margin: const EdgeInsets.all(5),
+                            child: const CustomLoader(),
+                          )
+                        : const SizedBox();
+                  }
+                  return CustomPaymentCard(
+                    index: index,
+                    rideUid:
+                        "${controller.paymentHistoryList[index].ride?.uid}",
+                    dateData: DateConverter.estimatedDate(
+                      DateTime.tryParse(
+                            controller.paymentHistoryList[index].createdAt ??
+                                "",
+                          ) ??
+                          DateTime.now(),
+                      formatType: DateFormatType.onlyDate,
                     ),
-                    scrollDirection: Axis.vertical,
-                    itemCount: controller.paymentHistoryList.length + 1,
-                    separatorBuilder: (context, index) => const SizedBox(height: Dimensions.space10),
-                    itemBuilder: (context, index) {
-                      if (controller.paymentHistoryList.length == index) {
-                        return controller.hasNext()
-                            ? Container(
-                                height: 40,
-                                width: MediaQuery.of(context).size.width,
-                                margin: const EdgeInsets.all(5),
-                                child: const CustomLoader(),
-                              )
-                            : const SizedBox();
-                      }
-                      return CustomPaymentCard(
-                        index: index,
-                        rideUid: "${controller.paymentHistoryList[index].ride?.uid}",
-                        dateData: DateConverter.estimatedDate(
-                          DateTime.tryParse(
-                                controller.paymentHistoryList[index].createdAt ?? "",
-                              ) ??
-                              DateTime.now(),
-                          formatType: DateFormatType.onlyDate,
-                        ),
-                        amountData: " ${Get.find<ApiClient>().getCurrency(isSymbol: true)}${controller.paymentHistoryList[index].amount}",
-                        paymentType: controller.paymentHistoryList[index].paymentType ?? "-1",
-                      );
-                    },
-                  ),
+                    amountData:
+                        " ${Get.find<ApiClient>().getCurrency(isSymbol: true)}${controller.paymentHistoryList[index].amount}",
+                    paymentType:
+                        controller.paymentHistoryList[index].paymentType ??
+                        "-1",
+                  );
+                },
+              ),
       ),
     );
   }

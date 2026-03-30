@@ -7,7 +7,6 @@ import 'package:ovoride/core/helper/string_format_helper.dart';
 import 'package:ovoride/core/route/route.dart';
 import 'package:ovoride/core/utils/my_color.dart';
 import 'package:ovoride/core/utils/my_strings.dart';
-import 'package:ovoride/core/utils/util.dart';
 import 'package:ovoride/data/model/global/response_model/response_model.dart';
 import 'package:ovoride/data/model/rider/location/selected_location_info.dart';
 import 'package:ovoride/environment.dart';
@@ -24,7 +23,8 @@ import '../home/home_controller.dart';
 class SelectLocationController extends GetxController {
   // Dependencies
   final LocationSearchRepo locationSearchRepo;
-  int selectedLocationIndex; // Current selected location index (0 = pickup, 1 = destination)
+  int
+  selectedLocationIndex; // Current selected location index (0 = pickup, 1 = destination)
 
   // Constructor with required dependencies
   SelectLocationController({
@@ -54,7 +54,8 @@ class SelectLocationController extends GetxController {
 
   // Controllers
   final HomeController homeController = Get.find();
-  final TextEditingController searchLocationController = TextEditingController();
+  final TextEditingController searchLocationController =
+      TextEditingController();
   final TextEditingController valueOfLocation = TextEditingController();
   final TextEditingController destinationController = TextEditingController();
   final TextEditingController pickUpController = TextEditingController();
@@ -91,13 +92,18 @@ class SelectLocationController extends GetxController {
 
   /// Initialize the controller, setting up locations from homeController
   void initialize() async {
-    printD("homeController.selectedLocations.length ${homeController.selectedLocations.length}");
+    printD(
+      "homeController.selectedLocations.length ${homeController.selectedLocations.length}",
+    );
 
     // Set pickup location if available
     if (homeController.selectedLocations.isNotEmpty) {
       final pickupInfo = homeController.getSelectedLocationInfoAtIndex(0);
       if (pickupInfo != null) {
-        pickupLatlong = LatLng(pickupInfo.latitude ?? 0, pickupInfo.longitude ?? 0);
+        pickupLatlong = LatLng(
+          pickupInfo.latitude ?? 0,
+          pickupInfo.longitude ?? 0,
+        );
         pickUpController.text = pickupInfo.getFullAddress(showFull: true);
       }
 
@@ -105,7 +111,10 @@ class SelectLocationController extends GetxController {
       if (homeController.selectedLocations.length > 1) {
         final destInfo = homeController.getSelectedLocationInfoAtIndex(1);
         if (destInfo != null) {
-          destinationLatlong = LatLng(destInfo.latitude ?? 0, destInfo.longitude ?? 0);
+          destinationLatlong = LatLng(
+            destInfo.latitude ?? 0,
+            destInfo.longitude ?? 0,
+          );
           destinationController.text = destInfo.getFullAddress(showFull: true);
         }
 
@@ -116,7 +125,10 @@ class SelectLocationController extends GetxController {
 
     // Get the current position based on the index
     if (homeController.selectedLocations.length < 2) {
-      await getCurrentPosition(isLoading1stTime: true, pickupLocationForIndex: selectedLocationIndex);
+      await getCurrentPosition(
+        isLoading1stTime: true,
+        pickupLocationForIndex: selectedLocationIndex,
+      );
     }
   }
 
@@ -165,7 +177,9 @@ class SelectLocationController extends GetxController {
     // Handle permanently denied permission
     if (permission == LocationPermission.deniedForever) {
       await Geolocator.openAppSettings();
-      CustomSnackBar.error(errorList: [MyStrings.locationPermissionPermanentDenied]);
+      CustomSnackBar.error(
+        errorList: [MyStrings.locationPermissionPermanentDenied],
+      );
       return false;
     }
 
@@ -191,12 +205,18 @@ class SelectLocationController extends GetxController {
     }
 
     // Get selected location data if available
-    final getSelectLocationData = homeController.getSelectedLocationInfoAtIndex(pickupLocationForIndex);
-    final effectiveIndex = getSelectLocationData == null ? -1 : pickupLocationForIndex;
+    final getSelectLocationData = homeController.getSelectedLocationInfoAtIndex(
+      pickupLocationForIndex,
+    );
+    final effectiveIndex = getSelectLocationData == null
+        ? -1
+        : pickupLocationForIndex;
 
     // Get current position if no selected location
     if (effectiveIndex == -1) {
-      await Geolocator.getCurrentPosition(locationSettings: AndroidSettings(accuracy: LocationAccuracy.high)).then((value) => currentPosition = value);
+      await Geolocator.getCurrentPosition(
+        locationSettings: AndroidSettings(accuracy: LocationAccuracy.high),
+      ).then((value) => currentPosition = value);
     }
 
     // Update camera position based on current or selected location
@@ -229,11 +249,15 @@ class SelectLocationController extends GetxController {
   /// Get the initial target location for the map
   LatLng getInitialTargetLocationForMap({int pickupLocationForIndex = -1}) {
     // selectedLocationIndex = pickupLocationForIndex;
-    final getSelectLocationData = homeController.getSelectedLocationInfoAtIndex(pickupLocationForIndex);
+    final getSelectLocationData = homeController.getSelectedLocationInfoAtIndex(
+      pickupLocationForIndex,
+    );
 
     if (getSelectLocationData == null) {
       // Default to current position or US center if not available
-      return currentPosition != null ? LatLng(currentPosition!.latitude, currentPosition!.longitude) : const LatLng(37.0902, 95.7129); // US center coordinates
+      return currentPosition != null
+          ? LatLng(currentPosition!.latitude, currentPosition!.longitude)
+          : const LatLng(37.0902, 95.7129); // US center coordinates
     } else {
       return LatLng(
         getSelectLocationData.latitude!,
@@ -253,7 +277,9 @@ class SelectLocationController extends GetxController {
       String address = '';
 
       if (Environment.addressPickerFromGoogleMapApi) {
-        address = await locationSearchRepo.getActualAddress(latitude, longitude) ?? '';
+        address =
+            await locationSearchRepo.getActualAddress(latitude, longitude) ??
+            '';
       } else {
         // Use local reverse geocoding
         final placemarks = await placemarkFromCoordinates(latitude, longitude);
@@ -266,8 +292,12 @@ class SelectLocationController extends GetxController {
       currentAddress.value = address;
       update();
       // Update the appropriate controller based on index
-      final bool useSearchedAddress = selectedAddressFromSearch.isNotEmpty && Get.currentRoute != RouteHelper.editLocationPickUpScreen;
-      final String displayAddress = useSearchedAddress ? selectedAddressFromSearch : currentAddress.value;
+      final bool useSearchedAddress =
+          selectedAddressFromSearch.isNotEmpty &&
+          Get.currentRoute != RouteHelper.editLocationPickUpScreen;
+      final String displayAddress = useSearchedAddress
+          ? selectedAddressFromSearch
+          : currentAddress.value;
 
       if (selectedLocationIndex == 0) {
         pickUpController.text = displayAddress;
@@ -308,7 +338,12 @@ class SelectLocationController extends GetxController {
     final country = placemark.country ?? '';
 
     // return [street, subLocality, locality, subAdministrativeArea, administrativeArea, country].where((part) => part.isNotEmpty).join(', ');
-    return [street, subLocality, locality, country].where((part) => part.isNotEmpty).join(', ');
+    return [
+      street,
+      subLocality,
+      locality,
+      country,
+    ].where((part) => part.isNotEmpty).join(', ');
   }
 
   /// Update the selected latitude and longitude based on camera movement
@@ -323,23 +358,29 @@ class SelectLocationController extends GetxController {
 
   /// Animate the map camera to a new position
   void animateMapCameraPosition({bool isFromEdit = false}) {
-    if (isFromEdit) {
-      editMapController?.animateCamera(
-        CameraUpdate.newCameraPosition(
-          CameraPosition(
-            target: LatLng(selectedLatitude, selectedLongitude),
-            zoom: 18,
+    try {
+      if (isFromEdit) {
+        editMapController?.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: LatLng(selectedLatitude, selectedLongitude),
+              zoom: 18,
+            ),
           ),
-        ),
-      );
-    } else {
-      mapController?.animateCamera(
-        CameraUpdate.newCameraPosition(
-          CameraPosition(
-            target: LatLng(selectedLatitude, selectedLongitude),
-            zoom: 18,
+        );
+      } else {
+        mapController?.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: LatLng(selectedLatitude, selectedLongitude),
+              zoom: 18,
+            ),
           ),
-        ),
+        );
+      }
+    } catch (e) {
+      printX(
+        "animateMapCameraPosition ignored error (map disposed): ${e.toString()}",
       );
     }
   }
@@ -372,22 +413,16 @@ class SelectLocationController extends GetxController {
     update();
 
     try {
-      Position? position;
-      try {
-        position = await MyUtils.getCurrentPosition();
-      } catch (e) {
-        printE('Location fetch failed: $e');
-      }
-
-      // ✅ Auto-detect country inside repo
+      // ✅ Auto-detect country inside repo and pass cached position to avoid 30s timeout on each keystroke
       final response = await locationSearchRepo.searchAddressByLocationName(
         text: locationName,
-        position: position,
+        position: currentPosition,
       );
 
       if (response != null) {
         final json = response.responseJson;
-        final predictions = PlacesAutocompleteResponse.fromJson(json).predictions ?? [];
+        final predictions =
+            PlacesAutocompleteResponse.fromJson(json).predictions ?? [];
         allPredictions = predictions;
         onSuccessCallback?.call();
       }
@@ -403,7 +438,8 @@ class SelectLocationController extends GetxController {
   Future<LatLng?> getLangAndLatFromMap(Prediction prediction) async {
     try {
       // Get place details
-      final ResponseModel response = await locationSearchRepo.getPlaceDetailsFromPlaceId(prediction);
+      final ResponseModel response = await locationSearchRepo
+          .getPlaceDetailsFromPlaceId(prediction);
       final placeDetails = PlaceDetails.fromJson((response.responseJson));
 
       if (placeDetails.result == null) {
@@ -424,10 +460,7 @@ class SelectLocationController extends GetxController {
       // Animate camera to the new position
       mapController?.animateCamera(
         CameraUpdate.newCameraPosition(
-          CameraPosition(
-            target: LatLng(lat, lng),
-            zoom: 15,
-          ),
+          CameraPosition(target: LatLng(lat, lng), zoom: 15),
         ),
       );
 
@@ -448,17 +481,21 @@ class SelectLocationController extends GetxController {
 
     try {
       final PolylinePoints polylinePoints = PolylinePoints();
-      final PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-        request: PolylineRequest(
-          origin: PointLatLng(pickupLatlong.latitude, pickupLatlong.longitude),
-          destination: PointLatLng(
-            destinationLatlong.latitude,
-            destinationLatlong.longitude,
-          ),
-          mode: TravelMode.driving,
-        ),
-        googleApiKey: Environment.mapKey,
-      );
+      final PolylineResult result = await polylinePoints
+          .getRouteBetweenCoordinates(
+            request: PolylineRequest(
+              origin: PointLatLng(
+                pickupLatlong.latitude,
+                pickupLatlong.longitude,
+              ),
+              destination: PointLatLng(
+                destinationLatlong.latitude,
+                destinationLatlong.longitude,
+              ),
+              mode: TravelMode.driving,
+            ),
+            googleApiKey: Environment.mapKey,
+          );
 
       if (result.points.isNotEmpty) {
         for (var point in result.points) {
@@ -497,14 +534,20 @@ class SelectLocationController extends GetxController {
   }
 
   /// Fit map bounds to show the entire polyline route
-  void fitPolylineBounds(List<LatLng> coords, {double bottomSheetExtent = 0.4}) {
+  void fitPolylineBounds(
+    List<LatLng> coords, {
+    double bottomSheetExtent = 0.4,
+  }) {
     if (coords.isEmpty) return;
 
     final LatLngBounds bounds = _createLatLngBounds(coords, bottomSheetExtent);
     mapController?.animateCamera(CameraUpdate.newLatLngBounds(bounds, 100));
   }
 
-  LatLngBounds _createLatLngBounds(List<LatLng> coords, double bottomSheetExtent) {
+  LatLngBounds _createLatLngBounds(
+    List<LatLng> coords,
+    double bottomSheetExtent,
+  ) {
     if (coords.isEmpty) {
       return LatLngBounds(
         southwest: const LatLng(0, 0),
@@ -525,7 +568,10 @@ class SelectLocationController extends GetxController {
     }
 
     // Adjust vertical bounds based on the draggable sheet
-    final latPaddingRatio = bottomSheetExtent.clamp(0.0, 1.0); // e.g. 0.3 for 30%
+    final latPaddingRatio = bottomSheetExtent.clamp(
+      0.0,
+      1.0,
+    ); // e.g. 0.3 for 30%
     final latSpan = maxLat - minLat;
     final extraPadding = latSpan * latPaddingRatio;
 
@@ -536,6 +582,7 @@ class SelectLocationController extends GetxController {
   }
 
   void fitPolylineInTopHalf(List<LatLng> polylinePoints) async {
+    if (polylinePoints.isEmpty) return;
     try {
       final bounds = _calculateBounds(polylinePoints);
 
@@ -551,6 +598,12 @@ class SelectLocationController extends GetxController {
   }
 
   LatLngBounds _calculateBounds(List<LatLng> points) {
+    if (points.isEmpty) {
+      return LatLngBounds(
+        southwest: const LatLng(0, 0),
+        northeast: const LatLng(1, 1),
+      );
+    }
     double x0 = points.first.latitude;
     double x1 = points.first.latitude;
     double y0 = points.first.longitude;
@@ -563,10 +616,7 @@ class SelectLocationController extends GetxController {
       if (latLng.longitude < y0) y0 = latLng.longitude;
     }
 
-    return LatLngBounds(
-      southwest: LatLng(x0, y0),
-      northeast: LatLng(x1, y1),
-    );
+    return LatLngBounds(southwest: LatLng(x0, y0), northeast: LatLng(x1, y1));
   }
 
   @override

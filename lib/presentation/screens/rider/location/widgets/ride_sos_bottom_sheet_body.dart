@@ -34,7 +34,7 @@ class RideDetailsSosBottomSheetBody extends StatelessWidget {
           text: MyStrings.submit,
           press: () async {
             if (controller.sosMsgController.text.isEmpty) {
-              CustomSnackBar.error(errorList: ['Please Enter Message']);
+              CustomSnackBar.error(errorList: ['من فضلك اكتب الرسالة']);
             } else {
               Get.back();
               await controller.sos(id);

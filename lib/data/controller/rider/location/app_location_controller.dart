@@ -9,7 +9,9 @@ import 'package:ovoride/environment.dart';
 import 'package:ovoride/presentation/components/snack_bar/show_custom_snackbar.dart';
 
 class AppLocationController extends GetxController {
-  LocationSearchRepo locationSearchRepo = LocationSearchRepo(apiClient: Get.find());
+  LocationSearchRepo locationSearchRepo = LocationSearchRepo(
+    apiClient: Get.find(),
+  );
   Position currentPosition = MyUtils.getDefaultPosition();
   String currentAddress = "${MyStrings.loading.tr}...";
   Position? position;
@@ -26,14 +28,22 @@ class AppLocationController extends GetxController {
       this.position = position;
 
       if (Environment.addressPickerFromGoogleMapApi) {
-        currentAddress = await locationSearchRepo.getActualAddress(position.latitude, position.longitude) ?? 'Unknown location..';
+        currentAddress =
+            await locationSearchRepo.getActualAddress(
+              position.latitude,
+              position.longitude,
+            ) ??
+            'موقع غير معروف';
       } else {
         // Use local reverse geocoding
-        final placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+        final placemarks = await placemarkFromCoordinates(
+          position.latitude,
+          position.longitude,
+        );
         if (placemarks.isNotEmpty) {
           currentAddress = _formatAddress(placemarks.first);
         } else {
-          currentAddress = 'Unknown location..';
+          currentAddress = 'موقع غير معروف';
         }
       }
 
@@ -60,6 +70,11 @@ class AppLocationController extends GetxController {
     final country = placemark.country ?? '';
 
     // return [street, subLocality, locality, subAdministrativeArea, administrativeArea, country].where((part) => part.isNotEmpty).join(', ');
-    return [street, subLocality, locality, country].where((part) => part.isNotEmpty).join(', ');
+    return [
+      street,
+      subLocality,
+      locality,
+      country,
+    ].where((part) => part.isNotEmpty).join(', ');
   }
 }

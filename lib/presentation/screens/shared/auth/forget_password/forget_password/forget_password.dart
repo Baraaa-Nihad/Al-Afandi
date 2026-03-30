@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ovoride/core/helper/shared_preference_helper.dart';
 import 'package:ovoride/core/route/route.dart';
 import 'package:ovoride/core/utils/dimensions.dart';
 import 'package:ovoride/core/utils/my_color.dart';
@@ -16,7 +15,6 @@ import 'package:ovoride/presentation/components/text-form-field/custom_text_fiel
 import 'package:ovoride/presentation/screens/shared/auth/auth_background.dart';
 
 import 'package:ovoride/core/utils/my_icons.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ForgetPasswordScreen extends StatefulWidget {
   const ForgetPasswordScreen({super.key});
@@ -27,14 +25,19 @@ class ForgetPasswordScreen extends StatefulWidget {
 
 class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
-  String _role = 'driver';
 
   @override
   void initState() {
-    final prefs = Get.find<SharedPreferences>();
-    _role = prefs.getString(SharedPreferenceHelper.userRoleKey) ?? 'driver';
-    Get.put<LoginRepo>(LoginRepo(apiClient: Get.find()), tag: 'forget_password', permanent: false);
-    Get.put<ForgetPasswordController>(ForgetPasswordController(loginRepo: Get.find(tag: 'forget_password')), tag: 'forget_password', permanent: false);
+    Get.put<LoginRepo>(
+      LoginRepo(apiClient: Get.find()),
+      tag: 'forget_password',
+      permanent: false,
+    );
+    Get.put<ForgetPasswordController>(
+      ForgetPasswordController(loginRepo: Get.find(tag: 'forget_password')),
+      tag: 'forget_password',
+      permanent: false,
+    );
 
     super.initState();
   }
@@ -56,7 +59,10 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
             child: Column(
               children: [
                 AuthBackgroundWidget(
-                  colors: [MyColor.colorWhite.withValues(alpha: 0.9), MyColor.colorWhite.withValues(alpha: 0.8)],
+                  colors: [
+                    MyColor.colorWhite.withValues(alpha: 0.9),
+                    MyColor.colorWhite.withValues(alpha: 0.8),
+                  ],
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -120,14 +126,19 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: MyColor.colorBlack.withValues(alpha: 0.05), // soft top shadow
+                          color: MyColor.colorBlack.withValues(
+                            alpha: 0.05,
+                          ), // soft top shadow
                           offset: const Offset(0, -30), // ⬆️ Shadow goes up
                           blurRadius: 15,
                           spreadRadius: -3,
                         ),
                       ],
                     ),
-                    padding: EdgeInsets.symmetric(horizontal: Dimensions.space20, vertical: Dimensions.space20),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: Dimensions.space20,
+                      vertical: Dimensions.space20,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -159,7 +170,10 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                                   return;
                                 },
                                 validator: (value) {
-                                  if (auth.emailOrUsernameController.text.isEmpty) {
+                                  if (auth
+                                      .emailOrUsernameController
+                                      .text
+                                      .isEmpty) {
                                     return MyStrings.enterEmailOrUserName.tr;
                                   } else {
                                     return null;

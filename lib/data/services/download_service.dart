@@ -22,9 +22,10 @@ class DownloadService {
     required String fileName,
   }) async {
     printX("Download PDF Service call $url");
-    String accessToken = Get.find<ApiClient>().sharedPreferences.getString(
-              SharedPreferenceHelper.accessTokenKey,
-            ) ??
+    String accessToken =
+        Get.find<ApiClient>().sharedPreferences.getString(
+          SharedPreferenceHelper.accessTokenKey,
+        ) ??
         "";
     Dio dio = Dio();
 
@@ -67,7 +68,7 @@ class DownloadService {
       return true;
     } catch (e) {
       printX('❌ Download failed: $e');
-      CustomSnackBar.error(errorList: ["Download failed. Please try again."]);
+      CustomSnackBar.error(errorList: [MyStrings.errorDownloadingFile]);
       return false;
     }
   }

@@ -27,7 +27,8 @@ class LocationSearchRepo {
     // Fallback with Google Geocoding API if null or empty
     if (code == null || code.trim().isEmpty || code.isEmpty) {
       try {
-        final url = '${UrlContainer.googleMapLocationSearch}/geocode/json?latlng=${position.latitude},${position.longitude}&key=${Environment.mapKey}';
+        final url =
+            '${UrlContainer.googleMapBaseUrl}/geocode/json?latlng=${position.latitude},${position.longitude}&key=${Environment.mapKey}';
 
         final response = await apiClient.request(url, Method.getMethod, null);
 
@@ -54,7 +55,8 @@ class LocationSearchRepo {
 
   /// ✅ Get address from lat/lng (Google Geocode API)
   Future<String?> getActualAddress(double lat, double lng) async {
-    final url = '${UrlContainer.googleMapLocationSearch}/geocode/json?latlng=$lat,$lng&key=${Environment.mapKey}';
+    final url =
+        '${UrlContainer.googleMapBaseUrl}/geocode/json?latlng=$lat,$lng&key=${Environment.mapKey}';
 
     final response = await apiClient.request(url, Method.getMethod, null);
 
@@ -63,7 +65,12 @@ class LocationSearchRepo {
       if (data['results'] != null && data['results'].isNotEmpty) {
         for (var result in data['results']) {
           final types = result['types'];
-          if (types != null && (types.contains('street_address') || types.contains('premise') || types.contains('subpremise') || types.contains('route') || types.contains('locality'))) {
+          if (types != null &&
+              (types.contains('street_address') ||
+                  types.contains('premise') ||
+                  types.contains('subpremise') ||
+                  types.contains('route') ||
+                  types.contains('locality'))) {
             return result['formatted_address'];
           }
         }
@@ -89,7 +96,8 @@ class LocationSearchRepo {
       countryCode = await detectCountryCode(position);
     }
 
-    String url = '${UrlContainer.googleMapLocationSearch}/place/autocomplete/json'
+    String url =
+        '${UrlContainer.googleMapBaseUrl}/place/autocomplete/json'
         '?input=$text'
         '&key=${Environment.mapKey}'
         '&language=en';
@@ -98,7 +106,8 @@ class LocationSearchRepo {
       url += '&components=country:$countryCode';
     } else if (position != null) {
       // fallback: bias by user’s coordinates
-      url += '&location=${position.latitude},${position.longitude}&radius=200000';
+      url +=
+          '&location=${position.latitude},${position.longitude}&radius=200000';
     }
 
     final response = await apiClient.request(url, Method.getMethod, null);
@@ -107,7 +116,8 @@ class LocationSearchRepo {
 
   /// ✅ Get place details by placeId
   Future<dynamic> getPlaceDetailsFromPlaceId(Prediction prediction) async {
-    final url = '${UrlContainer.googleMapLocationSearch}/place/details/json?placeid=${prediction.placeId}&key=${Environment.mapKey}';
+    final url =
+        '${UrlContainer.googleMapBaseUrl}/place/details/json?placeid=${prediction.placeId}&key=${Environment.mapKey}';
     final response = await apiClient.request(url, Method.getMethod, null);
     return response;
   }

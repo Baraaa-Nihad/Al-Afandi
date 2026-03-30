@@ -11,7 +11,6 @@ import 'package:ovoride/core/utils/util.dart';
 import 'package:ovoride/data/controller/driver/ride/ride_details/ride_details_controller.dart';
 import 'package:ovoride/data/model/global/ride/ride_model.dart';
 import 'package:ovoride/data/services/api_client.dart';
-import 'package:ovoride/data/services/arabic_numbers.dart';
 import 'package:ovoride/data/services/download_service.dart';
 import 'package:ovoride/environment.dart';
 import 'package:ovoride/presentation/components/bottom-sheet/custom_bottom_sheet.dart';
@@ -62,14 +61,16 @@ class RideDetailsBottomSheetWidget extends StatelessWidget {
                 controller: scrollController,
                 children: [
                   // Handle Bar
-                  if (ride.status != AppStatus.RIDE_COMPLETED && !isCancelled && ride.status != AppStatus.RIDE_PAYMENT_REQUESTED) ...[
+                  if (ride.status != AppStatus.RIDE_COMPLETED &&
+                      !isCancelled &&
+                      ride.status != AppStatus.RIDE_PAYMENT_REQUESTED) ...[
                     Align(
                       alignment: Alignment.topCenter,
                       child: Container(
                         height: 5,
                         width: 45,
                         decoration: BoxDecoration(
-                          color: MyColor.neutral300.withOpacity(0.5),
+                          color: MyColor.neutral300.withValues(alpha: 0.5),
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
@@ -77,7 +78,9 @@ class RideDetailsBottomSheetWidget extends StatelessWidget {
                     const SizedBox(height: Dimensions.space15),
                   ],
 
-                  if (ride.status == AppStatus.RIDE_PAYMENT_REQUESTED || (ride.status == AppStatus.RIDE_COMPLETED) || isCancelled) ...[
+                  if (ride.status == AppStatus.RIDE_PAYMENT_REQUESTED ||
+                      (ride.status == AppStatus.RIDE_COMPLETED) ||
+                      isCancelled) ...[
                     const SizedBox(height: Dimensions.space70),
                   ],
 
@@ -133,7 +136,9 @@ class RideDetailsBottomSheetWidget extends StatelessWidget {
             height: 60,
             decoration: BoxDecoration(
               // استخدام اللون البنفسجي للنجاح والأحمر الباهت للإلغاء
-              color: isCancelled ? Colors.redAccent.withOpacity(0.9) : MyColor.getPrimaryColor().withOpacity(0.9),
+              color: isCancelled
+                  ? Colors.redAccent.withValues(alpha: 0.9)
+                  : MyColor.getPrimaryColor().withValues(alpha: 0.9),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(Dimensions.moreRadius),
                 topRight: Radius.circular(Dimensions.moreRadius),
@@ -144,9 +149,12 @@ class RideDetailsBottomSheetWidget extends StatelessWidget {
                 isCompleted
                     ? MyStrings.rideCompleted.tr
                     : isCancelled
-                        ? "تم إلغاء هذا الطلب يا أفندي"
-                        : MyStrings.arriveAtMsg.tr,
-                style: boldExtraLarge.copyWith(color: Colors.white, fontSize: 18),
+                    ? "تم إلغاء هذا الطلب يا أفندي"
+                    : MyStrings.arriveAtMsg.tr,
+                style: boldExtraLarge.copyWith(
+                  color: Colors.white,
+                  fontSize: 18,
+                ),
               ),
             ),
           ),
@@ -165,7 +173,11 @@ class RideDetailsBottomSheetWidget extends StatelessWidget {
         children: [
           Column(
             children: [
-              const Icon(Icons.radio_button_checked, size: 20, color: MyColor.primaryColor),
+              const Icon(
+                Icons.radio_button_checked,
+                size: 20,
+                color: MyColor.primaryColor,
+              ),
               Container(width: 1, height: 50, color: MyColor.neutral300),
               const Icon(Icons.location_on, size: 20, color: Colors.redAccent),
             ],
@@ -175,9 +187,17 @@ class RideDetailsBottomSheetWidget extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildLocationItem(MyStrings.pickUpLocation.tr, ride.pickupLocation ?? '', MyColor.getPrimaryColor()),
+                _buildLocationItem(
+                  MyStrings.pickUpLocation.tr,
+                  ride.pickupLocation ?? '',
+                  MyColor.getPrimaryColor(),
+                ),
                 const SizedBox(height: 25),
-                _buildLocationItem(MyStrings.destination.tr, ride.destination ?? '', Colors.redAccent),
+                _buildLocationItem(
+                  MyStrings.destination.tr,
+                  ride.destination ?? '',
+                  Colors.redAccent,
+                ),
               ],
             ),
           ),
@@ -190,7 +210,13 @@ class RideDetailsBottomSheetWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: regularSmall.copyWith(color: labelColor, fontWeight: FontWeight.bold)),
+        Text(
+          label,
+          style: regularSmall.copyWith(
+            color: labelColor,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         const SizedBox(height: 4),
         Text(
           address,
@@ -203,12 +229,18 @@ class RideDetailsBottomSheetWidget extends StatelessWidget {
   }
 
   // دالة بناء أزرار التحكم بناءً على الحالة
-  Widget _buildActionButtons(BuildContext context, RideDetailsController controller, RideModel ride) {
+  Widget _buildActionButtons(
+    BuildContext context,
+    RideDetailsController controller,
+    RideModel ride,
+  ) {
     if (ride.status == AppStatus.RIDE_COMPLETED) {
       if (ride.userReview == null) {
         return RoundedButton(
           text: MyStrings.review.tr,
-          press: () => CustomBottomSheet(child: RideDetailsReviewSection()).customBottomSheet(context),
+          press: () => CustomBottomSheet(
+            child: RideDetailsReviewSection(),
+          ).customBottomSheet(context),
         );
       } else {
         return buildReceiptButton(ride);
@@ -220,13 +252,17 @@ class RideDetailsBottomSheetWidget extends StatelessWidget {
         children: [
           RoundedButton(
             text: MyStrings.pickupPassenger.tr,
-            press: () => CustomBottomSheet(child: PickUpRiderBottomSheet(ride: ride)).customBottomSheet(context),
+            press: () => CustomBottomSheet(
+              child: PickUpRiderBottomSheet(ride: ride),
+            ).customBottomSheet(context),
             isLoading: controller.isStartBtnLoading,
           ),
           const SizedBox(height: 15),
           RoundedButton(
             text: MyStrings.cancelRide.tr,
-            press: () => CustomBottomSheet(child: RideCancelBottomSheet(ride: ride)).customBottomSheet(context),
+            press: () => CustomBottomSheet(
+              child: RideCancelBottomSheet(ride: ride),
+            ).customBottomSheet(context),
             bgColor: Colors.transparent,
             textColor: MyColor.redCancelTextColor,
             isOutlined: true,
@@ -265,51 +301,40 @@ class RideDetailsBottomSheetWidget extends StatelessWidget {
       ),
       child: Row(
         children: [
-          _buildInfoItem('${ride.getDistance()} ${MyUtils.getDistanceLabel(distance: ride.distance, unit: Get.find<ApiClient>().getDistanceUnit())}', MyStrings.distance.tr),
+          _buildInfoItem(
+            '${ride.getDistance()} ${MyUtils.getDistanceLabel(distance: ride.distance, unit: Get.find<ApiClient>().getDistanceUnit())}',
+            MyStrings.distance.tr,
+          ),
           _buildDivider(),
           _buildInfoItem('${ride.duration}', MyStrings.estimatedTime.tr),
           _buildDivider(),
-          _buildInfoItem('${StringConverter.formatNumber(ride.amount.toString())} $currency', MyStrings.rideFare.tr, isAmount: true),
+          _buildInfoItem(
+            '${StringConverter.formatNumber(ride.amount.toString())} $currency',
+            MyStrings.rideFare.tr,
+            isAmount: true,
+          ),
         ],
       ),
     );
   }
 
   Widget _buildInfoItem(String value, String label, {bool isAmount = false}) {
-    // دالة داخلية سريعة لتحويل الدقائق إلى تنسيق (ساعة ودقيقة)
-    String formattedValue = value;
-
-    // إذا كانت التسمية (label) تحتوي على كلمة "وقت" أو "مدة" أو القيمة تحتوي على "Min"
-    if (label.contains('وقت') || label.contains('مدة') || value.toLowerCase().contains('min')) {
-      double? totalMinutes = double.tryParse(value.replaceAll(RegExp(r'[^0-9.]'), ''));
-      if (totalMinutes != null) {
-        int hours = totalMinutes ~/ 60;
-        int mins = (totalMinutes % 60).toInt();
-
-        if (hours > 0) {
-          formattedValue = "$hours ساعة و $mins دقيقة".toArabicNumbers();
-        } else {
-          formattedValue = "$mins دقيقة".toArabicNumbers();
-        }
-      }
-    } else if (!isAmount) {
-      // لضمان تحويل أي أرقام أخرى (مثل المسافة) للأرقام العربية
-      formattedValue = value.toArabicNumbers();
-    }
-
     return Expanded(
       child: Column(
         children: [
           FittedBox(
             child: Text(
-              // تحويل القيمة كاملة (المبلغ + العملة) للأرقام العربية
-              formattedValue.toArabicNumbers(),
-              style: boldMediumLarge.copyWith(color: isAmount ? MyColor.getPrimaryColor() : MyColor.titleColor),
+              value,
+              style: boldMediumLarge.copyWith(
+                color: isAmount
+                    ? MyColor.getPrimaryColor()
+                    : MyColor.titleColor,
+              ),
             ),
           ),
           const SizedBox(height: 4),
           Text(
-            label.tr,
+            label,
             style: regularSmall.copyWith(color: MyColor.getBodyTextColor()),
           ),
         ],
@@ -317,26 +342,31 @@ class RideDetailsBottomSheetWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildDivider() => Container(height: 30, width: 1, color: MyColor.neutral200);
+  Widget _buildDivider() =>
+      Container(height: 30, width: 1, color: MyColor.neutral200);
 
   Widget buildReceiptButton(RideModel ride) {
-    return Builder(builder: (context) {
-      bool isLoading = false;
-      return StatefulBuilder(builder: (context, setState) {
-        return RoundedButton(
-          text: MyStrings.receipt.tr,
-          isOutlined: true,
-          isLoading: isLoading,
-          press: () async {
-            setState(() => isLoading = true);
-            await DownloadService.downloadPDF(
-              url: "${UrlContainer.rideReceipt}/${ride.id}",
-              fileName: "${Environment.appName}_receipt_${ride.id}.pdf",
+    return Builder(
+      builder: (context) {
+        bool isLoading = false;
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return RoundedButton(
+              text: MyStrings.receipt.tr,
+              isOutlined: true,
+              isLoading: isLoading,
+              press: () async {
+                setState(() => isLoading = true);
+                await DownloadService.downloadPDF(
+                  url: "${UrlContainer.rideReceipt}/${ride.id}",
+                  fileName: "${Environment.appName}_receipt_${ride.id}.pdf",
+                );
+                setState(() => isLoading = false);
+              },
             );
-            setState(() => isLoading = false);
           },
         );
-      });
-    });
+      },
+    );
   }
 }

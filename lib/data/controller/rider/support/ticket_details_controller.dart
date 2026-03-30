@@ -63,7 +63,7 @@ class TicketDetailsController extends GetxController {
     if (attachmentList.length < 5) {
       attachmentList.add(File(result.files.single.path!));
     } else {
-      CustomSnackBar.error(errorList: ['Maximal 5 files']);
+      CustomSnackBar.error(errorList: [MyStrings.maxAttachmentError]);
     }
 
     update();
@@ -168,7 +168,9 @@ class TicketDetailsController extends GetxController {
     update();
     ResponseModel responseModel = await repo.closeTicket(supportTicketID);
     if (responseModel.statusCode == 200) {
-      AuthorizationResponseModel model = AuthorizationResponseModel.fromJson((responseModel.responseJson));
+      AuthorizationResponseModel model = AuthorizationResponseModel.fromJson(
+        (responseModel.responseJson),
+      );
       if (model.status?.toLowerCase() == MyStrings.success.toLowerCase()) {
         Get.find<SupportController>().loadData();
         clearAllData();
@@ -199,12 +201,12 @@ class TicketDetailsController extends GetxController {
     text = priority == '0'
         ? MyStrings.open.tr
         : priority == '1'
-            ? MyStrings.answered.tr
-            : priority == '2'
-                ? MyStrings.replied.tr
-                : priority == '3'
-                    ? MyStrings.closed.tr
-                    : '';
+        ? MyStrings.answered.tr
+        : priority == '2'
+        ? MyStrings.replied.tr
+        : priority == '3'
+        ? MyStrings.closed.tr
+        : '';
     return text;
   }
 
@@ -214,18 +216,18 @@ class TicketDetailsController extends GetxController {
       output = status == '1'
           ? MyColor.pendingColor
           : status == '2'
-              ? MyColor.greenSuccessColor
-              : status == '3'
-                  ? MyColor.redCancelTextColor
-                  : MyColor.pendingColor;
+          ? MyColor.greenSuccessColor
+          : status == '3'
+          ? MyColor.redCancelTextColor
+          : MyColor.pendingColor;
     } else {
       output = status == '1'
           ? MyColor.highPriorityPurpleColor
           : status == '2'
-              ? MyColor.highPriorityPurpleColor
-              : status == '3'
-                  ? MyColor.redCancelTextColor
-                  : MyColor.greenSuccessColor;
+          ? MyColor.highPriorityPurpleColor
+          : status == '3'
+          ? MyColor.redCancelTextColor
+          : MyColor.greenSuccessColor;
     }
 
     return output;
@@ -323,7 +325,9 @@ class TicketDetailsController extends GetxController {
       );
     } else {
       try {
-        AuthorizationResponseModel model = AuthorizationResponseModel.fromJson((response.data));
+        AuthorizationResponseModel model = AuthorizationResponseModel.fromJson(
+          (response.data),
+        );
         CustomSnackBar.error(
           errorList: model.message ?? [MyStrings.somethingWentWrong],
         );

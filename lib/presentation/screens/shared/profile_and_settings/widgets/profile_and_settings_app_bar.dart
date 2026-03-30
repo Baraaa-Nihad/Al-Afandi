@@ -5,7 +5,8 @@ import 'package:ovoride/core/route/route.dart';
 import 'package:ovoride/core/helper/shared_preference_helper.dart';
 import 'package:ovoride/data/services/api_client.dart';
 import 'package:ovoride/core/utils/dimensions.dart';
-import 'package:ovoride/data/controller/rider/account/profile_controller.dart' as riderProfileCtrl;
+import 'package:ovoride/data/controller/rider/account/profile_controller.dart'
+    as rider_profile_ctrl;
 import 'package:ovoride/core/utils/my_color.dart';
 import 'package:ovoride/core/utils/my_icons.dart';
 import 'package:ovoride/core/utils/my_strings.dart';
@@ -39,9 +40,18 @@ class ProfileAndSettingsScreenAppBar extends StatelessWidget {
                       Expanded(
                         child: GestureDetector(
                           onTap: () {
-                          final role = Get.find<ApiClient>().sharedPreferences.getString(SharedPreferenceHelper.userRoleKey) ?? 'driver';
-                          Get.toNamed(role == 'rider' ? RouteHelper.riderProfileScreen : RouteHelper.profileScreen);
-                        },
+                            final role =
+                                Get.find<ApiClient>().sharedPreferences
+                                    .getString(
+                                      SharedPreferenceHelper.userRoleKey,
+                                    ) ??
+                                'driver';
+                            Get.toNamed(
+                              role == 'rider'
+                                  ? RouteHelper.riderProfileScreen
+                                  : RouteHelper.profileScreen,
+                            );
+                          },
                           child: Row(
                             children: [
                               MyImageWidget(
@@ -59,7 +69,11 @@ class ProfileAndSettingsScreenAppBar extends StatelessWidget {
                                     FittedBox(
                                       fit: BoxFit.scaleDown,
                                       child: HeaderText(
-                                        text: controller is riderProfileCtrl.ProfileController ? '${controller.user?.firstname ?? ''} ${controller.user?.lastname ?? ''}' : controller.driver.getFullName(),
+                                        text:
+                                            controller
+                                                is rider_profile_ctrl.ProfileController
+                                            ? '${controller.user?.firstname ?? ''} ${controller.user?.lastname ?? ''}'
+                                            : controller.driver.getFullName(),
                                         style: boldLarge.copyWith(
                                           color: MyColor.getTextColor(),
                                           fontSize: Dimensions.fontLarge,
@@ -68,8 +82,10 @@ class ProfileAndSettingsScreenAppBar extends StatelessWidget {
                                     ),
                                     spaceDown(Dimensions.space3),
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
                                       children: [
                                         SvgPicture.asset(
                                           MyIcons.telePhone,
@@ -83,7 +99,10 @@ class ProfileAndSettingsScreenAppBar extends StatelessWidget {
                                         ),
                                         spaceSide(Dimensions.space5),
                                         Text(
-                                          controller is riderProfileCtrl.ProfileController ? controller.user?.mobile ?? "" : "+${controller.driver.dialCode ?? ""}${controller.driver.mobile ?? ""}",
+                                          controller
+                                                  is rider_profile_ctrl.ProfileController
+                                              ? controller.user?.mobile ?? ""
+                                              : "+${controller.driver.dialCode ?? ""}${controller.driver.mobile ?? ""}",
                                           style: regularDefault.copyWith(
                                             fontSize: Dimensions.fontLarge,
                                             color: MyColor.getBodyTextColor(),
@@ -137,7 +156,16 @@ class ProfileAndSettingsScreenAppBar extends StatelessWidget {
                             ),
                             spaceSide(Dimensions.space5),
                             Text(
-                              controller is riderProfileCtrl.ProfileController ? (controller.user?.avgRating?.toString() == '0.0' ? MyStrings.nA.tr : controller.user?.avgRating?.toString() ?? '') : (controller.driver.avgRating == '0.00' ? MyStrings.nA.tr : (controller.driver.avgRating ?? '')),
+                              controller is rider_profile_ctrl.ProfileController
+                                  ? (controller.user?.avgRating?.toString() ==
+                                            '0.0'
+                                        ? MyStrings.nA.tr
+                                        : controller.user?.avgRating
+                                                  ?.toString() ??
+                                              '')
+                                  : (controller.driver.avgRating == '0.00'
+                                        ? MyStrings.nA.tr
+                                        : (controller.driver.avgRating ?? '')),
                               style: boldDefault.copyWith(
                                 fontSize: Dimensions.fontLarge,
                                 color: MyColor.getHeadingTextColor(),

@@ -23,12 +23,8 @@ class _SplashScreenState extends State<SplashScreen> {
 
     Get.put(GeneralSettingRepo(apiClient: Get.find()));
     Get.put(LocalizationController(sharedPreferences: Get.find()));
-
     final controller = Get.put(
-      SplashController(
-        repo: Get.find(),
-        localizationController: Get.find(),
-      ),
+      SplashController(repo: Get.find(), localizationController: Get.find()),
     );
 
     super.initState();
@@ -78,8 +74,20 @@ class _SplashScreenState extends State<SplashScreen> {
                               begin: Alignment.center,
                               end: Alignment.bottomCenter,
                               colors: [
-                                const Color.fromARGB(255, 4, 2, 10),
-                                const Color.fromARGB(255, 112, 94, 167).withValues(alpha: 0.8),
+                                const Color.fromARGB(
+                                  255,
+                                  4,
+                                  2,
+                                  10,
+                                ), // Left-side purple
+                                const Color.fromARGB(
+                                  255,
+                                  112,
+                                  94,
+                                  167,
+                                ).withValues(
+                                  alpha: 0.8,
+                                ), // Right-side lighter purple
                               ],
                             ),
                           ),

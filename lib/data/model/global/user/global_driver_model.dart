@@ -89,7 +89,8 @@ class GlobalDriverInfoModel {
     this.dialCode,
   });
 
-  factory GlobalDriverInfoModel.fromJson(Map<String, dynamic> json) => GlobalDriverInfoModel(
+  factory GlobalDriverInfoModel.fromJson(Map<String, dynamic> json) =>
+      GlobalDriverInfoModel(
         id: json["id"].toString(),
         loginBy: json["login_by"].toString(),
         zone: json["zone"].toString(),
@@ -110,9 +111,17 @@ class GlobalDriverInfoModel {
         dv: json["dv"].toString(),
         vv: json["vv"].toString(),
         brand: json["brand"] == null ? null : Brand.fromJson(json["brand"]),
-        driverData: json["driver_data"] == null ? null : List<KycPendingData>.from(json["driver_data"]!.map((x) => KycPendingData.fromJson(x))),
-        vehicleData: json["vehicle"] == null ? null : VehicleInfo.fromJson(json["vehicle"]),
-        riderRuleId: json["rider_rule_id"] == null ? [] : List<String>.from(json["rider_rule_id"]!.map((x) => x)),
+        driverData: json["driver_data"] == null
+            ? null
+            : List<KycPendingData>.from(
+                json["driver_data"]!.map((x) => KycPendingData.fromJson(x)),
+              ),
+        vehicleData: json["vehicle"] == null
+            ? null
+            : VehicleInfo.fromJson(json["vehicle"]),
+        riderRuleId: json["rider_rule_id"] == null
+            ? []
+            : List<String>.from(json["rider_rule_id"]!.map((x) => x)),
         ev: json["ev"].toString(),
         sv: json["sv"].toString(),
         ts: json["ts"].toString(),
@@ -124,58 +133,64 @@ class GlobalDriverInfoModel {
         createdAt: json["created_at"]?.toString(),
         updatedAt: json["updated_at"]?.toString(),
         balance: json["balance"] != null ? json["balance"].toString() : '',
-        rules: json["rules"] == null ? [] : List<String>.from(json["rules"]!.map((x) => x)),
+        rules: json["rules"] == null
+            ? []
+            : List<String>.from(json["rules"]!.map((x) => x)),
         imageWithPath: json["image_with_path"]?.toString(),
         image: json["image"]?.toString(),
         address: json["address"] != null ? json["address"].toString() : "",
         city: json["city"] != null ? json["city"].toString() : "",
         state: json["state"] != null ? json["state"].toString() : "",
         zip: json["zip"] != null ? json["zip"].toString() : "",
-        countryName: json["country_name"] != null ? json["country_name"].toString() : "",
+        countryName: json["country_name"] != null
+            ? json["country_name"].toString()
+            : "",
         dialCode: json["dial_code"] != null ? json["dial_code"].toString() : "",
       );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
-        "login_by": loginBy,
-        "zone": zone,
-        "firstname": firstname,
-        "lastname": lastname,
-        "username": username,
-        "email": email,
-        "avatar": avatar,
-        "country_code": countryCode,
-        "mobile": mobile,
-        "total_reviews": totalReviews,
-        "avg_rating": avgRating,
-        "online_status": onlineStatus,
-        "status": status,
-        "license_number": licenseNumber,
-        "license_expire": licenseExpire,
-        "license_photo": licensePhoto,
-        "dv": dv,
-        "vv": vv,
-        "rider_rule_id": riderRuleId == null ? [] : List<dynamic>.from(riderRuleId!.map((x) => x)),
-        "ev": ev,
-        "sv": sv,
-        "ts": ts,
-        "tv": tv,
-        "profile_complete": profileComplete,
-        "ver_code_send_at": verCodeSendAt,
-        "tsc": tsc,
-        "ban_reason": banReason,
-        "created_at": createdAt,
-        "updated_at": updatedAt,
-        "balance": balance,
-        "rules": rules,
-        "image_with_path": imageWithPath,
-        "address": address,
-        "city": city,
-        "state": state,
-        "zip": zip,
-        "country_name": countryName,
-        "dial_code": dialCode,
-      };
+    "id": id,
+    "login_by": loginBy,
+    "zone": zone,
+    "firstname": firstname,
+    "lastname": lastname,
+    "username": username,
+    "email": email,
+    "avatar": avatar,
+    "country_code": countryCode,
+    "mobile": mobile,
+    "total_reviews": totalReviews,
+    "avg_rating": avgRating,
+    "online_status": onlineStatus,
+    "status": status,
+    "license_number": licenseNumber,
+    "license_expire": licenseExpire,
+    "license_photo": licensePhoto,
+    "dv": dv,
+    "vv": vv,
+    "rider_rule_id": riderRuleId == null
+        ? []
+        : List<dynamic>.from(riderRuleId!.map((x) => x)),
+    "ev": ev,
+    "sv": sv,
+    "ts": ts,
+    "tv": tv,
+    "profile_complete": profileComplete,
+    "ver_code_send_at": verCodeSendAt,
+    "tsc": tsc,
+    "ban_reason": banReason,
+    "created_at": createdAt,
+    "updated_at": updatedAt,
+    "balance": balance,
+    "rules": rules,
+    "image_with_path": imageWithPath,
+    "address": address,
+    "city": city,
+    "state": state,
+    "zip": zip,
+    "country_name": countryName,
+    "dial_code": dialCode,
+  };
   String getFullName() {
     return "${firstname ?? ""} ${lastname ?? ""}".trim();
   }
@@ -191,20 +206,20 @@ class Address {
   Address({this.address, this.city, this.state, this.zip, this.country});
 
   factory Address.fromJson(Map<String, dynamic> json) => Address(
-        address: json["address"],
-        city: json["city"],
-        state: json["state"],
-        zip: json["zip"],
-        country: json["country"],
-      );
+    address: json["address"],
+    city: json["city"],
+    state: json["state"],
+    zip: json["zip"],
+    country: json["country"],
+  );
 
   Map<String, dynamic> toJson() => {
-        "address": address,
-        "city": city,
-        "state": state,
-        "zip": zip,
-        "country": country,
-      };
+    "address": address,
+    "city": city,
+    "state": state,
+    "zip": zip,
+    "country": country,
+  };
 }
 
 class Rule {
@@ -217,22 +232,21 @@ class Rule {
   Rule({this.id, this.name, this.status, this.createdAt, this.updatedAt});
 
   factory Rule.fromJson(Map<String, dynamic> json) => Rule(
-        id: json["id"].toString(),
-        name: json["name"],
-        status: json["status"].toString(),
-        createdAt: json["created_at"]?.toString(),
-        updatedAt: json["updated_at"]?.toString(),
-      );
+    id: json["id"].toString(),
+    name: json["name"],
+    status: json["status"].toString(),
+    createdAt: json["created_at"]?.toString(),
+    updatedAt: json["updated_at"]?.toString(),
+  );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-        "status": status,
-        "created_at": createdAt,
-        "updated_at": updatedAt,
-      };
+    "id": id,
+    "name": name,
+    "status": status,
+    "created_at": createdAt,
+    "updated_at": updatedAt,
+  };
 }
-
 
 class KycPendingData {
   String? name;
@@ -240,10 +254,10 @@ class KycPendingData {
   String? value;
   KycPendingData({this.name, this.type, this.value});
   factory KycPendingData.fromJson(Map<String, dynamic> json) => KycPendingData(
-        name: json["name"],
-        type: json["type"],
-        value: json["value"] != null ? json["value"].toString() : "",
-      );
+    name: json["name"],
+    type: json["type"],
+    value: json["value"] != null ? json["value"].toString() : "",
+  );
   Map<String, dynamic> toJson() => {"name": name, "type": type, "value": value};
 }
 
@@ -287,46 +301,48 @@ class VehicleInfo {
   });
 
   factory VehicleInfo.fromJson(Map<String, dynamic> json) => VehicleInfo(
-        id: json["id"].toString(),
-        driverId: json["driver_id"].toString(),
-        serviceId: json["service_id"].toString(),
-        brandId: json["brand_id"].toString(),
-        colorId: json["color_id"].toString(),
-        yearId: json["year_id"].toString(),
-        modelId: json["model_id"].toString(),
-        image: json["image"].toString(),
-        vehicleNumber: json["vehicle_number"].toString(),
-        formData: json["form_data"] == null
-            ? []
-            : List<KycPendingData>.from(
-                json["form_data"]!.map((x) => KycPendingData.fromJson(x)),
-              ),
-        createdAt: json["created_at"]?.toString(),
-        updatedAt: json["updated_at"]?.toString(),
-        imageSrc: json["image_src"].toString(),
-        model: json["model"] == null ? null : VerifyElement.fromJson(json["model"]),
-        color: json["color"] == null ? null : VerifyElement.fromJson(json["color"]),
-        year: json["year"] == null ? null : VerifyElement.fromJson(json["year"]),
-      );
+    id: json["id"].toString(),
+    driverId: json["driver_id"].toString(),
+    serviceId: json["service_id"].toString(),
+    brandId: json["brand_id"].toString(),
+    colorId: json["color_id"].toString(),
+    yearId: json["year_id"].toString(),
+    modelId: json["model_id"].toString(),
+    image: json["image"].toString(),
+    vehicleNumber: json["vehicle_number"].toString(),
+    formData: json["form_data"] == null
+        ? []
+        : List<KycPendingData>.from(
+            json["form_data"]!.map((x) => KycPendingData.fromJson(x)),
+          ),
+    createdAt: json["created_at"]?.toString(),
+    updatedAt: json["updated_at"]?.toString(),
+    imageSrc: json["image_src"].toString(),
+    model: json["model"] == null ? null : VerifyElement.fromJson(json["model"]),
+    color: json["color"] == null ? null : VerifyElement.fromJson(json["color"]),
+    year: json["year"] == null ? null : VerifyElement.fromJson(json["year"]),
+  );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
-        "driver_id": driverId,
-        "service_id": serviceId,
-        "brand_id": brandId,
-        "color_id": colorId,
-        "year_id": yearId,
-        "model_id": modelId,
-        "image": image,
-        "vehicle_number": vehicleNumber,
-        "form_data": formData == null ? [] : List<dynamic>.from(formData!.map((x) => x.toJson())),
-        "created_at": createdAt,
-        "updated_at": updatedAt,
-        "image_src": imageSrc,
-        "model": model?.toJson(),
-        "color": color?.toJson(),
-        "year": year?.toJson(),
-      };
+    "id": id,
+    "driver_id": driverId,
+    "service_id": serviceId,
+    "brand_id": brandId,
+    "color_id": colorId,
+    "year_id": yearId,
+    "model_id": modelId,
+    "image": image,
+    "vehicle_number": vehicleNumber,
+    "form_data": formData == null
+        ? []
+        : List<dynamic>.from(formData!.map((x) => x.toJson())),
+    "created_at": createdAt,
+    "updated_at": updatedAt,
+    "image_src": imageSrc,
+    "model": model?.toJson(),
+    "color": color?.toJson(),
+    "year": year?.toJson(),
+  };
 }
 
 class VerifyElement {
@@ -347,22 +363,22 @@ class VerifyElement {
   });
 
   factory VerifyElement.fromJson(Map<String, dynamic> json) => VerifyElement(
-        id: json["id"].toString(),
-        name: json["name"].toString(),
-        status: json["status"].toString(),
-        brandId: json["brand_id"].toString(),
-        createdAt: json["created_at"]?.toString(),
-        updatedAt: json["updated_at"]?.toString(),
-      );
+    id: json["id"].toString(),
+    name: json["name"].toString(),
+    status: json["status"].toString(),
+    brandId: json["brand_id"].toString(),
+    createdAt: json["created_at"]?.toString(),
+    updatedAt: json["updated_at"]?.toString(),
+  );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-        "status": status,
-        "brand_id": brandId,
-        "created_at": createdAt?.toString(),
-        "updated_at": updatedAt?.toString(),
-      };
+    "id": id,
+    "name": name,
+    "status": status,
+    "brand_id": brandId,
+    "created_at": createdAt?.toString(),
+    "updated_at": updatedAt?.toString(),
+  };
 }
 
 class Brand {
@@ -373,16 +389,30 @@ class Brand {
   String? updatedAt;
   String? imageWithPath;
 
-  Brand({this.id, this.name, this.image, this.createdAt, this.updatedAt, this.imageWithPath});
+  Brand({
+    this.id,
+    this.name,
+    this.image,
+    this.createdAt,
+    this.updatedAt,
+    this.imageWithPath,
+  });
 
   factory Brand.fromJson(Map<String, dynamic> json) => Brand(
-        id: json["id"].toString(),
-        name: json["name"],
-        image: json["image"],
-        createdAt: json["created_at"]?.toString(),
-        updatedAt: json["updated_at"]?.toString(),
-        imageWithPath: json["image_with_path"],
-      );
+    id: json["id"].toString(),
+    name: json["name"],
+    image: json["image"],
+    createdAt: json["created_at"]?.toString(),
+    updatedAt: json["updated_at"]?.toString(),
+    imageWithPath: json["image_with_path"],
+  );
 
-  Map<String, dynamic> toJson() => {"id": id, "name": name, "image": image, "created_at": createdAt, "updated_at": updatedAt, "image_with_path": imageWithPath};
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "name": name,
+    "image": image,
+    "created_at": createdAt,
+    "updated_at": updatedAt,
+    "image_with_path": imageWithPath,
+  };
 }

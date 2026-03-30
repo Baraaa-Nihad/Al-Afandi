@@ -5,9 +5,11 @@ import 'package:ovoride/core/utils/my_icons.dart';
 import 'package:ovoride/core/helper/shared_preference_helper.dart';
 import 'package:ovoride/data/services/api_client.dart';
 import 'package:ovoride/data/controller/shared/account/profile_controller.dart';
-import 'package:ovoride/data/controller/rider/account/profile_controller.dart' as riderProfileCtrl;
+import 'package:ovoride/data/controller/rider/account/profile_controller.dart'
+    as rider_profile_ctrl;
 import 'package:ovoride/data/repo/shared/account/profile_repo.dart';
-import 'package:ovoride/data/repo/rider/account/profile_repo.dart' as riderProfile;
+import 'package:ovoride/data/repo/rider/account/profile_repo.dart'
+    as rider_profile;
 import 'package:ovoride/presentation/components/divider/custom_spacer.dart';
 import 'package:ovoride/presentation/components/shimmer/user_shimmer.dart';
 import 'package:ovoride/presentation/components/snack_bar/show_custom_snackbar.dart';
@@ -31,7 +33,8 @@ class ProfileAndSettingsScreen extends StatefulWidget {
   const ProfileAndSettingsScreen({super.key});
 
   @override
-  State<ProfileAndSettingsScreen> createState() => _ProfileAndSettingsScreenState();
+  State<ProfileAndSettingsScreen> createState() =>
+      _ProfileAndSettingsScreenState();
 }
 
 class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
@@ -39,13 +42,21 @@ class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
   String _role = 'driver';
   @override
   void initState() {
-    final savedRole = Get.find<ApiClient>().sharedPreferences.getString(SharedPreferenceHelper.userRoleKey) ?? 'driver';
+    final savedRole =
+        Get.find<ApiClient>().sharedPreferences.getString(
+          SharedPreferenceHelper.userRoleKey,
+        ) ??
+        'driver';
     _role = savedRole;
     final role = savedRole;
     // Only register driver controller here - rider controller registered lazily in build
     if (role == 'driver') {
       if (!Get.isRegistered<ProfileController>()) {
-        Get.put(ProfileController(profileRepo: Get.put(ProfileRepo(apiClient: Get.find()))));
+        Get.put(
+          ProfileController(
+            profileRepo: Get.put(ProfileRepo(apiClient: Get.find())),
+          ),
+        );
       }
     }
     super.initState();
@@ -65,14 +76,23 @@ class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
   Widget build(BuildContext context) {
     if (_role == 'rider') {
       // Lazily register rider profile controller only when rider menu is actually shown
-      if (!Get.isRegistered<riderProfileCtrl.ProfileController>(tag: 'rider')) {
-        Get.put(riderProfileCtrl.ProfileController(profileRepo: Get.find<riderProfile.ProfileRepo>(tag: 'rider')), tag: 'rider');
+      if (!Get.isRegistered<rider_profile_ctrl.ProfileController>(
+        tag: 'rider',
+      )) {
+        Get.put(
+          rider_profile_ctrl.ProfileController(
+            profileRepo: Get.find<rider_profile.ProfileRepo>(tag: 'rider'),
+          ),
+          tag: 'rider',
+        );
       }
-      return GetBuilder<riderProfileCtrl.ProfileController>(
+      return GetBuilder<rider_profile_ctrl.ProfileController>(
         tag: 'rider',
         builder: (riderCtrl) {
           if (riderCtrl.isLoading && riderCtrl.imageUrl.isEmpty) {
-            WidgetsBinding.instance.addPostFrameCallback((_) => riderCtrl.loadProfileInfo());
+            WidgetsBinding.instance.addPostFrameCallback(
+              (_) => riderCtrl.loadProfileInfo(),
+            );
           }
           return _buildBody(riderCtrl);
         },
@@ -81,7 +101,9 @@ class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
     return GetBuilder<ProfileController>(
       builder: (controller) {
         if (controller.isLoading && controller.imageUrl.isEmpty) {
-          WidgetsBinding.instance.addPostFrameCallback((_) => controller.loadProfileInfo());
+          WidgetsBinding.instance.addPostFrameCallback(
+            (_) => controller.loadProfileInfo(),
+          );
         }
         return DashboardBackground(
           child: Scaffold(
@@ -107,7 +129,8 @@ class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
                     controller.isLoading
                         ? const UserShimmer()
                         : AccountUserBalanceCard(
-                            balance: "${controller.profileRepo.apiClient.getCurrency(isSymbol: true)}${StringConverter.formatNumber(controller.driver.balance ?? '0')}",
+                            balance:
+                                "${controller.profileRepo.apiClient.getCurrency(isSymbol: true)}${StringConverter.formatNumber(controller.driver.balance ?? '0')}",
                           ),
                     spaceDown(Dimensions.space20),
                     HeaderText(
@@ -131,7 +154,8 @@ class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
                           MenuRowWidget(
                             image: MyIcons.profile,
                             label: MyStrings.profile,
-                            onPressed: () => Get.toNamed(RouteHelper.profileScreen),
+                            onPressed: () =>
+                                Get.toNamed(RouteHelper.profileScreen),
                           ),
                           const CustomDivider(space: Dimensions.space15),
                           MenuRowWidget(
@@ -146,19 +170,22 @@ class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
                           MenuRowWidget(
                             image: MyIcons.deposit,
                             label: MyStrings.deposit,
-                            onPressed: () => Get.toNamed(RouteHelper.newDepositScreenScreen),
+                            onPressed: () =>
+                                Get.toNamed(RouteHelper.newDepositScreenScreen),
                           ),
                           const CustomDivider(space: Dimensions.space15),
                           MenuRowWidget(
                             image: MyIcons.passwordChange,
                             label: MyStrings.changePassword,
-                            onPressed: () => Get.toNamed(RouteHelper.changePasswordScreen),
+                            onPressed: () =>
+                                Get.toNamed(RouteHelper.changePasswordScreen),
                           ),
                           const CustomDivider(space: Dimensions.space15),
                           MenuRowWidget(
                             image: MyIcons.twoFaIcon,
                             label: MyStrings.twoFactorAuth,
-                            onPressed: () => Get.toNamed(RouteHelper.twoFactorSetupScreen),
+                            onPressed: () =>
+                                Get.toNamed(RouteHelper.twoFactorSetupScreen),
                           ),
                           spaceDown(Dimensions.space10),
                         ],
@@ -226,19 +253,22 @@ class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
                           MenuRowWidget(
                             image: MyIcons.payment,
                             label: MyStrings.paymentHistory,
-                            onPressed: () => Get.toNamed(RouteHelper.paymentHistoryScreen),
+                            onPressed: () =>
+                                Get.toNamed(RouteHelper.paymentHistoryScreen),
                           ),
                           const CustomDivider(space: Dimensions.space15),
                           MenuRowWidget(
                             image: MyIcons.depositHistory,
                             label: MyStrings.depositHistory,
-                            onPressed: () => Get.toNamed(RouteHelper.depositsScreen),
+                            onPressed: () =>
+                                Get.toNamed(RouteHelper.depositsScreen),
                           ),
                           const CustomDivider(space: Dimensions.space15),
                           MenuRowWidget(
                             image: MyIcons.withdrawHistory,
                             label: MyStrings.withdrawHistory,
-                            onPressed: () => Get.toNamed(RouteHelper.withdrawScreen),
+                            onPressed: () =>
+                                Get.toNamed(RouteHelper.withdrawScreen),
                           ),
                           const CustomDivider(space: Dimensions.space15),
                           MenuRowWidget(
@@ -270,22 +300,29 @@ class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          if (controller.profileRepo.apiClient.isMultiLanguageEnabled()) ...[
+                          if (controller.profileRepo.apiClient
+                              .isMultiLanguageEnabled()) ...[
                             MenuRowWidget(
                               image: MyIcons.language,
                               label: MyStrings.language,
-                              onPressed: () => Get.toNamed(RouteHelper.languageScreen),
+                              onPressed: () =>
+                                  Get.toNamed(RouteHelper.languageScreen),
                             ),
                             const CustomDivider(space: Dimensions.space15),
                           ],
                           MenuRowWidget(
                             image: MyIcons.support,
                             label: MyStrings.supportTicket,
-                            onPressed: () => Get.toNamed(RouteHelper.supportTicketScreen),
+                            onPressed: () =>
+                                Get.toNamed(RouteHelper.supportTicketScreen),
                           ),
                           const CustomDivider(space: Dimensions.space15),
                           MenuRowWidget(
-                            image: controller.profileRepo.apiClient.isNotificationAudioEnable() ? MyIcons.volume : MyIcons.volumeMute,
+                            image:
+                                controller.profileRepo.apiClient
+                                    .isNotificationAudioEnable()
+                                ? MyIcons.volume
+                                : MyIcons.volumeMute,
                             label: MyStrings.audioNotification,
                             onPressed: () {},
                             endWidget: Switch(
@@ -296,9 +333,11 @@ class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
                               trackOutlineColor: WidgetStateProperty.all(
                                 MyColor.colorWhite,
                               ),
-                              value: controller.profileRepo.apiClient.isNotificationAudioEnable(),
+                              value: controller.profileRepo.apiClient
+                                  .isNotificationAudioEnable(),
                               onChanged: (value) {
-                                controller.profileRepo.apiClient.storeNotificationAudioEnable(value);
+                                controller.profileRepo.apiClient
+                                    .storeNotificationAudioEnable(value);
                                 controller.update();
                               },
                             ),
@@ -328,7 +367,8 @@ class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
                           MenuRowWidget(
                             image: MyIcons.policy,
                             label: MyStrings.policies,
-                            onPressed: () => Get.toNamed(RouteHelper.privacyScreen),
+                            onPressed: () =>
+                                Get.toNamed(RouteHelper.privacyScreen),
                           ),
                           const CustomDivider(space: Dimensions.space15),
                           MenuRowWidget(
@@ -355,7 +395,9 @@ class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
                           const CustomDivider(space: Dimensions.space15),
                           MenuRowWidget(
                             image: MyIcons.deleteAccount,
-                            label: controller.isDeleteBtnLoading ? "${MyStrings.loading}..." : MyStrings.deleteAccount,
+                            label: controller.isDeleteBtnLoading
+                                ? "${MyStrings.loading}..."
+                                : MyStrings.deleteAccount,
                             onPressed: () {
                               CustomBottomSheet(
                                 bgColor: MyColor.getScreenBgColor(),
@@ -385,7 +427,9 @@ class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
                         image: MyIcons.logout,
                         imgColor: MyColor.redCancelTextColor,
                         textColor: MyColor.redCancelTextColor,
-                        label: controller.logoutLoading ? '${MyStrings.loggingOut}...' : MyStrings.logout,
+                        label: controller.logoutLoading
+                            ? '${MyStrings.loggingOut}...'
+                            : MyStrings.logout,
                         textStyle: regularLarge.copyWith(
                           color: MyColor.redCancelTextColor,
                           fontSize: Dimensions.space20,
@@ -416,7 +460,7 @@ class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
     );
   }
 
-  Widget _buildBody(riderProfileCtrl.ProfileController controller) {
+  Widget _buildBody(rider_profile_ctrl.ProfileController controller) {
     return DashboardBackground(
       child: Scaffold(
         extendBody: true,
@@ -442,7 +486,9 @@ class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
                 spaceDown(Dimensions.space20),
                 HeaderText(
                   text: MyStrings.account.tr.toUpperCase(),
-                  style: boldDefault.copyWith(color: MyColor.bodyMutedTextColor),
+                  style: boldDefault.copyWith(
+                    color: MyColor.bodyMutedTextColor,
+                  ),
                 ),
                 spaceDown(Dimensions.space10),
                 Container(
@@ -458,7 +504,8 @@ class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
                       MenuRowWidget(
                         image: MyIcons.profile,
                         label: MyStrings.profile,
-                        onPressed: () => Get.toNamed(RouteHelper.riderProfileScreen),
+                        onPressed: () =>
+                            Get.toNamed(RouteHelper.riderProfileScreen),
                       ),
                       const CustomDivider(space: Dimensions.space15),
                       MenuRowWidget(
@@ -473,7 +520,8 @@ class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
                       MenuRowWidget(
                         image: MyIcons.passwordChange,
                         label: MyStrings.changePassword,
-                        onPressed: () => Get.toNamed(RouteHelper.changePasswordScreen),
+                        onPressed: () =>
+                            Get.toNamed(RouteHelper.changePasswordScreen),
                       ),
                       spaceDown(Dimensions.space10),
                     ],
@@ -482,7 +530,9 @@ class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
                 spaceDown(Dimensions.space15),
                 HeaderText(
                   text: MyStrings.ridesHistory.tr.toUpperCase(),
-                  style: boldDefault.copyWith(color: MyColor.bodyMutedTextColor),
+                  style: boldDefault.copyWith(
+                    color: MyColor.bodyMutedTextColor,
+                  ),
                 ),
                 spaceDown(Dimensions.space10),
                 Container(
@@ -498,13 +548,19 @@ class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
                       MenuRowWidget(
                         image: MyIcons.city,
                         label: MyStrings.city,
-                        onPressed: () => Get.toNamed(RouteHelper.rideActivityScreen, arguments: 1),
+                        onPressed: () => Get.toNamed(
+                          RouteHelper.rideActivityScreen,
+                          arguments: 1,
+                        ),
                       ),
                       const CustomDivider(space: Dimensions.space15),
                       MenuRowWidget(
                         image: MyIcons.intercity,
                         label: MyStrings.interCity,
-                        onPressed: () => Get.toNamed(RouteHelper.rideActivityScreen, arguments: 2),
+                        onPressed: () => Get.toNamed(
+                          RouteHelper.rideActivityScreen,
+                          arguments: 2,
+                        ),
                       ),
                       spaceDown(Dimensions.space10),
                     ],
@@ -513,7 +569,9 @@ class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
                 spaceDown(Dimensions.space15),
                 HeaderText(
                   text: MyStrings.history.tr.toUpperCase(),
-                  style: boldDefault.copyWith(color: MyColor.bodyMutedTextColor),
+                  style: boldDefault.copyWith(
+                    color: MyColor.bodyMutedTextColor,
+                  ),
                 ),
                 spaceDown(Dimensions.space10),
                 Container(
@@ -529,7 +587,8 @@ class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
                       MenuRowWidget(
                         image: MyIcons.payment,
                         label: MyStrings.paymentHistory,
-                        onPressed: () => Get.toNamed(RouteHelper.riderPaymentHistoryScreen),
+                        onPressed: () =>
+                            Get.toNamed(RouteHelper.riderPaymentHistoryScreen),
                       ),
                       const CustomDivider(space: Dimensions.space15),
                     ],
@@ -538,7 +597,9 @@ class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
                 spaceDown(Dimensions.space15),
                 HeaderText(
                   text: MyStrings.settingsAndSupport.tr.toUpperCase(),
-                  style: boldDefault.copyWith(color: MyColor.bodyMutedTextColor),
+                  style: boldDefault.copyWith(
+                    color: MyColor.bodyMutedTextColor,
+                  ),
                 ),
                 spaceDown(Dimensions.space10),
                 Container(
@@ -551,22 +612,29 @@ class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (controller.profileRepo.apiClient.isMultiLanguageEnabled()) ...[
+                      if (controller.profileRepo.apiClient
+                          .isMultiLanguageEnabled()) ...[
                         MenuRowWidget(
                           image: MyIcons.language,
                           label: MyStrings.language,
-                          onPressed: () => Get.toNamed(RouteHelper.languageScreen),
+                          onPressed: () =>
+                              Get.toNamed(RouteHelper.languageScreen),
                         ),
                         const CustomDivider(space: Dimensions.space15),
                       ],
                       MenuRowWidget(
                         image: MyIcons.support,
                         label: MyStrings.supportTicket,
-                        onPressed: () => Get.toNamed(RouteHelper.riderSupportTicketScreen),
+                        onPressed: () =>
+                            Get.toNamed(RouteHelper.riderSupportTicketScreen),
                       ),
                       const CustomDivider(space: Dimensions.space15),
                       MenuRowWidget(
-                        image: controller.profileRepo.apiClient.isNotificationAudioEnable() ? MyIcons.volume : MyIcons.volumeMute,
+                        image:
+                            controller.profileRepo.apiClient
+                                .isNotificationAudioEnable()
+                            ? MyIcons.volume
+                            : MyIcons.volumeMute,
                         label: MyStrings.audioNotification,
                         onPressed: () {},
                         endWidget: Switch(
@@ -574,10 +642,14 @@ class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
                           activeThumbColor: MyColor.colorWhite,
                           inactiveTrackColor: MyColor.redCancelTextColor,
                           inactiveThumbColor: MyColor.colorWhite,
-                          trackOutlineColor: WidgetStateProperty.all(MyColor.colorWhite),
-                          value: controller.profileRepo.apiClient.isNotificationAudioEnable(),
+                          trackOutlineColor: WidgetStateProperty.all(
+                            MyColor.colorWhite,
+                          ),
+                          value: controller.profileRepo.apiClient
+                              .isNotificationAudioEnable(),
                           onChanged: (value) {
-                            controller.profileRepo.apiClient.storeNotificationAudioEnable(value);
+                            controller.profileRepo.apiClient
+                                .storeNotificationAudioEnable(value);
                             controller.update();
                           },
                         ),
@@ -588,7 +660,9 @@ class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
                 spaceDown(Dimensions.space15),
                 HeaderText(
                   text: MyStrings.more.tr.toUpperCase(),
-                  style: boldDefault.copyWith(color: MyColor.bodyMutedTextColor),
+                  style: boldDefault.copyWith(
+                    color: MyColor.bodyMutedTextColor,
+                  ),
                 ),
                 spaceDown(Dimensions.space10),
                 Container(
@@ -620,18 +694,26 @@ class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
                           if (await controller.inAppReview.isAvailable()) {
                             controller.inAppReview.requestReview();
                           } else {
-                            CustomSnackBar.error(errorList: [MyStrings.pleaseUploadYourAppOnPlayStore]);
+                            CustomSnackBar.error(
+                              errorList: [
+                                MyStrings.pleaseUploadYourAppOnPlayStore,
+                              ],
+                            );
                           }
                         },
                       ),
                       const CustomDivider(space: Dimensions.space15),
                       MenuRowWidget(
                         image: MyIcons.deleteAccount,
-                        label: controller.isDeleteBtnLoading ? "\${MyStrings.loading}..." : MyStrings.deleteAccount,
+                        label: controller.isDeleteBtnLoading
+                            ? "\${MyStrings.loading}..."
+                            : MyStrings.deleteAccount,
                         onPressed: () {
                           CustomBottomSheet(
                             bgColor: MyColor.getScreenBgColor(),
-                            child: DeleteAccountBottomSheetBody(controller: controller),
+                            child: DeleteAccountBottomSheetBody(
+                              controller: controller,
+                            ),
                           ).customBottomSheet(context);
                         },
                       ),
@@ -640,7 +722,10 @@ class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
                 ),
                 spaceDown(Dimensions.space20),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: Dimensions.space15, vertical: Dimensions.space15),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: Dimensions.space15,
+                    vertical: Dimensions.space15,
+                  ),
                   decoration: BoxDecoration(
                     color: MyColor.redCancelTextColor.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(Dimensions.space12),
@@ -650,8 +735,13 @@ class _ProfileAndSettingsScreenState extends State<ProfileAndSettingsScreen> {
                     image: MyIcons.logout,
                     imgColor: MyColor.redCancelTextColor,
                     textColor: MyColor.redCancelTextColor,
-                    label: controller.logoutLoading ? '${MyStrings.loggingOut}...' : MyStrings.logout,
-                    textStyle: regularLarge.copyWith(color: MyColor.redCancelTextColor, fontSize: Dimensions.space20),
+                    label: controller.logoutLoading
+                        ? '${MyStrings.loggingOut}...'
+                        : MyStrings.logout,
+                    textStyle: regularLarge.copyWith(
+                      color: MyColor.redCancelTextColor,
+                      fontSize: Dimensions.space20,
+                    ),
                     onPressed: () {
                       if (controller.logoutLoading == false) {
                         controller.logout();

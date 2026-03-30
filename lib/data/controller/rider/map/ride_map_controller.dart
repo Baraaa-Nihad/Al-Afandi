@@ -13,10 +13,12 @@ import 'package:ovoride/core/helper/string_format_helper.dart';
 import 'package:ovoride/core/utils/helper.dart';
 import 'package:ovoride/core/utils/my_color.dart';
 import 'package:ovoride/core/utils/my_images.dart';
+import 'package:ovoride/core/utils/my_strings.dart';
 import 'package:ovoride/environment.dart';
 import 'package:ovoride/presentation/packages/polyline_animation/polyline_animation_v1.dart';
 
-class RideMapController extends GetxController with GetSingleTickerProviderStateMixin {
+class RideMapController extends GetxController
+    with GetSingleTickerProviderStateMixin {
   bool isLoading = false;
   final PolylineAnimator animator = PolylineAnimator();
 
@@ -40,7 +42,10 @@ class RideMapController extends GetxController with GetSingleTickerProviderState
   @override
   void onInit() {
     super.onInit();
-    _animationController = AnimationController(vsync: this, duration: const Duration(seconds: 2));
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    );
   }
 
   @override
@@ -79,8 +84,14 @@ class RideMapController extends GetxController with GetSingleTickerProviderState
       CurvedAnimation(parent: _animationController, curve: Curves.linear),
     );
 
-    final latTween = Tween<double>(begin: oldPosition.latitude, end: newPosition.latitude);
-    final lngTween = Tween<double>(begin: oldPosition.longitude, end: newPosition.longitude);
+    final latTween = Tween<double>(
+      begin: oldPosition.latitude,
+      end: newPosition.latitude,
+    );
+    final lngTween = Tween<double>(
+      begin: oldPosition.longitude,
+      end: newPosition.longitude,
+    );
 
     void listener() {
       final lat = latTween.evaluate(animation);
@@ -137,7 +148,8 @@ class RideMapController extends GetxController with GetSingleTickerProviderState
     final y = sin(deltaLambda) * cos(phi2);
     final x = cos(phi1) * sin(phi2) - sin(phi1) * cos(phi2) * cos(deltaLambda);
     final bearing = atan2(y, x);
-    var bearingDegrees = (bearing * 180.0 / pi + 360.0) % 360.0; // normalize 0-360
+    var bearingDegrees =
+        (bearing * 180.0 / pi + 360.0) % 360.0; // normalize 0-360
 
     return bearingDegrees;
   }
@@ -156,7 +168,11 @@ class RideMapController extends GetxController with GetSingleTickerProviderState
       generatePolyLineFromPoints(data);
       fitPolylineBounds(data);
       if (Get.isRegistered<RideDetailsController>()) {
-        if (![AppStatus.RIDE_RUNNING, AppStatus.RIDE_ACTIVE, AppStatus.RIDE_COMPLETED].contains(Get.find<RideDetailsController>().ride.status)) {
+        if (![
+          AppStatus.RIDE_RUNNING,
+          AppStatus.RIDE_ACTIVE,
+          AppStatus.RIDE_COMPLETED,
+        ].contains(Get.find<RideDetailsController>().ride.status)) {
           // animator.animatePolyline(
           //   data,
           //   'polyline_id',
@@ -207,24 +223,28 @@ class RideMapController extends GetxController with GetSingleTickerProviderState
   List<LatLng> polylineCoordinates = [];
   Future<List<LatLng>> getPolyLinePoints() async {
     List<LatLng> polylineCoordinates = [];
-    PolylinePoints polylinePoints = PolylinePoints();
-    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-      request: PolylineRequest(
-        origin: PointLatLng(pickupLatLng.latitude, pickupLatLng.longitude),
-        destination: PointLatLng(
-          destinationLatLng.latitude,
-          destinationLatLng.longitude,
+    try {
+      PolylinePoints polylinePoints = PolylinePoints();
+      PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+        request: PolylineRequest(
+          origin: PointLatLng(pickupLatLng.latitude, pickupLatLng.longitude),
+          destination: PointLatLng(
+            destinationLatLng.latitude,
+            destinationLatLng.longitude,
+          ),
+          mode: TravelMode.driving,
         ),
-        mode: TravelMode.driving,
-      ),
-      googleApiKey: Environment.mapKey,
-    );
-    if (result.points.isNotEmpty) {
-      for (var point in result.points) {
-        polylineCoordinates.add(LatLng(point.latitude, point.longitude));
+        googleApiKey: Environment.mapKey,
+      );
+      if (result.points.isNotEmpty) {
+        for (var point in result.points) {
+          polylineCoordinates.add(LatLng(point.latitude, point.longitude));
+        }
+      } else {
+        printX(result.errorMessage);
       }
-    } else {
-      printX(result.errorMessage);
+    } catch (e) {
+      printX('Error getting polyline points: $e');
     }
     return polylineCoordinates;
   }
@@ -325,13 +345,19 @@ class RideMapController extends GetxController with GetSingleTickerProviderState
   }
 
   Future<void> setCustomMarkerIcon() async {
-    pickupIcon = await Helper.getBytesFromAsset(MyIcons.mapMarkerPickUpIcon, 150);
-    destinationIcon = await Helper.getBytesFromAsset(MyIcons.mapMarkerIcon, 150);
+    pickupIcon = await Helper.getBytesFromAsset(
+      MyIcons.mapMarkerPickUpIcon,
+      150,
+    );
+    destinationIcon = await Helper.getBytesFromAsset(
+      MyIcons.mapMarkerIcon,
+      150,
+    );
     driverIcon = await Helper.getBytesFromAsset(MyImages.mapDriverMarker, 80);
     update();
   }
 
-  String driverAddress = 'Loading...';
+  String driverAddress = '${MyStrings.loading}...';
 
   Future<void> getCurrentDriverAddress() async {
     try {
@@ -340,7 +366,8 @@ class RideMapController extends GetxController with GetSingleTickerProviderState
         driverLatLng.longitude,
       );
       driverAddress = "";
-      driverAddress = "${placeMark[0].street} ${placeMark[0].subThoroughfare} ${placeMark[0].thoroughfare},${placeMark[0].subLocality},${placeMark[0].locality},${placeMark[0].country}";
+      driverAddress =
+          "${placeMark[0].street} ${placeMark[0].subThoroughfare} ${placeMark[0].thoroughfare},${placeMark[0].subLocality},${placeMark[0].locality},${placeMark[0].country}";
       update();
       printX('appLocations position $driverAddress');
     } catch (e) {
@@ -371,7 +398,10 @@ class RideMapController extends GetxController with GetSingleTickerProviderState
     }
     mapController?.animateCamera(
       CameraUpdate.newLatLngBounds(
-        LatLngBounds(southwest: LatLng(minLat, minLong), northeast: LatLng(maxLat, maxLong)),
+        LatLngBounds(
+          southwest: LatLng(minLat, minLong),
+          northeast: LatLng(maxLat, maxLong),
+        ),
         30,
       ),
     );

@@ -33,7 +33,10 @@ class StringConverter {
 
   static String removeQuotationAndSpecialCharacterFromString(String value) {
     try {
-      String formatedString = value.replaceAll('"', '').replaceAll('[', '').replaceAll(']', '');
+      String formatedString = value
+          .replaceAll('"', '')
+          .replaceAll('[', '')
+          .replaceAll(']', '');
       return formatedString;
     } catch (e) {
       return value;
@@ -43,7 +46,10 @@ class StringConverter {
   static String replaceUnderscoreWithSpace(String value) {
     try {
       String formatedString = value.replaceAll('_', ' ');
-      String v = formatedString.split(" ").map((str) => str.capitalize).join(" ");
+      String v = formatedString
+          .split(" ")
+          .map((str) => str.capitalize)
+          .join(" ");
       return v;
     } catch (e) {
       return value;
@@ -137,18 +143,26 @@ class StringConverter {
   }
 
   static String mul(String first, String second) {
-    double result = (double.tryParse(first) ?? 0) * (double.tryParse(second) ?? 0);
+    double result =
+        (double.tryParse(first) ?? 0) * (double.tryParse(second) ?? 0);
     return StringConverter.formatNumber(result.toString());
   }
 
   static String calculateRate(String amount, String rate, {int precision = 2}) {
-    double result = (double.tryParse(amount) ?? 0) / (double.tryParse(rate) ?? 0);
+    double result =
+        (double.tryParse(amount) ?? 0) / (double.tryParse(rate) ?? 0);
     return StringConverter.formatNumber(
       result.toString(),
       precision: precision,
     );
   }
-  static String calculateDiscount(String price, String discount, {int precision = 2, bool isPercentageCalculation = false}) {
+
+  static String calculateDiscount(
+    String price,
+    String discount, {
+    int precision = 2,
+    bool isPercentageCalculation = false,
+  }) {
     double p = double.tryParse(price) ?? 0;
     double d = double.tryParse(discount) ?? 0;
     double result = isPercentageCalculation ? p - ((p * d) / 100) : p - d;
@@ -157,12 +171,13 @@ class StringConverter {
 }
 
 extension StringCasingExtension on String {
-  String toCapitalized() => length > 0 ? '${this[0].toUpperCase()}${substring(1).toLowerCase()}' : '';
+  String toCapitalized() =>
+      length > 0 ? '${this[0].toUpperCase()}${substring(1).toLowerCase()}' : '';
 
   String toTitleCase() => replaceAll(
-        RegExp(' +'),
-        ' ',
-      ).split(' ').map((str) => str.toCapitalized()).join(' ');
+    RegExp(' +'),
+    ' ',
+  ).split(' ').map((str) => str.toCapitalized()).join(' ');
 }
 
 extension StringExtension on String {
@@ -205,21 +220,14 @@ void printX(Object? object) {
 //       result = result.replaceAll("{$key}", value);
 //     });
 
-
 //
 
+void printD(Object? object) {
+  final log = Logger();
+  log.d(object);
+}
 
-
-
-
-
-
-  void printD(Object? object) {
-    final log = Logger();
-    log.d(object);
-  }
-
-  void printE(Object? object) {
-    final log = Logger();
-    log.e(object);
-  }
+void printE(Object? object) {
+  final log = Logger();
+  log.e(object);
+}

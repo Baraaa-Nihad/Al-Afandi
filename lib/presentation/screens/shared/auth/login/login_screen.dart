@@ -32,7 +32,10 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     Get.put(LoginRepo(apiClient: Get.find()), tag: 'driver');
-    Get.put(LoginController(loginRepo: Get.find(tag: 'driver')), tag: 'driver');
+    Get.put(
+      LoginController(loginRepo: Get.find(tag: 'driver')),
+      tag: 'driver',
+    );
 
     super.initState();
 
@@ -49,7 +52,8 @@ class _LoginScreenState extends State<LoginScreen> {
         statusBarColor: Colors.transparent,
         child: Scaffold(
           backgroundColor: MyColor.colorWhite,
-          body: GetBuilder<LoginController>(tag: 'driver',
+          body: GetBuilder<LoginController>(
+            tag: 'driver',
             builder: (controller) {
               return SafeArea(
                 child: LayoutBuilder(
@@ -78,7 +82,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                     Center(
                                       child: Image.asset(
                                         MyImages.appLogoWhite,
-                                        width: MediaQuery.of(context).size.width / 2,
+                                        width:
+                                            MediaQuery.of(context).size.width /
+                                            2,
                                       ),
                                     ),
                                     spaceDown(Dimensions.space15),
@@ -110,12 +116,18 @@ class _LoginScreenState extends State<LoginScreen> {
                                 decoration: BoxDecoration(
                                   color: MyColor.colorWhite,
                                   borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(Dimensions.radius25),
-                                    topRight: Radius.circular(Dimensions.radius25),
+                                    topLeft: Radius.circular(
+                                      Dimensions.radius25,
+                                    ),
+                                    topRight: Radius.circular(
+                                      Dimensions.radius25,
+                                    ),
                                   ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: MyColor.colorBlack.withValues(alpha: 0.05),
+                                      color: MyColor.colorBlack.withValues(
+                                        alpha: 0.05,
+                                      ),
                                       offset: const Offset(0, -30),
                                       blurRadius: 15,
                                       spreadRadius: -3,
@@ -134,22 +146,29 @@ class _LoginScreenState extends State<LoginScreen> {
                                     Form(
                                       key: formKey,
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
                                         children: [
                                           spaceDown(Dimensions.space20),
                                           CustomTextField(
-                                            controller: controller.emailController,
-                                            hintText: MyStrings.usernameOrEmail.tr,
+                                            controller:
+                                                controller.emailController,
+                                            hintText:
+                                                MyStrings.usernameOrEmail.tr,
                                             onChanged: (value) {},
-                                            focusNode: controller.emailFocusNode,
-                                            nextFocus: controller.passwordFocusNode,
-                                            textInputType: TextInputType.emailAddress,
+                                            focusNode:
+                                                controller.emailFocusNode,
+                                            nextFocus:
+                                                controller.passwordFocusNode,
+                                            textInputType:
+                                                TextInputType.emailAddress,
                                             inputAction: TextInputAction.next,
                                             prefixIcon: Padding(
-                                              padding: EdgeInsetsDirectional.only(
-                                                start: Dimensions.space12,
-                                                end: Dimensions.space8,
-                                              ),
+                                              padding:
+                                                  EdgeInsetsDirectional.only(
+                                                    start: Dimensions.space12,
+                                                    end: Dimensions.space8,
+                                                  ),
                                               child: CustomSvgPicture(
                                                 image: MyIcons.user,
                                                 color: MyColor.primaryColor,
@@ -157,8 +176,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                               ),
                                             ),
                                             validator: (value) {
-                                              if (value == null || value.isEmpty) {
-                                                return MyStrings.fieldErrorMsg.tr;
+                                              if (value == null ||
+                                                  value.isEmpty) {
+                                                return MyStrings
+                                                    .fieldErrorMsg
+                                                    .tr;
                                               } else {
                                                 return null;
                                               }
@@ -167,18 +189,21 @@ class _LoginScreenState extends State<LoginScreen> {
                                           spaceDown(Dimensions.space20),
                                           CustomTextField(
                                             hintText: MyStrings.password.tr,
-                                            controller: controller.passwordController,
-                                            focusNode: controller.passwordFocusNode,
+                                            controller:
+                                                controller.passwordController,
+                                            focusNode:
+                                                controller.passwordFocusNode,
                                             onChanged: (value) {},
                                             isShowSuffixIcon: true,
                                             isPassword: true,
                                             textInputType: TextInputType.text,
                                             inputAction: TextInputAction.done,
                                             prefixIcon: Padding(
-                                              padding: EdgeInsetsDirectional.only(
-                                                start: Dimensions.space12,
-                                                end: Dimensions.space8,
-                                              ),
+                                              padding:
+                                                  EdgeInsetsDirectional.only(
+                                                    start: Dimensions.space12,
+                                                    end: Dimensions.space8,
+                                                  ),
                                               child: CustomSvgPicture(
                                                 image: MyIcons.password,
                                                 color: MyColor.primaryColor,
@@ -186,8 +211,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                               ),
                                             ),
                                             validator: (value) {
-                                              if (value == null || value.isEmpty) {
-                                                return MyStrings.fieldErrorMsg.tr;
+                                              if (value == null ||
+                                                  value.isEmpty) {
+                                                return MyStrings
+                                                    .fieldErrorMsg
+                                                    .tr;
                                               } else {
                                                 return null;
                                               }
@@ -195,7 +223,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                           ),
                                           spaceDown(Dimensions.space15),
                                           Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
                                               Row(
                                                 children: [
@@ -204,28 +233,43 @@ class _LoginScreenState extends State<LoginScreen> {
                                                     height: 28,
                                                     child: Checkbox(
                                                       shape: RoundedRectangleBorder(
-                                                        borderRadius: BorderRadius.circular(
-                                                          Dimensions.space5,
-                                                        ),
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              Dimensions.space5,
+                                                            ),
                                                       ),
-                                                      activeColor: MyColor.primaryColor,
-                                                      checkColor: MyColor.colorWhite,
-                                                      value: controller.remember,
+                                                      activeColor:
+                                                          MyColor.primaryColor,
+                                                      checkColor:
+                                                          MyColor.colorWhite,
+                                                      value:
+                                                          controller.remember,
                                                       side: WidgetStateBorderSide.resolveWith(
                                                         (states) => BorderSide(
                                                           width: 2.0,
-                                                          color: controller.remember ? MyColor.primaryColor : MyColor.getTextFieldDisableBorder(),
+                                                          color:
+                                                              controller
+                                                                  .remember
+                                                              ? MyColor
+                                                                    .primaryColor
+                                                              : MyColor.getTextFieldDisableBorder(),
                                                         ),
                                                       ),
-                                                      onChanged: (value) => controller.changeRememberMe(),
+                                                      onChanged: (value) =>
+                                                          controller
+                                                              .changeRememberMe(),
                                                     ),
                                                   ),
                                                   spaceSide(Dimensions.space8),
                                                   InkWell(
-                                                    onTap: () => controller.changeRememberMe(),
+                                                    onTap: () => controller
+                                                        .changeRememberMe(),
                                                     child: DefaultText(
-                                                      text: MyStrings.rememberMe.tr,
-                                                      textColor: MyColor.getBodyTextColor(),
+                                                      text: MyStrings
+                                                          .rememberMe
+                                                          .tr,
+                                                      textColor:
+                                                          MyColor.getBodyTextColor(),
                                                       fontSize: 14,
                                                     ),
                                                   ),
@@ -234,48 +278,66 @@ class _LoginScreenState extends State<LoginScreen> {
                                               InkWell(
                                                 onTap: () {
                                                   controller.clearTextField();
-                                                  Get.toNamed(RouteHelper.forgotPasswordScreen);
+                                                  Get.toNamed(
+                                                    RouteHelper
+                                                        .forgotPasswordScreen,
+                                                  );
                                                 },
                                                 child: DefaultText(
-                                                  text: MyStrings.forgotPassword.tr,
-                                                  textColor: MyColor.redCancelTextColor,
-                                                  textStyle: boldDefault.copyWith(
-                                                    fontSize: Dimensions.fontLarge,
-                                                  ),
+                                                  text: MyStrings
+                                                      .forgotPassword
+                                                      .tr,
+                                                  textColor: MyColor
+                                                      .redCancelTextColor,
+                                                  textStyle: boldDefault
+                                                      .copyWith(
+                                                        fontSize: Dimensions
+                                                            .fontLarge,
+                                                      ),
                                                 ),
                                               ),
                                             ],
                                           ),
                                           spaceDown(Dimensions.space25),
                                           RoundedButton(
-                                            isLoading: controller.isSubmitLoading,
+                                            isLoading:
+                                                controller.isSubmitLoading,
                                             text: MyStrings.logIn.tr,
                                             press: () {
-                                              if (formKey.currentState!.validate()) {
+                                              if (formKey.currentState!
+                                                  .validate()) {
                                                 controller.loginUser();
                                               }
                                             },
                                           ),
                                           spaceDown(Dimensions.space30),
                                           Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
                                             children: [
                                               Text(
                                                 MyStrings.doNotHaveAccount.tr,
                                                 style: boldLarge.copyWith(
-                                                  color: MyColor.getBodyTextColor(),
+                                                  color:
+                                                      MyColor.getBodyTextColor(),
                                                   fontWeight: FontWeight.normal,
                                                 ),
                                               ),
-                                              const SizedBox(width: Dimensions.space5),
+                                              const SizedBox(
+                                                width: Dimensions.space5,
+                                              ),
                                               TextButton(
                                                 onPressed: () {
-                                                  Get.offAndToNamed(RouteHelper.registrationScreen);
+                                                  Get.offAndToNamed(
+                                                    RouteHelper
+                                                        .registrationScreen,
+                                                  );
                                                 },
                                                 child: Text(
                                                   MyStrings.register.tr,
                                                   style: boldLarge.copyWith(
-                                                    color: MyColor.getPrimaryColor(),
+                                                    color:
+                                                        MyColor.getPrimaryColor(),
                                                   ),
                                                 ),
                                               ),
@@ -292,13 +354,16 @@ class _LoginScreenState extends State<LoginScreen> {
                                         horizontal: 15,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: MyColor.primaryColor.withValues(alpha: 0.05),
+                                        color: MyColor.primaryColor.withValues(
+                                          alpha: 0.05,
+                                        ),
                                         borderRadius: BorderRadius.circular(
                                           Dimensions.radius25,
                                         ),
                                       ),
                                       child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
                                             "ترجع تسجل كراكب ؟",
@@ -307,11 +372,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                             ),
                                           ),
                                           InkWell(
-                                            onTap: () => Get.offAllNamed(RouteHelper.userRoleScreen),
+                                            onTap: () => Get.offAllNamed(
+                                              RouteHelper.userRoleScreen,
+                                            ),
                                             child: Text(
                                               "تغيير الدور؟",
                                               style: regularDefault.copyWith(
-                                                color: MyColor.redCancelTextColor,
+                                                color:
+                                                    MyColor.redCancelTextColor,
                                               ),
                                             ),
                                           ),

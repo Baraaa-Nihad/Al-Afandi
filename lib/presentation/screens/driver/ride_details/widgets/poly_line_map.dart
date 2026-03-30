@@ -16,7 +16,8 @@ class _PolyLineMapScreenState extends State<PolyLineMapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GetBuilder<RideMapController>(tag: 'driver', 
+      body: GetBuilder<RideMapController>(
+        tag: 'driver',
         builder: (controller) {
           return GoogleMap(
             trafficEnabled: false,
@@ -39,7 +40,8 @@ class _PolyLineMapScreenState extends State<PolyLineMapScreen> {
               double northEastLat;
               double northEastLong;
 
-              if (controller.pickupLatLng.latitude <= controller.destinationLatLng.latitude) {
+              if (controller.pickupLatLng.latitude <=
+                  controller.destinationLatLng.latitude) {
                 southWestLat = controller.pickupLatLng.latitude;
                 northEastLat = controller.destinationLatLng.latitude;
               } else {
@@ -47,7 +49,8 @@ class _PolyLineMapScreenState extends State<PolyLineMapScreen> {
                 southWestLat = controller.destinationLatLng.latitude;
               }
 
-              if (controller.pickupLatLng.longitude <= controller.destinationLatLng.longitude) {
+              if (controller.pickupLatLng.longitude <=
+                  controller.destinationLatLng.longitude) {
                 southWestLong = controller.pickupLatLng.longitude;
                 northEastLong = controller.destinationLatLng.longitude;
               } else {

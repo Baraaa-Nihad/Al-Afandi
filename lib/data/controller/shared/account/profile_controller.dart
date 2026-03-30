@@ -55,7 +55,8 @@ class ProfileController extends GetxController {
   Future<void> loadProfileInfo({bool shouldLoad = true}) async {
     isLoading = shouldLoad;
     model = await profileRepo.loadProfileInfo();
-    if (model.data != null && model.status?.toLowerCase() == MyStrings.success.toLowerCase()) {
+    if (model.data != null &&
+        model.status?.toLowerCase() == MyStrings.success.toLowerCase()) {
       loadData(model);
     } else {
       isLoading = false;
@@ -118,7 +119,8 @@ class ProfileController extends GetxController {
     stateController.text = model?.data?.driver?.state ?? '';
     zipCodeController.text = model?.data?.driver?.zip ?? '';
     cityController.text = model?.data?.driver?.city ?? '';
-    imageUrl = "${UrlContainer.domainUrl}/${model?.data?.driverImagePath}/${model?.data?.driver?.image}";
+    imageUrl =
+        "${UrlContainer.domainUrl}/${model?.data?.driverImagePath}/${model?.data?.driver?.image}";
     user2faIsOne = model?.data?.driver?.ts == "1" ? true : false;
     isLoading = false;
     update();
@@ -176,8 +178,8 @@ class ProfileController extends GetxController {
         );
 
         final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(SharedPreferenceHelper.userRoleKey);
-    Get.offAllNamed(RouteHelper.userRoleScreen);
+        await prefs.remove(SharedPreferenceHelper.userRoleKey);
+        Get.offAllNamed(RouteHelper.userRoleScreen);
         CustomSnackBar.error(
           errorList: model.message ?? [MyStrings.accountDeletedSuccessfully],
         );

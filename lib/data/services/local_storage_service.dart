@@ -4,41 +4,141 @@ import 'package:ovoride/core/helper/string_format_helper.dart';
 import 'package:ovoride/core/utils/app_status.dart';
 import 'package:ovoride/data/model/country_model/country_model.dart';
 import 'package:ovoride/data/model/general_setting/general_setting_response_model.dart';
+import 'package:ovoride/data/model/notification/notification_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalStorageService {
   final SharedPreferences sharedPreferences;
 
   LocalStorageService({required this.sharedPreferences});
-  void storeNotifications(List<String> notificationsJsonList) {
-    sharedPreferences.setStringList('notification_list_key', notificationsJsonList);
+  void storeNotifications(List<String> notificationsJsonList, {String? role}) {
+    sharedPreferences.setStringList(
+      _resolveNotificationStorageKey(sharedPreferences, role: role),
+      notificationsJsonList,
+    );
   }
 
   // جلب قائمة الإشعارات المخزنة
-  List<String> getStoredNotifications() {
-    return sharedPreferences.getStringList('notification_list_key') ?? [];
+  List<String> getStoredNotifications({String? role}) {
+    return _readStoredNotifications(sharedPreferences, role: role);
   }
 
   // إضافة إشعار واحد جديد للقائمة (Update)
-  void addNewNotification(String notificationJson) {
-    List<String> currentList = getStoredNotifications();
-    currentList.insert(0, notificationJson); // إضافته في البداية ليظهر كأحدث إشعار
+  void addNewNotification(String notificationJson, {String? role}) {
+    List<String> currentList = getStoredNotifications(role: role);
+    currentList.insert(
+      0,
+      notificationJson,
+    ); // إضافته في البداية ليظهر كأحدث إشعار
 
     // الاحتفاظ بآخر 50 إشعاراً فقط لضمان سرعة التطبيق
     if (currentList.length > 50) {
       currentList = currentList.sublist(0, 50);
     }
-    storeNotifications(currentList);
+    storeNotifications(currentList, role: role);
   }
 
   // مسح جميع الإشعارات
-  void clearNotifications() {
-    sharedPreferences.remove('notification_list_key');
+  void clearNotifications({String? role}) {
+    sharedPreferences.remove(
+      _resolveNotificationStorageKey(sharedPreferences, role: role),
+    );
+  }
+
+  void addNotificationModel(NotificationModel notification, {String? role}) {
+    _storeNotificationModel(sharedPreferences, notification, role: role);
+  }
+
+  static Future<void> addNotificationModelToPreferences(
+    SharedPreferences sharedPreferences,
+    NotificationModel notification, {
+    String? role,
+  }) {
+    _storeNotificationModel(sharedPreferences, notification, role: role);
+    return Future<void>.value();
+  }
+
+  static void _storeNotificationModel(
+    SharedPreferences sharedPreferences,
+    NotificationModel notification, {
+    String? role,
+  }) {
+    List<String> currentList = _readStoredNotifications(
+      sharedPreferences,
+      role: role,
+    );
+
+    final bool alreadyExists = currentList.any((String rawNotification) {
+      final NotificationModel? existing = _parseStoredNotification(
+        rawNotification,
+      );
+      return existing?.fingerprint == notification.fingerprint;
+    });
+
+    if (alreadyExists) {
+      return;
+    }
+
+    currentList.insert(0, jsonEncode(notification.toJson()));
+    if (currentList.length > 50) {
+      currentList = currentList.sublist(0, 50);
+    }
+
+    sharedPreferences.setStringList(
+      _resolveNotificationStorageKey(sharedPreferences, role: role),
+      currentList,
+    );
+  }
+
+  static List<String> _readStoredNotifications(
+    SharedPreferences sharedPreferences, {
+    String? role,
+  }) {
+    final String scopedKey = _resolveNotificationStorageKey(
+      sharedPreferences,
+      role: role,
+    );
+    final List<String>? scopedList = sharedPreferences.getStringList(scopedKey);
+    if (scopedList != null) {
+      return List<String>.from(scopedList);
+    }
+
+    return List<String>.from(
+      sharedPreferences.getStringList(
+            SharedPreferenceHelper.notificationListKey,
+          ) ??
+          <String>[],
+    );
+  }
+
+  static String _resolveNotificationStorageKey(
+    SharedPreferences sharedPreferences, {
+    String? role,
+  }) {
+    final String resolvedRole =
+        role ??
+        sharedPreferences.getString(SharedPreferenceHelper.userRoleKey) ??
+        'driver';
+    return '${SharedPreferenceHelper.notificationListKey}_$resolvedRole';
+  }
+
+  static NotificationModel? _parseStoredNotification(String rawNotification) {
+    try {
+      final dynamic decoded = jsonDecode(rawNotification);
+      if (decoded is! Map) {
+        return null;
+      }
+
+      return NotificationModel.fromJson(Map<String, dynamic>.from(decoded));
+    } catch (_) {
+      return null;
+    }
   }
 
   // Token Management
   String getToken() {
-    return sharedPreferences.getString(SharedPreferenceHelper.accessTokenKey) ?? '';
+    return sharedPreferences.getString(SharedPreferenceHelper.accessTokenKey) ??
+        '';
   }
 
   String getTokenType() {
@@ -63,7 +163,8 @@ class LocalStorageService {
   }
 
   bool getRememberMe() {
-    return sharedPreferences.getBool(SharedPreferenceHelper.rememberMeKey) ?? false;
+    return sharedPreferences.getBool(SharedPreferenceHelper.rememberMeKey) ??
+        false;
   }
 
   // General Settings
@@ -73,7 +174,9 @@ class LocalStorageService {
   }
 
   GeneralSettingResponseModel getGeneralSettings() {
-    String pre = sharedPreferences.getString(SharedPreferenceHelper.generalSettingKey) ?? '{}';
+    String pre =
+        sharedPreferences.getString(SharedPreferenceHelper.generalSettingKey) ??
+        '{}';
     try {
       return GeneralSettingResponseModel.fromJson(jsonDecode(pre));
     } catch (e) {
@@ -91,7 +194,8 @@ class LocalStorageService {
   }
 
   PusherConfig getPushConfig() {
-    String pre = sharedPreferences.getString(
+    String pre =
+        sharedPreferences.getString(
           SharedPreferenceHelper.pusherConfigSettingKey,
         ) ??
         '{}';
@@ -125,7 +229,8 @@ class LocalStorageService {
   }
 
   bool isNotificationAudioEnable() {
-    String pre = sharedPreferences.getString(
+    String pre =
+        sharedPreferences.getString(
           SharedPreferenceHelper.notificationAudioEnableKey,
         ) ??
         '1';
@@ -134,11 +239,13 @@ class LocalStorageService {
 
   // User Information
   String getUserEmail() {
-    return sharedPreferences.getString(SharedPreferenceHelper.userEmailKey) ?? '';
+    return sharedPreferences.getString(SharedPreferenceHelper.userEmailKey) ??
+        '';
   }
 
   String getUserName() {
-    return sharedPreferences.getString(SharedPreferenceHelper.userNameKey) ?? '';
+    return sharedPreferences.getString(SharedPreferenceHelper.userNameKey) ??
+        '';
   }
 
   String getUserID() {
@@ -146,7 +253,8 @@ class LocalStorageService {
   }
 
   String getUserPhone() {
-    String phone = sharedPreferences.getString(
+    String phone =
+        sharedPreferences.getString(
           SharedPreferenceHelper.userPhoneNumberKey,
         ) ??
         '';
@@ -160,7 +268,8 @@ class LocalStorageService {
   }
 
   String getCurrentTab() {
-    return sharedPreferences.getString(SharedPreferenceHelper.currentTabKey) ?? '1';
+    return sharedPreferences.getString(SharedPreferenceHelper.currentTabKey) ??
+        '1';
   }
 
   String getMinimumRideDistance() {
@@ -190,7 +299,9 @@ class LocalStorageService {
 
   String getCurrency({bool isSymbol = false}) {
     GeneralSettingResponseModel model = getGeneralSettings();
-    return isSymbol ? model.data?.generalSetting?.curSym ?? '' : model.data?.generalSetting?.curText ?? '';
+    return isSymbol
+        ? model.data?.generalSetting?.curSym ?? ''
+        : model.data?.generalSetting?.curText ?? '';
   }
 
   List<Countries> getOperatingCountries() {
@@ -220,7 +331,8 @@ class LocalStorageService {
 
   String getDistanceUnit() {
     GeneralSettingResponseModel model = getGeneralSettings();
-    return model.data?.generalSetting?.distanceUnit ?? AppStatus.DISTANCE_UNIT_KM;
+    return model.data?.generalSetting?.distanceUnit ??
+        AppStatus.DISTANCE_UNIT_KM;
   }
 
   bool getUserOnlineStatus() {
