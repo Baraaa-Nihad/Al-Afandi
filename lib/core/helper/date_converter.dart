@@ -23,6 +23,11 @@ class DateConverter {
     }
   }
 
+  String getMonthName(int monthNumber) {
+    List<String> months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+    return months[monthNumber - 1];
+  }
+
   /// Get user timezone location, fallback to UTC
   static tz.Location _getUserTimeZone() {
     try {
