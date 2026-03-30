@@ -1,7 +1,7 @@
 import 'package:ovoride/core/utils/dimensions.dart';
 import 'package:ovoride/core/utils/my_color.dart';
 import 'package:ovoride/core/utils/my_strings.dart';
-import 'package:ovoride/core/utils/style.dart';
+import 'package:ovoride/core/utils/style.dart'; // تأكد من استيراد ملف الستايبل
 import 'package:ovoride/data/controller/rider/ride/all_ride_controller.dart';
 import 'package:ovoride/presentation/screens/rider/ride/section/all_rides_list_section.dart';
 import 'package:flutter/material.dart';
@@ -17,8 +17,6 @@ class RiderRideActivityScreen extends StatefulWidget {
 
 class _RiderRideActivityScreenState extends State<RiderRideActivityScreen> with SingleTickerProviderStateMixin {
   ScrollController scrollController = ScrollController();
-
-  // تأكد أن هذا الرقم يطابق تماماً عدد العناصر في قائمة الـ tabs بالأسفل
   static const int totalTabs = 6;
 
   void scrollListener() {
@@ -33,9 +31,7 @@ class _RiderRideActivityScreenState extends State<RiderRideActivityScreen> with 
   void initState() {
     super.initState();
     var controller = Get.find<AllRideController>();
-
-    // إعادة تهيئة الـ TabController بطول مطابق (6)
-    controller.tabController = TabController(length: totalTabs, vsync: this, initialIndex: controller.selectedTab < totalTabs ? controller.selectedTab : 0);
+    controller.tabController = TabController(length: totalTabs, vsync: this, initialIndex: controller.selectedTab);
 
     WidgetsBinding.instance.addPostFrameCallback((time) {
       controller.initialData(
@@ -49,10 +45,6 @@ class _RiderRideActivityScreenState extends State<RiderRideActivityScreen> with 
 
   @override
   void dispose() {
-    // إغلاق الـ TabController لتجنب تسريب الذاكرة (Memory Leak)
-    var controller = Get.find<AllRideController>();
-    controller.tabController.dispose();
-
     scrollController.removeListener(scrollListener);
     scrollController.dispose();
     super.dispose();
@@ -61,6 +53,7 @@ class _RiderRideActivityScreenState extends State<RiderRideActivityScreen> with 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // لون خلفية هادئ جداً ليبرز البطاقات البيضاء
       backgroundColor: const Color(0xFFF3F4F6),
       body: SafeArea(
         child: GetBuilder<AllRideController>(
@@ -68,14 +61,15 @@ class _RiderRideActivityScreenState extends State<RiderRideActivityScreen> with 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // --- Header Section ---
+                // --- الجزء العلوي الإبداعي (Header) ---
                 Padding(
                   padding: const EdgeInsets.fromLTRB(Dimensions.space20, Dimensions.space20, Dimensions.space20, Dimensions.space10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // العنوان الجريء (Modern Large Title)
                       Text(
-                        MyStrings.allRides.tr,
+                        MyStrings.allRides.tr, // أو "مشاويري"
                         style: boldExtraLarge.copyWith(
                           fontSize: 28,
                           color: MyColor.getHeadingTextColor(),
@@ -84,30 +78,28 @@ class _RiderRideActivityScreenState extends State<RiderRideActivityScreen> with 
                       ),
                       const SizedBox(height: Dimensions.space5),
                       Text(
-                        "تابع سجل رحلاتك وحالتها الحالية",
+                        "تابع سجل رحلاتك وحالتها الحالية ",
                         style: regularDefault.copyWith(color: MyColor.getGreyColor(), fontSize: 13),
                       ),
                     ],
                   ),
                 ),
 
-                // --- Pill Tabs Section ---
+                // --- شريط التبويبات بنظام الكبسولة (Pill Tabs) ---
                 Container(
                   height: 50,
                   margin: const EdgeInsets.symmetric(vertical: Dimensions.space5),
                   child: Stack(
                     children: [
+                      // 👇 التاب بار نفسه
                       TabBar(
                         controller: controller.tabController,
                         isScrollable: true,
                         tabAlignment: TabAlignment.start,
-                        onTap: (i) {
-                          controller.changeTab(i);
-                        },
+                        onTap: (i) => controller.changeTab(i),
                         indicatorColor: Colors.transparent,
                         dividerColor: Colors.transparent,
                         labelPadding: const EdgeInsets.symmetric(horizontal: 8),
-                        // تأكد أن عدد العناصر هنا هو 6 بالضبط
                         tabs: [
                           _buildPillTab(MyStrings.allRides.tr, 0, controller.selectedTab),
                           _buildPillTab(MyStrings.activeRide.tr, 1, controller.selectedTab),
@@ -118,26 +110,30 @@ class _RiderRideActivityScreenState extends State<RiderRideActivityScreen> with 
                         ],
                       ),
 
-                      // Right Gradient
+                      // التدرج اللوني من الجهة اليمنى (البداية)
                       Positioned(
                         left: 0,
                         top: 0,
                         bottom: 0,
-                        width: 30,
+                        width: 30, // عرض منطقة التدرج
                         child: IgnorePointer(
+                          // لضمان عدم حجب الضغط عن العناصر تحتها
                           child: Container(
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
-                                colors: [const Color(0xFFF3F4F6), const Color(0xFFF3F4F6).withOpacity(0)],
+                                colors: [
+                                  MyColor.getCardBgColor(), // نفس لون خلفية الصفحة ليختفي التاب تحته
+                                  MyColor.getCardBgColor().withOpacity(0),
+                                ],
                               ),
                             ),
                           ),
                         ),
                       ),
 
-                      // Left Gradient
+                      // التدرج اللوني من الجهة اليسرى (النهاية)
                       Positioned(
                         right: 0,
                         top: 0,
@@ -149,7 +145,10 @@ class _RiderRideActivityScreenState extends State<RiderRideActivityScreen> with 
                               gradient: LinearGradient(
                                 begin: Alignment.centerRight,
                                 end: Alignment.centerLeft,
-                                colors: [const Color(0xFFF3F4F6), const Color(0xFFF3F4F6).withOpacity(0)],
+                                colors: [
+                                  MyColor.getCardBgColor(),
+                                  MyColor.getCardBgColor().withOpacity(0),
+                                ],
                               ),
                             ),
                           ),
@@ -159,7 +158,7 @@ class _RiderRideActivityScreenState extends State<RiderRideActivityScreen> with 
                   ),
                 ),
 
-                // --- List Section ---
+                // --- مساحة القائمة ---
                 Expanded(
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: Dimensions.space15),
@@ -176,6 +175,7 @@ class _RiderRideActivityScreenState extends State<RiderRideActivityScreen> with 
     );
   }
 
+  // دالة بناء الكبسولة (The Pill Tab UI)
   Widget _buildPillTab(String text, int index, int selectedIndex) {
     bool isSelected = index == selectedIndex;
     return Tab(

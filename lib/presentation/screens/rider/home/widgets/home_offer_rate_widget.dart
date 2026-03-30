@@ -20,6 +20,18 @@ class HomeOfferRateWidget extends StatefulWidget {
 }
 
 class _HomeOfferRateWidgetState extends State<HomeOfferRateWidget> {
+  @override
+  void initState() {
+    super.initState();
+    // تعيين السعر المقترح كقيمة افتراضية عند فتح الصفحة
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final controller = Get.find<HomeController>();
+      double recAmount = double.tryParse(controller.selectedService.recommendAmount.toString()) ?? 0.0;
+      controller.amountController.text = recAmount.toStringAsFixed(1);
+      setState(() {});
+    });
+  }
+
   // دالة قوية لتحديث السعر تضمن التغيير في كل ضغطة
   void _modifyPrice(double amountToAdd, HomeController controller, {bool isSetExplicit = false}) {
     // 1. قراءة القيمة الحالية من الحقل وتحويلها لرقم
