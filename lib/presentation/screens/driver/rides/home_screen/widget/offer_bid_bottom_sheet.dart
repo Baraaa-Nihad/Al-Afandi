@@ -1,19 +1,15 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:ovoride/core/helper/string_format_helper.dart';
 import 'package:ovoride/core/utils/dimensions.dart';
 import 'package:ovoride/core/utils/my_color.dart';
 import 'package:ovoride/core/utils/my_strings.dart';
 import 'package:ovoride/core/utils/style.dart';
-import 'package:ovoride/core/utils/util.dart';
 import 'package:ovoride/data/controller/driver/dashboard/dashboard_controller.dart';
 import 'package:ovoride/data/model/global/ride/ride_model.dart';
 import 'package:ovoride/presentation/components/bottom-sheet/bottom_sheet_header_row.dart';
 import 'package:ovoride/presentation/components/snack_bar/show_custom_snackbar.dart';
 import 'package:ovoride/presentation/components/text/header_text.dart';
-import 'package:ovoride/data/services/api_client.dart';
 
 class OfferBidBottomSheet extends StatefulWidget {
   final RideModel ride;

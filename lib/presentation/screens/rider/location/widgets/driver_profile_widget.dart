@@ -109,7 +109,7 @@ class DriverProfileWidget extends StatelessWidget {
                       ),
                       spaceDown(Dimensions.space3),
                       Text(
-                        "$totalCompletedRide ".toArabicNumbers() + " طلبية ناجحة ",
+                        "${"$totalCompletedRide ".toArabicNumbers()} طلبية ناجحة ",
                         style: regularDefault.copyWith(fontSize: Dimensions.fontDefault, color: MyColor.getBodyTextColor()),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,

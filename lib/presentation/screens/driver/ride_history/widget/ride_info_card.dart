@@ -133,7 +133,7 @@ class _RideInfoCardState extends State<RideInfoCard> with SingleTickerProviderSt
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    _formatDistance(widget.ride.distance).toArabicNumbers() + " كم",
+                    "${_formatDistance(widget.ride.distance).toArabicNumbers()} كم",
                     style: regularSmall.copyWith(color: MyColor.getGreyColor(), fontSize: 10),
                   ),
                 ],

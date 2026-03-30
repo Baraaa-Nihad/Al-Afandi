@@ -46,7 +46,7 @@ class PaymentRideDetailsCard extends StatelessWidget {
   }
 
   String _formattedRating() {
-    return '${ride.driver?.avgRating ?? '0.0'}'.toArabicNumbers();
+    return (ride.driver?.avgRating ?? '0.0').toArabicNumbers();
   }
 
   String _formattedDistance() {

@@ -338,7 +338,7 @@ class _ProfileCompleteScreenState extends State<ProfileCompleteScreen> {
                                         const SizedBox(width: 10),
                                         Expanded(
                                           child: Text(
-                                            controller.selectedAddressText.isEmpty ? 'جارٍ تحديد العنوان...' : " مكانك الآن : " + controller.selectedAddressText.split(RegExp(r'[,|،]')).map((e) => e.trim()).where((e) => e.isNotEmpty).toSet().join(' - '),
+                                            controller.selectedAddressText.isEmpty ? 'جارٍ تحديد العنوان...' : " مكانك الآن : ${controller.selectedAddressText.split(RegExp(r'[,|،]')).map((e) => e.trim()).where((e) => e.isNotEmpty).toSet().join(' - ')}",
                                             style: regularDefault.copyWith(
                                               color: MyColor.getHeadingTextColor(),
                                               height: 1.5,
