@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:ovoride/core/utils/dimensions.dart';
 import 'package:ovoride/core/utils/my_color.dart';
 import 'package:ovoride/core/utils/my_strings.dart';
@@ -10,7 +11,6 @@ import 'package:ovoride/presentation/components/custom_loader/custom_loader.dart
 import 'package:ovoride/presentation/components/no_data.dart';
 import 'package:ovoride/presentation/components/shimmer/transaction_card_shimmer.dart';
 import 'package:ovoride/presentation/screens/rider/payment_history/widget/custom_payment_card.dart';
-import 'package:get/get.dart';
 
 class RiderPaymentHistoryScreen extends StatefulWidget {
   const RiderPaymentHistoryScreen({super.key});
@@ -22,28 +22,23 @@ class RiderPaymentHistoryScreen extends StatefulWidget {
 class _RiderPaymentHistoryScreenState extends State<RiderPaymentHistoryScreen> {
   final ScrollController scrollController = ScrollController();
 
-  void fetchData() {
-    Get.find<PaymentHistoryController>().loadTransaction();
-  }
-
-  void scrollListener() {
-    if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
-      if (Get.find<PaymentHistoryController>().hasNext()) {
-        fetchData();
-      }
-    }
-  }
-
   @override
   void initState() {
-    final controller = Get.find<PaymentHistoryController>();
-
     super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final controller = Get.find<PaymentHistoryController>();
       controller.initData();
-      scrollController.addListener(scrollListener);
+      scrollController.addListener(_scrollListener);
     });
+  }
+
+  void _scrollListener() {
+    if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
+      final controller = Get.find<PaymentHistoryController>();
+      if (controller.hasNext()) {
+        controller.loadTransaction();
+      }
+    }
   }
 
   @override
@@ -60,7 +55,7 @@ class _RiderPaymentHistoryScreenState extends State<RiderPaymentHistoryScreen> {
           backgroundColor: MyColor.secondaryScreenBgColor,
           appBar: CustomAppBar(
             isTitleCenter: false,
-            elevation: 1,
+            elevation: 0.5,
             title: MyStrings.payment,
           ),
           body: RefreshIndicator(
@@ -69,63 +64,70 @@ class _RiderPaymentHistoryScreenState extends State<RiderPaymentHistoryScreen> {
             onRefresh: () async {
               controller.initData(shouldLoad: true);
             },
-            child: controller.isLoading
-                ? ListView.separated(
-                    itemCount: 20,
-                    padding: EdgeInsets.symmetric(
-                      horizontal: Dimensions.space16,
-                      vertical: Dimensions.space16,
-                    ),
-                    separatorBuilder: (context, index) => const SizedBox(height: Dimensions.space10),
-                    itemBuilder: (context, index) {
-                      return Container(
-                          decoration: BoxDecoration(
-                            color: MyColor.getCardBgColor(),
-                            boxShadow: MyUtils.getCardShadow(),
-                            borderRadius: BorderRadius.circular(Dimensions.moreRadius),
-                          ),
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: Dimensions.space16,
-                            vertical: Dimensions.space16,
-                          ),
-                          child: TransactionCardShimmer());
-                    },
-                  )
-                : controller.transactionList.isEmpty && controller.isLoading == false
-                    ? Center(child: NoDataWidget(text: MyStrings.noTrxFound))
-                    : ListView.separated(
-                        controller: scrollController,
-                        physics: const AlwaysScrollableScrollPhysics(parent: ClampingScrollPhysics()),
-                        shrinkWrap: true,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: Dimensions.space16,
-                          vertical: Dimensions.space16,
-                        ),
-                        scrollDirection: Axis.vertical,
-                        itemCount: controller.transactionList.length + 1,
-                        separatorBuilder: (context, index) => const SizedBox(height: Dimensions.space10),
-                        itemBuilder: (context, index) {
-                          if (controller.transactionList.length == index) {
-                            return controller.hasNext()
-                                ? Container(
-                                    height: 40,
-                                    width: MediaQuery.of(context).size.width,
-                                    margin: const EdgeInsets.all(5),
-                                    child: const CustomLoader(),
-                                  )
-                                : const SizedBox();
-                          }
-
-                          return RiderCustomPaymentCard(
-                            index: index,
-                            expandIndex: controller.expandIndex,
-                          );
-                        },
-                      ),
+            child: _buildUI(controller),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildUI(PaymentHistoryController controller) {
+    // حالة التحميل الأولية
+    if (controller.isLoading) {
+      return ListView.separated(
+        itemCount: 10,
+        padding: const EdgeInsets.all(Dimensions.space15),
+        separatorBuilder: (context, index) => const SizedBox(height: Dimensions.space12),
+        itemBuilder: (context, index) => _shimmerContainer(),
+      );
+    }
+
+    // حالة عدم وجود بيانات
+    if (controller.transactionList.isEmpty) {
+      return const Center(child: NoDataWidget(text: MyStrings.noTrxFound));
+    }
+
+    // القائمة الفعلية
+    return ListView.separated(
+      controller: scrollController,
+      physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+      padding: const EdgeInsets.symmetric(horizontal: Dimensions.space15, vertical: Dimensions.space20),
+      itemCount: controller.transactionList.length + 1,
+      separatorBuilder: (context, index) => const SizedBox(height: Dimensions.space12),
+      itemBuilder: (context, index) {
+        if (index == controller.transactionList.length) {
+          return controller.hasNext()
+              ? const Padding(
+                  padding: EdgeInsets.symmetric(vertical: Dimensions.space15),
+                  child: CustomLoader(),
+                )
+              : const SizedBox(height: Dimensions.space20);
+        }
+
+        // استخدام الكارد الأصلي مع تحسين بسيط في الحاوية الخارجية لجمالية التصميم
+        return Container(
+          decoration: BoxDecoration(
+            boxShadow: MyUtils.getCardShadow(),
+            borderRadius: BorderRadius.circular(Dimensions.mediumRadius),
+          ),
+          child: RiderCustomPaymentCard(
+            index: index,
+            expandIndex: controller.expandIndex,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _shimmerContainer() {
+    return Container(
+      padding: const EdgeInsets.all(Dimensions.space15),
+      decoration: BoxDecoration(
+        color: MyColor.getCardBgColor(),
+        borderRadius: BorderRadius.circular(Dimensions.mediumRadius),
+        boxShadow: MyUtils.getCardShadow(),
+      ),
+      child: const TransactionCardShimmer(),
     );
   }
 }

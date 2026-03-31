@@ -33,7 +33,8 @@ class CustomPaymentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<PaymentHistoryController>(tag: 'driver', 
+    return GetBuilder<PaymentHistoryController>(
+      tag: 'driver',
       builder: (controller) => CustomAppCard(
         width: double.infinity,
         child: Column(
